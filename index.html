@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAG Tech - Monthly P&L Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;color:#1a1a1a;font-size:12px;background:#fff;padding:16px;padding-bottom:80px}
+.hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;border-bottom:2px solid #1a1a1a;padding-bottom:8px}
+.hd h1{font-size:18px;font-weight:600}
+.hd .dt{font-size:11px;color:#888}
+.kpi{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px}
+.kpi .m{background:#f5f5f5;border-radius:8px;padding:10px 12px}
+.kpi .l{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.5px}
+.kpi .v{font-size:18px;font-weight:600;margin-top:2px}
+.kpi .d{font-size:10px;margin-top:1px}
+.up{color:#1D9E75}.dn{color:#E24B4A}.warn{color:#BA7517}
+.sec{font-size:14px;font-weight:600;margin:22px 0 8px;padding-bottom:4px;border-bottom:1px solid #e5e5e5}
+.leg{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;color:#888;margin-bottom:4px}
+.leg span{display:flex;align-items:center;gap:3px}
+.dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{text-align:left;padding:4px;font-weight:600;font-size:8.5px;color:#888;text-transform:uppercase;letter-spacing:.2px;border-bottom:2px solid #ccc;position:sticky;top:0;background:#fff;z-index:2}
+th.r{text-align:right}
+td{padding:3px 4px;border-bottom:1px solid #f0f0f0;font-size:10.5px;white-space:nowrap}
+td.r{text-align:right}
+tr:hover{background:#fafafa}
+.trsec td{font-weight:600;font-size:11px;background:#f5f5f5;border-bottom:1px solid #ccc;padding:5px 4px}
+.gp td{font-weight:600;background:rgba(29,158,117,.05);border-top:1px solid #e5e5e5}
+.gpp td{font-size:9.5px;color:#999;background:rgba(29,158,117,.02)}
+.subtot td{font-weight:600;border-top:1px solid #ddd}
+.bigtot td{font-weight:600;border-top:2px solid #999;background:#f5f5f5;padding:4px;font-size:11px}
+.i1{padding-left:14px!important}.i2{padding-left:26px!important}
+.sep{border-left:2px solid #ccc}
+.new{font-size:7px;background:#FCE4EC;color:#791F1F;padding:1px 4px;border-radius:6px;margin-left:2px;font-weight:600}
+.flag{font-size:7px;background:#FFF2CC;color:#633806;padding:1px 4px;border-radius:6px;margin-left:2px;font-weight:600}
+.flat{color:#ccc}
+.fb{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.fb button{font-size:10px;padding:3px 10px;border-radius:14px;cursor:pointer;background:transparent;border:1px solid #ccc;color:#888;font-family:inherit}
+.fb button.a{background:#E6F1FB;color:#185FA5;border-color:#85B7EB}
+.alert{border-left:3px solid #E24B4A;background:#fff;border-top:1px solid #eee;border-right:1px solid #eee;border-bottom:1px solid #eee;padding:8px 12px;margin-bottom:6px}
+.alert h4{font-size:11px;font-weight:600;margin-bottom:2px}
+.alert p{font-size:10px;color:#888;line-height:1.4}
+.alertw{border-left-color:#BA7517}
+.pill{display:inline-block;font-size:8px;padding:1px 5px;border-radius:6px;font-weight:600;margin-left:3px}
+.pill-r{background:#FCE4EC;color:#791F1F}.pill-y{background:#FFF2CC;color:#633806}
+.g2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+#gate{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center}
+#gate .box{text-align:center;max-width:360px;padding:40px}
+#gate h2{font-size:20px;font-weight:600;margin-bottom:6px}
+#gate .sub{font-size:13px;color:#888;margin-bottom:24px}
+#gate input{width:100%;padding:10px 14px;border:1px solid #ccc;border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px}
+#gate input:focus{border-color:#185FA5}
+#gate button{width:100%;padding:10px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer;font-weight:500}
+#gate button:hover{background:#0C447C}
+#gate .err{color:#E24B4A;font-size:12px;margin-top:8px;display:none}
+#dashboard{display:none}
+#chatToggle{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:#185FA5;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:600;display:none;align-items:center;justify-content:center;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2);font-family:inherit;letter-spacing:.3px}
+#chatToggle:hover{background:#0C447C}
+#chatPanel{position:fixed;bottom:20px;right:20px;width:440px;height:580px;background:#fff;border:1px solid #ddd;border-radius:12px;display:none;flex-direction:column;z-index:101;box-shadow:0 4px 24px rgba(0,0,0,.15)}
+#chatHeader{padding:12px 16px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;border-radius:12px 12px 0 0;background:#f8f8f8}
+#chatHeader h3{font-size:14px;font-weight:600}
+#chatHeader .cls{background:none;border:none;font-size:20px;cursor:pointer;color:#888;padding:0 4px;line-height:1}
+#chatHeader .cls:hover{color:#1a1a1a}
+#chatMessages{flex:1;overflow-y:auto;padding:12px 16px;font-size:13px;line-height:1.6}
+.msg{margin-bottom:10px;padding:8px 12px;border-radius:8px;max-width:92%}
+.msg.user{background:#E6F1FB;color:#042C53;margin-left:auto;text-align:right}
+.msg.asst{background:#f5f5f5;color:#1a1a1a;white-space:pre-wrap;word-wrap:break-word}
+.msg.sys{background:#FFF2CC;color:#633806;font-size:11px;text-align:center;max-width:100%;padding:6px 10px}
+.msg.loading{color:#888;font-style:italic}
+.quick-q{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick-q button{font-size:11px;padding:5px 10px;border-radius:14px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#555;font-family:inherit;text-align:left;line-height:1.3}
+.quick-q button:hover{background:#E6F1FB;border-color:#85B7EB;color:#185FA5}
+#chatInputBar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #eee}
+#chatInputBar input{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+#chatInputBar input:focus{border-color:#185FA5}
+#chatInputBar button{padding:8px 16px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500}
+#chatInputBar button:hover{background:#0C447C}
+#chatInputBar button:disabled{background:#ccc;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div id="gate"><div class="box">
+<h2>DAG Tech</h2>
+<div class="sub">Monthly P&L Dashboard — Confidential</div>
+<input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPw()">
+<button onclick="checkPw()">Access dashboard</button>
+<div class="err" id="pwErr">Incorrect password. Please try again.</div>
+</div></div>
+
+<div id="dashboard">
+<div class="hd"><h1>DAG Tech - Monthly P&L Dashboard</h1><div class="dt" id="hdDt"></div></div>
+<div class="kpi" id="kpiRow"></div>
+<div class="sec">1. Revenue, profit & margin trend — full year</div>
+<div class="leg"><span><span class="dot" style="background:#85B7EB"></span>Revenue</span><span><span class="dot" style="background:#5DCAA5"></span>Net profit</span><span><span class="dot" style="background:#BA7517"></span>GP %</span><span><span class="dot" style="background:rgba(226,75,74,.5)"></span>NP %</span></div>
+<div style="position:relative;width:100%;height:240px;margin-bottom:12px"><canvas id="c1"></canvas></div>
+<div class="sec">2. Condensed P&L — all months ($K)</div>
+<div style="overflow-x:auto;margin-bottom:8px"><table id="sumTbl"></table></div>
+<div class="sec">3. Division gross profit trend ($K)</div>
+<div style="overflow-x:auto;margin-bottom:8px"><table id="divGPTbl"></table></div>
+<div class="g2">
+<div><div class="sec" style="margin-top:4px">4. Div 8 growth trajectory</div><div style="position:relative;width:100%;height:200px"><canvas id="c2"></canvas></div></div>
+<div><div class="sec" style="margin-top:4px">5. Division GP% vs target</div><div style="position:relative;width:100%;height:200px"><canvas id="c3"></canvas></div></div>
+</div>
+<div class="sec">6. Detailed divisional P&L — last 4 months + variance</div>
+<div class="fb" id="filterBtns"></div>
+<div style="overflow-x:auto"><table id="pnl"><thead><tr><th style="min-width:190px">Line item</th><th class="r" id="th0" style="min-width:62px"></th><th class="r" id="th1" style="min-width:62px"></th><th class="r" id="th2" style="min-width:62px"></th><th class="r sep" id="th3" style="min-width:68px;color:#1a1a1a"></th><th class="r sep" style="min-width:58px">MoM Δ</th><th class="r" style="min-width:46px">MoM %</th><th class="r sep" style="min-width:62px">3-Mo avg</th><th class="r" style="min-width:58px">vs Avg Δ</th><th class="r" style="min-width:46px">vs Avg %</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="sec">7. Expense trend — full year</div>
+<div class="leg"><span><span class="dot" style="background:#85B7EB"></span>Operating</span><span><span class="dot" style="background:#AFA9EC"></span>Growth</span><span><span class="dot" style="background:#E24B4A;opacity:.6"></span>Total</span></div>
+<div style="position:relative;width:100%;height:200px;margin-bottom:8px"><canvas id="c4"></canvas></div>
+<div class="sec">8. Flagged items — action required</div>
+<div id="flags"></div>
+<div style="background:#f5f5f5;border-radius:8px;padding:10px 12px;margin-top:16px;border-left:4px solid #185FA5"><div style="font-size:12px;font-weight:600;margin-bottom:3px">Month-end summary</div><div style="font-size:11px;color:#888;line-height:1.5" id="summary"></div></div>
+<div style="font-size:10px;color:#bbb;text-align:right;margin-top:8px" id="updAt"></div>
+</div>
+
+<button id="chatToggle" onclick="toggleChat()">Ask AI</button>
+<div id="chatPanel">
+<div id="chatHeader"><h3>Ask the P&L analyst</h3><button class="cls" onclick="toggleChat()">&times;</button></div>
+<div id="chatMessages">
+<div class="msg sys">I have DAG Tech's full P&L (Jan 2025 – Jan 2026) and MSP industry benchmarks. Ask me anything about performance, trends, or how DAG compares to peers.</div>
+<div class="quick-q">
+<button onclick="askQ(this.textContent)">How does our GP% compare to similar MSPs?</button>
+<button onclick="askQ(this.textContent)">What's driving the Jan margin compression?</button>
+<button onclick="askQ(this.textContent)">Which division needs the most attention?</button>
+<button onclick="askQ(this.textContent)">If we add 3 A+ Animal clients, what happens?</button>
+<button onclick="askQ(this.textContent)">What should our top 3 priorities be for 2026?</button>
+<button onclick="askQ(this.textContent)">How does our expense ratio compare to peers?</button>
+</div>
+</div>
+<div id="chatInputBar"><input type="text" id="chatQ" placeholder="Ask about the P&L..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()"><button id="chatBtn" onclick="sendChat()">Send</button></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+var D = DAG_DATA;
+
+function checkPw(){if(document.getElementById('pwInput').value==='G0dz1ll@'){document.getElementById('gate').style.display='none';document.getElementById('dashboard').style.display='block';document.getElementById('chatToggle').style.display='flex';initDashboard();}else{document.getElementById('pwErr').style.display='block';document.getElementById('pwInput').value='';document.getElementById('pwInput').focus();}}
+document.getElementById('pwInput').focus();
+
+var chatOpen=false;
+function toggleChat(){chatOpen=!chatOpen;document.getElementById('chatPanel').style.display=chatOpen?'flex':'none';document.getElementById('chatToggle').style.display=chatOpen?'none':'flex';if(chatOpen)document.getElementById('chatQ').focus();}
+
+var chatHist=[];
+var SYS=`You are the CFO/financial analyst for DAG Tech LLC, a New York-based MSP. You have full P&L data Jan 2025 through Jan 2026.
+
+COMPANY: DAG Tech LLC, 185 Madison Ave NYC. MSP serving enterprise clients.
+FY2025: Revenue $2,675,943 | Net Profit $302,084 (11.3%) | GP $1,036,921 (38.8%)
+Jan 2026: Revenue $256,299 | Net Profit $19,649 (7.7%) | GP $102,984 (40.2%)
+Annualized pace: $3.08M vs $2.68M FY25. YoY growth: 24.4%.
+
+DIVISIONS & JAN 2026 GP%:
+Div 1 IT Support: $35,443 rev, 62.6% GP (target 50%) — ABOVE
+Div 2 Project Labor: $5,376 rev, 17.0% GP (target 50%) — FAR BELOW, volatile
+Div 3 Cloud VAR: $49,901 rev, 19.9% GP (target 60%) — FAR BELOW, thin pass-through
+Div 4 Partner Network: $4,065 rev, 100% GP (target 90%) — ABOVE
+Div 5 Materials: $31,632 rev, 15.3% GP (target 20%) — BELOW
+Div 6 CxO Consulting: $5,110 rev, 45.4% GP (target 50%) — SLIGHTLY BELOW
+Div 8 A+ Animal/Diamond: $124,773 rev, 67.9% GP — highest margin, fastest growing (46.6% YoY)
+
+KEY ISSUES JAN 2026: $25,856 R&D appeared in COGS (new, was $868/mo below line). Labor overhead dropped to $0. If R&D reclassified to match 2025, GP=50.3%. Travel $7,748 (5x Dec). Consulting $2,468 (new). Bonus $3,000.
+
+MONTHLY REVENUE TREND: Jan25 $206K, Feb $195K, Mar $208K, Apr $200K, May $196K, Jun $262K, Jul $223K, Aug $220K, Sep $270K, Oct $207K, Nov $211K, Dec $278K, Jan26 $256K
+MONTHLY NP TREND: Jan25 $12K, Feb $12K, Mar $26K, Apr $19K, May $9K, Jun $42K, Jul $17K, Aug $34K, Sep $31K, Oct $22K, Nov $31K, Dec $46K, Jan26 $20K
+
+H1 2025 NP margin: 9.6%. H2 2025 NP margin: 12.8%. Debt eliminated by Oct 2025.
+FY25 expenses: Operating $386K (14.4%), Growth $345K (12.9%). Total $731K (27.3%).
+Non-billable labor overhead in 2025: $205K (7.7% of rev).
+Payment processing (Bank+QB): $80K in 2025 (3% of rev), running at $103K annualized Jan 26.
+
+MSP INDUSTRY BENCHMARKS ($2M-$5M revenue MSPs):
+Gross Margin: 50-60% (best: 65%+). DAG at 38.8% includes low-margin pass-through. Service-only margins are competitive.
+Net Profit: 8-15% (best: 18-22%). DAG at 11.3% is mid-range.
+Revenue/Employee: $150K-$250K. DAG ~$179K — mid-range.
+Managed Services % of Rev: Top MSPs 60%+. DAG Div1+Div8=64% — strong.
+EBITDA: 12-20%. DAG in range.
+SG&A % Rev: 25-35%. DAG 27.3% — competitive.
+Marketing spend: 3-5%. DAG 5.7% — slightly high.
+Utilization: Best 70-80%. DAG has room to improve given $205K overhead.
+Valuation: 0.8-1.5x revenue or 5-8x EBITDA for MSP acquisitions.
+
+Be specific with numbers. Reference actual data. Compare to benchmarks with ranges. Concise: 3-5 paragraphs max. No markdown formatting — plain text only since this renders in chat bubbles.`;
+
+function askQ(q){document.getElementById('chatQ').value=q;sendChat();}
+async function sendChat(){var inp=document.getElementById('chatQ'),q=inp.value.trim();if(!q)return;inp.value='';var m=document.getElementById('chatMessages');m.innerHTML+='<div class="msg user">'+q.replace(/</g,'&lt;')+'</div><div class="msg asst loading" id="lm">Analyzing the data...</div>';m.scrollTop=m.scrollHeight;document.getElementById('chatBtn').disabled=true;chatHist.push({role:'user',content:q});
+try{var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:chatHist})});var d=await r.json();var reply=d.content.map(function(c){return c.text||'';}).join('');chatHist.push({role:'assistant',content:reply});var el=document.getElementById('lm');if(el)el.remove();m.innerHTML+='<div class="msg asst">'+reply.replace(/</g,'&lt;').replace(/\n/g,'<br>')+'</div>';}
+catch(e){var el=document.getElementById('lm');if(el)el.remove();m.innerHTML+='<div class="msg asst" style="color:#E24B4A">Unable to connect to AI analyst. This feature requires the dashboard to be published as a Claude artifact. If viewing locally, the AI chat will not function.</div>';chatHist.pop();}
+m.scrollTop=m.scrollHeight;document.getElementById('chatBtn').disabled=false;document.getElementById('chatQ').focus();}
+
+function initDashboard(){
+var N=D.months.length,li=N-1;
+var a13=function(fn){return Array.from({length:N},function(_,i){return fn(i);});};
+var tRev=a13(function(i){return D.rev.d1[i]+D.rev.d2[i]+D.rev.d3[i]+D.rev.d4[i]+D.rev.d5a[i]+D.rev.d5b[i]+D.rev.d5o[i]+D.rev.d6[i]+D.rev.d8[i];});
+var tCogs=a13(function(i){return D.cogs.d1[i]+(D.cogs.d2a[i]+D.cogs.d2n[i])+D.cogs.d3[i]+(D.cogs.d5a[i]+D.cogs.d5b[i]+D.cogs.d5s[i])+D.cogs.d6[i]+(D.cogs.d8c[i]+D.cogs.d8l[i]+D.cogs.d8r[i])+D.cogs.loh[i]+D.cogs.rd[i];});
+var tGP=a13(function(i){return tRev[i]-tCogs[i];});
+var tExp=a13(function(i){return D.opex[i]+D.growth[i];});
+var tNP=a13(function(i){return tGP[i]-tExp[i];});
+var d1gp=a13(function(i){return D.rev.d1[i]-D.cogs.d1[i];});
+var d2gp=a13(function(i){return D.rev.d2[i]-D.cogs.d2a[i]-D.cogs.d2n[i];});
+var d3gp=a13(function(i){return D.rev.d3[i]-D.cogs.d3[i];});
+var d5gp=a13(function(i){return(D.rev.d5a[i]+D.rev.d5b[i]+D.rev.d5o[i])-(D.cogs.d5a[i]+D.cogs.d5b[i]+D.cogs.d5s[i]);});
+var d6gp=a13(function(i){return D.rev.d6[i]-D.cogs.d6[i];});
+var d8gp=a13(function(i){return D.rev.d8[i]-(D.cogs.d8c[i]+D.cogs.d8l[i]+D.cogs.d8r[i]);});
+var L4=function(a){return[a[li-3],a[li-2],a[li-1],a[li]];};
+var curRev=tRev[li],yoy=tRev[0]?((curRev-tRev[0])/tRev[0]*100):0;
+var curGP=tGP[li],curGPp=curRev?(curGP/curRev*100):0;
+var adjGP=curGP+D.cogs.rd[li],adjGPp=curRev?(adjGP/curRev*100):0;
+var curExp=tExp[li],prevExp=tExp[li-1],expChg=prevExp?((curExp-prevExp)/prevExp*100):0;
+var curNP=tNP[li],curNPp=curRev?(curNP/curRev*100):0;
+var fy25=tRev.slice(0,12).reduce(function(a,b){return a+b;},0);
+document.getElementById('hdDt').textContent='Latest: '+D.latest+' | Full trending from Jan 2025';
+document.getElementById('kpiRow').innerHTML='<div class="m"><div class="l">Revenue</div><div class="v">$'+Math.round(curRev/1000)+'K</div><div class="d '+(yoy>0?'up':'dn')+'">'+(yoy>0?'+':'')+Math.round(yoy)+'% YoY</div></div><div class="m"><div class="l">Gross profit</div><div class="v">$'+Math.round(curGP/1000)+'K</div><div class="d">'+curGPp.toFixed(1)+'% margin</div></div><div class="m"><div class="l">GP excl R&D COGS</div><div class="v up">$'+Math.round(adjGP/1000)+'K</div><div class="d up">'+adjGPp.toFixed(1)+'%</div></div><div class="m"><div class="l">Expenses</div><div class="v '+(expChg>10?'dn':'')+'">$'+Math.round(curExp/1000)+'K</div><div class="d '+(expChg>0?'dn':'up')+'">'+(expChg>0?'+':'')+Math.round(expChg)+'% vs prior</div></div><div class="m"><div class="l">Net profit</div><div class="v '+(curNPp<10?'warn':'')+'">$'+Math.round(curNP/1000)+'K</div><div class="d '+(curNPp<10?'dn':'')+'">'+curNPp.toFixed(1)+'% margin</div></div><div class="m"><div class="l">Annualized</div><div class="v">$'+(curRev*12/1e6).toFixed(2)+'M</div><div class="d '+(curRev*12>fy25?'up':'')+'">vs $'+(fy25/1e6).toFixed(2)+'M FY25</div></div>';
+var gC='rgba(0,0,0,.06)',tC='rgba(0,0,0,.4)',cO={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:D.months,datasets:[{type:'bar',data:tRev.map(function(v){return Math.round(v/1000);}),backgroundColor:tRev.map(function(_,i){return i===li?'#185FA5':'#85B7EB';}),borderRadius:3,order:3,yAxisID:'y',label:'Revenue'},{type:'bar',data:tNP.map(function(v){return Math.round(v/1000);}),backgroundColor:tNP.map(function(_,i){return i===li?'#0F6E56':'#5DCAA5';}),borderRadius:3,order:4,yAxisID:'y',label:'Net profit'},{type:'line',data:a13(function(i){return Math.round(tGP[i]/tRev[i]*1000)/10;}),borderColor:'#BA7517',pointRadius:2,pointBackgroundColor:'#BA7517',borderWidth:2,tension:.3,order:1,yAxisID:'y1',backgroundColor:'transparent',label:'GP %'},{type:'line',data:a13(function(i){return Math.round(tNP[i]/tRev[i]*1000)/10;}),borderColor:'rgba(226,75,74,.5)',pointRadius:1.5,pointBackgroundColor:'#E24B4A',borderWidth:1.5,borderDash:[4,3],tension:.3,order:2,yAxisID:'y1',backgroundColor:'transparent',label:'NP %'}]},options:Object.assign({},cO,{scales:{x:{ticks:{color:tC,font:{size:9},autoSkip:false,maxRotation:45},grid:{display:false}},y:{position:'left',ticks:{color:tC,font:{size:9},callback:function(v){return'$'+v+'K';}},grid:{color:gC}},y1:{position:'right',min:0,max:55,ticks:{color:tC,font:{size:9},callback:function(v){return v+'%';}},grid:{display:false}}}})});
+function k$(v){return v===0?'–':(v<0?'(':'')+'$'+Math.abs(Math.round(v/1000))+'K'+(v<0?')':'');}
+var st='<thead><tr><th style="min-width:100px"></th>';D.ms.forEach(function(m,i){st+='<th class="r'+(i===li?' sep':'')+'" style="min-width:42px">'+m+'</th>';});st+='<th class="r sep" style="min-width:50px">FY25</th></tr></thead><tbody>';
+var fy=function(v){return v.slice(0,12).reduce(function(a,b){return a+b;},0);};
+[['Revenue',tRev],['COGS',tCogs],['Gross profit',tGP],['Opex',D.opex.map(function(v){return-v;})],['Growth',D.growth.map(function(v){return-v;})],['Net profit',tNP]].forEach(function(r,ri){var isTot=ri===2||ri===5;st+='<tr'+(isTot?' class="bigtot"':'')+'><td'+(isTot?' style="font-weight:600"':'')+'>'+r[0]+'</td>';r[1].forEach(function(v,i){st+='<td class="r'+(i===li?' sep':'')+'"'+(isTot?' style="font-weight:600"':'')+'>'+k$(v)+'</td>';});st+='<td class="r sep" style="font-weight:600">'+k$(fy(r[1]))+'</td></tr>';if(isTot){var p=r[1].map(function(v,i){return tRev[i]?(v/tRev[i]*100):0;});st+='<tr class="gpp"><td class="i1">'+(ri===2?'GP':'NP')+' %</td>';p.forEach(function(v,i){st+='<td class="r'+(i===li?' sep':'')+'">'+Math.round(v)+'%</td>';});st+='<td class="r sep">'+Math.round(fy(tRev)?(fy(r[1])/fy(tRev)*100):0)+'%</td></tr>';}});
+document.getElementById('sumTbl').innerHTML=st+'</tbody>';
+var gt='<thead><tr><th style="min-width:80px">Division</th>';D.ms.forEach(function(m,i){gt+='<th class="r'+(i===li?' sep':'')+'" style="min-width:40px">'+m+'</th>';});gt+='<th class="r sep" style="min-width:48px">FY25</th></tr></thead><tbody>';
+[['Div 1',d1gp],['Div 2',d2gp],['Div 3',d3gp],['Div 4',D.rev.d4],['Div 5',d5gp],['Div 6',d6gp],['Div 8',d8gp]].forEach(function(r){gt+='<tr><td style="font-weight:600">'+r[0]+'</td>';r[1].forEach(function(v,i){gt+='<td class="r'+(i===li?' sep':'')+' '+(v<0?'dn':'')+'">'+k$(v)+'</td>';});gt+='<td class="r sep" style="font-weight:600">'+k$(fy(r[1]))+'</td></tr>';});
+document.getElementById('divGPTbl').innerHTML=gt+'</tbody>';
+new Chart(document.getElementById('c2'),{type:'line',data:{labels:D.months,datasets:[{data:D.rev.d8.map(function(v){return Math.round(v/1000);}),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.1)',fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:'#1D9E75',tension:.3}]},options:Object.assign({},cO,{scales:{x:{ticks:{color:tC,font:{size:9},autoSkip:false,maxRotation:45},grid:{display:false}},y:{ticks:{color:tC,font:{size:9},callback:function(v){return'$'+v+'K';}},grid:{color:gC}}}})});
+var divRevs=[D.rev.d1,D.rev.d2,D.rev.d3,D.rev.d4,a13(function(i){return D.rev.d5a[i]+D.rev.d5b[i]+D.rev.d5o[i];}),D.rev.d6,D.rev.d8];
+var divGPs=[d1gp,d2gp,d3gp,D.rev.d4,d5gp,d6gp,d8gp];
+var gpPcts=divGPs.map(function(g,idx){return divRevs[idx][li]?Math.round(g[li]/divRevs[idx][li]*1000)/10:0;});
+var targets=[50,50,60,90,20,50,null];
+new Chart(document.getElementById('c3'),{type:'bar',data:{labels:['D1','D2','D3','D4','D5','D6','D8'],datasets:[{data:gpPcts,backgroundColor:gpPcts.map(function(v,i){var t=targets[i];return t!==null&&v<t*0.7?'#F09595':v<(t||0)*0.9?'#FAC775':'#97C459';}),borderRadius:3,label:'GP%'},{data:targets,type:'line',borderColor:'#E24B4A',borderDash:[5,3],borderWidth:2,pointRadius:0,spanGaps:true,order:0,label:'Target'}]},options:Object.assign({},cO,{scales:{x:{ticks:{color:tC,font:{size:9}},grid:{display:false}},y:{ticks:{color:tC,font:{size:9},callback:function(v){return v+'%';}},grid:{color:gC},max:110}}})});
+function f$(v){if(!v&&v!==0)return'–';var a=Math.abs(v);return(v<0?'(':'')+'$'+(a>=1000?a.toLocaleString('en-US',{maximumFractionDigits:0}):a.toFixed(0))+(v<0?')':'');}
+function fD(v){if(!v||!isFinite(v))return'<span class="flat">–</span>';var a=Math.abs(v),s='$'+(a>=1000?a.toLocaleString('en-US',{maximumFractionDigits:0}):a.toFixed(0));return v>0?'+'+s:'-'+s;}
+function fP(v){if(v===null||v===undefined||!isFinite(v))return'<span class="flat">–</span>';var a=Math.abs(v*100);if(a<0.5)return'<span class="flat">0%</span>';return(v>0?'+':'-')+a.toFixed(0)+'%';}
+function cc(d,isE){if(!d||!isFinite(d))return'flat';return isE?(d>0?'dn':'up'):(d>0?'up':'dn');}
+function R(nm,v,isE,cls,isN,grp){var o=v[0],n=v[1],d=v[2],j=v[3],avg=(o+n+d)/3,md=j-d,mp=d?(j-d)/Math.abs(d):null,ad=j-avg,ap=avg?(j-avg)/Math.abs(avg):null,mc=cc(md,isE),ac=cc(ad,isE),isBig=isE&&(Math.abs(md)>1500||(ap!==null&&Math.abs(ap)>0.3&&Math.abs(ad)>500));return'<tr class="'+cls+'" data-g="'+grp+'"><td class="'+(cls.indexOf('i2')>=0?'i2':cls.indexOf('i1')>=0?'i1':'')+'">'+nm+(isN?'<span class="new">NEW</span>':'')+(isBig?'<span class="flag">FLAG</span>':'')+'</td><td class="r">'+f$(o)+'</td><td class="r">'+f$(n)+'</td><td class="r">'+f$(d)+'</td><td class="r sep" style="font-weight:'+(cls.indexOf('gp')>=0||cls.indexOf('bigtot')>=0?'600':'500')+'">'+f$(j)+'</td><td class="r sep '+mc+'">'+fD(md)+'</td><td class="r '+mc+'">'+fP(mp)+'</td><td class="r sep">'+f$(Math.round(avg))+'</td><td class="r '+ac+'">'+fD(ad)+'</td><td class="r '+ac+'">'+fP(ap)+'</td></tr>';}
+function GP2(rV,gV,grp){var p=[0,1,2,3].map(function(i){return rV[i]?gV[i]/rV[i]:0;}),a3=(p[0]+p[1]+p[2])/3,md=p[3]-p[2],ad=p[3]-a3;return'<tr class="gpp" data-g="'+grp+'"><td class="i1">GP %</td><td class="r">'+(p[0]*100).toFixed(1)+'%</td><td class="r">'+(p[1]*100).toFixed(1)+'%</td><td class="r">'+(p[2]*100).toFixed(1)+'%</td><td class="r sep" style="font-weight:600">'+(p[3]*100).toFixed(1)+'%</td><td class="r sep '+(md>0?'up':'dn')+'">'+(md>0?'+':'')+(md*100).toFixed(1)+'pts</td><td class="r"></td><td class="r sep">'+(a3*100).toFixed(1)+'%</td><td class="r '+(ad>0?'up':'dn')+'">'+(ad>0?'+':'')+(ad*100).toFixed(1)+'pts</td><td class="r"></td></tr>';}
+function S(l,g){return'<tr class="trsec" data-g="'+g+'"><td colspan="10">'+l+'</td></tr>';}
+document.getElementById('th0').textContent=D.months[li-3];document.getElementById('th1').textContent=D.months[li-2];document.getElementById('th2').textContent=D.months[li-1];document.getElementById('th3').textContent=D.months[li];
+function mkDiv(nm,revA,cogsAs,cogsLbls,grp){var h=S(nm,grp),rv=L4(revA);h+=R('Revenue',rv,false,'i1',0,grp);var cls2=cogsAs.map(function(c,i){return{v:L4(c),l:cogsLbls[i][0],n:cogsLbls[i][1]};});cls2.forEach(function(c){h+=R('COGS – '+c.l,c.v,true,'i2',c.n,grp);});if(cls2.length>1){var ct=[0,1,2,3].map(function(i){return cls2.reduce(function(s,c){return s+c.v[i];},0);});h+=R('Total COGS',ct,true,'subtot i1',0,grp);}var ct2=[0,1,2,3].map(function(i){return cls2.reduce(function(s,c){return s+c.v[i];},0);});var gp=[0,1,2,3].map(function(i){return rv[i]-ct2[i];});h+=R('Gross profit',gp,false,'gp i1',0,grp);h+=GP2(rv,gp,grp);return h;}
+var h='';
+h+=mkDiv('Division 1 – IT support',D.rev.d1,[D.cogs.d1],[['Tech support labor']],'d1');
+h+=mkDiv('Division 2 – Project labor',D.rev.d2,[D.cogs.d2a,D.cogs.d2n],[['Allocatable'],['Non-allocatable (Dan)']],'d2');
+h+=mkDiv('Division 3 – Cloud & managed',D.rev.d3,[D.cogs.d3],[['Resold cloud']],'d3');
+h+=S('Division 4 – Partner network','d4');h+=R('Revenue',L4(D.rev.d4),false,'i1',0,'d4');h+=R('COGS',[0,0,0,0],true,'i1',0,'d4');h+=R('Gross profit',L4(D.rev.d4),false,'gp i1',0,'d4');h+=GP2(L4(D.rev.d4),L4(D.rev.d4),'d4');
+var d5rv=a13(function(i){return D.rev.d5a[i]+D.rev.d5b[i]+D.rev.d5o[i];});
+h+=mkDiv('Division 5 – Materials',d5rv,[D.cogs.d5a,D.cogs.d5b,D.cogs.d5s],[['Non-project'],['Project'],['Shipping',1]],'d5');
+h+=mkDiv('Division 6 – CxO',D.rev.d6,[D.cogs.d6],[['CxO labor']],'d6');
+h+=mkDiv('Division 8 – A+ Animal / Diamond',D.rev.d8,[D.cogs.d8c,D.cogs.d8l,D.cogs.d8r],[['Cloud/VAR'],['Labor'],['Resold svcs',1]],'d8');
+h+=S('Unallocated COGS','bot');h+=R('Labor overhead',L4(D.cogs.loh),true,'i1',0,'bot');h+=R('R&D (COGS)',L4(D.cogs.rd),true,'i1',1,'bot');
+var cRev=L4(tRev),cCog=L4(tCogs),cGP2=L4(tGP);
+h+=R('Consolidated revenue',cRev,false,'bigtot',0,'all bot');h+=R('Consolidated COGS',cCog,true,'bigtot',0,'all bot');h+=R('Consolidated GP',cGP2,false,'bigtot',0,'all bot');h+=GP2(cRev,cGP2,'all bot');
+var oK=Object.keys(D.opxD),oT=[0,1,2,3].map(function(i){return oK.reduce(function(s,k){return s+D.opxD[k][i];},0);});
+h+=S('Operating expenses','exp');oK.forEach(function(k){h+=R(k,D.opxD[k],true,'i1',D.opxD[k][0]===0&&D.opxD[k][1]===0&&D.opxD[k][2]===0&&D.opxD[k][3]>0?1:0,'exp');});h+=R('Total operating',oT,true,'subtot',0,'exp');
+var gK=Object.keys(D.grwD),gTT=[0,1,2,3].map(function(i){return gK.reduce(function(s,k){return s+D.grwD[k][i];},0);});
+h+=S('Growth expenses','exp');gK.forEach(function(k){h+=R(k,D.grwD[k],true,'i1',0,'exp');});h+=R('Total growth',gTT,true,'subtot',0,'exp');
+var eT=[0,1,2,3].map(function(i){return oT[i]+gTT[i];});h+=R('Total expenses',eT,true,'bigtot',0,'exp bot');
+var noi=[0,1,2,3].map(function(i){return cGP2[i]-eT[i];});h+=R('Net operating income',noi,false,'bigtot',0,'bot');
+var npF=L4(tNP);h+=R('Net profit',npF,false,'bigtot',0,'all bot');
+var npPc=npF.map(function(v,i){return cRev[i]?v/cRev[i]:0;}),a3p=(npPc[0]+npPc[1]+npPc[2])/3;
+h+='<tr class="gpp" data-g="all bot"><td class="i1">NP %</td>'+npPc.map(function(p,i){return'<td class="r'+(i===3?' sep':'')+'"'+(i===3?' style="font-weight:600"':'')+'>'+(p*100).toFixed(1)+'%</td>';}).join('')+'<td class="r sep">'+(a3p*100).toFixed(1)+'%</td><td class="r '+(npPc[3]>a3p?'up':'dn')+'">'+((npPc[3]-a3p)*100).toFixed(1)+'pts</td><td class="r"></td></tr>';
+document.getElementById('tb').innerHTML=h;
+var btns=['all','d1','d2','d3','d4','d5','d6','d8','exp','bot'],bLbls=['Full P&L','Div 1','Div 2','Div 3','Div 4','Div 5','Div 6','Div 8','Expenses','Bottom line'];
+document.getElementById('filterBtns').innerHTML=btns.map(function(b,i){return'<button class="'+(i===0?'a':'')+'" onclick="filt(this,\''+b+'\')">'+bLbls[i]+'</button>';}).join('');
+new Chart(document.getElementById('c4'),{type:'bar',data:{labels:D.months,datasets:[{data:D.opex.map(function(v){return Math.round(v/1000);}),backgroundColor:'#85B7EB',borderRadius:3,stack:'s',label:'Operating'},{data:D.growth.map(function(v){return Math.round(v/1000);}),backgroundColor:'#AFA9EC',borderRadius:3,stack:'s',label:'Growth'},{type:'line',data:tExp.map(function(v){return Math.round(v/1000);}),borderColor:'#E24B4A',borderWidth:2,pointRadius:2,pointBackgroundColor:'#E24B4A',backgroundColor:'transparent',order:0,label:'Total'}]},options:Object.assign({},cO,{scales:{x:{ticks:{color:tC,font:{size:9},autoSkip:false,maxRotation:45},grid:{display:false}},y:{ticks:{color:tC,font:{size:9},callback:function(v){return'$'+v+'K';}},grid:{color:gC}}}})});
+var fh='';D.flags.forEach(function(f){fh+='<div class="alert '+(f.s==='y'?'alertw':'')+'"><h4>'+f.t+'<span class="pill pill-'+(f.s==='r'?'r':'y')+'">'+(f.s==='r'?'Action required':'Monitor')+'</span></h4><p>'+f.p+'</p><p style="margin-top:3px;font-weight:600;font-size:10px">Next step: '+f.a+'</p></div>';});
+document.getElementById('flags').innerHTML=fh;
+document.getElementById('summary').textContent='Revenue at $'+Math.round(curRev/1000)+'K grew '+Math.round(yoy)+'% YoY. GP margin at '+curGPp.toFixed(1)+'%. Net margin at '+curNPp.toFixed(1)+'% compressed by expense anomalies. A+ Animal/Diamond at $'+Math.round(D.rev.d8[li]/1000)+'K represents '+Math.round(D.rev.d8[li]/curRev*100)+'% of revenue. Normalize for the R&D COGS reclassification and GP would be '+adjGPp.toFixed(1)+'%.';
+document.getElementById('updAt').textContent='Dashboard generated: '+new Date().toLocaleString();
+}
+window.filt=function(btn,grp){document.querySelectorAll('.fb button').forEach(function(b){b.classList.remove('a');});btn.classList.add('a');document.querySelectorAll('#pnl tbody tr').forEach(function(tr){var g=tr.dataset.g||'';tr.style.display=(grp==='all'||g.indexOf(grp)>=0||g==='all')?'':'none';});};
+</script>
+</body>
+</html>
