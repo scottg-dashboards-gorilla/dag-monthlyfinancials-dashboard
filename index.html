@@ -1924,58 +1924,115 @@
             </div>
           </div>
           ${monthsHtml}
-        </div>`;
-    }
-
-    const adviceResponses = [
-      'DAG Tech continues strong momentum with 40%+ gross margins on core platforms. Recommend focus on Cloud VAR pricing strategy.',
-      'Labor allocation in Division 2 shows volatility. Consider reviewing resource planning and project costing.',
-      'Division 8 (Security Platform) driving 35% of total revenue with consistent 60%+ margins. Excellent growth vector.',
-      'Unallocated overhead increased in Jan 26. Recommend review with finance on allocation methodology.',
-      'Operating expenses trending well within targets. Growth spend optimized for market expansion.',
-      'Materials division (d5) showing compression - recommend renegotiating vendor terms or raising pricing.'
-    ];
-
-    function initChat() {
-      document.getElementById('chatMessages').innerHTML = `
-        <div class="chat-msg assistant">
-          <div class="chat-bubble">Hi! I'm the MSP Advisor for DAG Tech. I can help you analyze financial performance, spot trends, and recommend actions. What would you like to explore?</div>
+        
+    <div class="intel-section" style="margin-top:24px;">
+      <div class="intel-section-header">
+        <div class="intel-section-title">🧠 MSP Strategy Advisor</div>
+        <div class="intel-section-subtitle">Benchmarks & Analysis</div>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-wrap">
+          <input id="chatInput" placeholder="Ask about margins, valuations, labor, growth..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button onclick="sendChat()">▶</button>
         </div>
-      `;
-
-      document.getElementById('quickBtns').innerHTML = [
-        'Margin trends by division',
-        'Expense analysis',
-        'Revenue mix insights',
-        'Growth recommendations'
-      ].map(q => `<button class="quick-btn" onclick="sendChat('${q}')">${q}</button>`).join('');
-
-      document.getElementById('chatInput').value = '';
+      </div>
+    </div>
+    </div>`;
+        initChat();
     }
 
-    function sendChat(msg) {
-      if (!msg) msg = document.getElementById('chatInput').value.trim();
-      if (!msg) return;
+    var MSP_BM={gpMtgt:52,gpMtop:62,gpMmed:42,laborPct:28,laborTop:22,laborMed:32};
 
-      const messages = document.getElementById('chatMessages');
-      messages.innerHTML += `
-        <div class="chat-msg user">
-          <div class="chat-bubble">${msg}</div>
-        </div>
-      `;
+function generateResponse(msg){
+  var cur=DATA[DATA.length-1];var prev=DATA.length>1?DATA[DATA.length-2]:null;
+  var totalRev=cur.totRev||0;var gpM=cur.gpM||0;
+  var opexVal=cur.opex||0;var opexPct=totalRev>0?(opexVal/totalRev*100):0;
+  var ebitda=cur.ebitda||0;var ebitdaM=cur.ebitdaM||0;
+  var revGrowth=prev&&prev.totRev>0?((totalRev-prev.totRev)/prev.totRev*100):0;
+  var q=msg.toLowerCase();
 
-      setTimeout(() => {
-        const response = adviceResponses[Math.floor(Math.random() * adviceResponses.length)];
-        messages.innerHTML += `
-          <div class="chat-msg assistant">
-            <div class="chat-bubble">${response}</div>
-          </div>
-        `;
-        messages.scrollTop = messages.scrollHeight;
-      }, 500);
+  if(q.match(/margin|gp|gross/)){
+    var lines='';
+    DEPTS.forEach(function(dept){
+      var dd=cur.d[dept.id];if(!dd)return;
+      var bm=BM[dept.id];
+      var status=dd.gpM>=bm.tgt?'\u2705 Above target':dd.gpM>=bm.med?'\u26A0\uFE0F Near median':'\u274C Below median';
+      lines+='<b>'+dept.name+'</b>: '+dd.gpM.toFixed(1)+'% (target '+bm.tgt+'%) '+status+'<br>';
+    });
+    return '<b>Gross Margin Analysis ('+cur.month+')</b><br>Overall GP Margin: <b>'+gpM.toFixed(1)+'%</b> (MSP benchmark: '+MSP_BM.gpMtgt+'%)<br><br>'+lines+'<br><em>Tip: Focus on departments below median to lift overall margin.</em>';
+  }
 
-      document.getElementById('chatInput').value = '';
-    }
+  if(q.match(/labor|opex|expense|overhead|payroll/)){
+    var expLines='';var cats=Object.keys(opxD);
+    cats.sort(function(a,b){var ai=opxD[a].length-1;var bi=opxD[b].length-1;return (opxD[b][bi]||0)-(opxD[a][ai]||0);});
+    cats.slice(0,5).forEach(function(cat){var vals=opxD[cat];var v=vals[vals.length-1]||0;expLines+='  '+cat+': $'+v.toLocaleString()+'<br>';});
+    return '<b>Operating Expense Analysis ('+cur.month+')</b><br>Total OpEx: <b>$'+opexVal.toLocaleString()+'</b> ('+opexPct.toFixed(1)+'% of revenue)<br>MSP Benchmark: '+MSP_BM.laborPct+'% (top quartile: '+MSP_BM.laborTop+'%)<br><br><b>Top 5 Expense Categories:</b><br>'+expLines+'<br><em>Tip: Labor costs above '+MSP_BM.laborMed+'% of revenue signal overstaffing or low utilization.</em>';
+  }
+
+  if(q.match(/growth|revenue|trend|sales/)){
+    var revLines='';
+    DEPTS.forEach(function(dept){
+      var dd=cur.d[dept.id];var pd=prev?prev.d[dept.id]:null;
+      if(!dd)return;
+      var dGrowth=pd&&pd.rev>0?((dd.rev-pd.rev)/pd.rev*100):0;
+      revLines+='<b>'+dept.name+'</b>: $'+dd.rev.toLocaleString()+' ('+(dGrowth>=0?'+':'')+dGrowth.toFixed(1)+'% MoM)<br>';
+    });
+    return '<b>Revenue & Growth Analysis ('+cur.month+')</b><br>Total Revenue: <b>$'+totalRev.toLocaleString()+'</b> ('+(revGrowth>=0?'+':'')+revGrowth.toFixed(1)+'% MoM)<br><br>'+revLines;
+  }
+
+  if(q.match(/valuation|ebitda|multiple|worth|value/)){
+    var multiples=[4,6,8];
+    var valLines='';multiples.forEach(function(m){valLines+=m+'x: <b>$'+(ebitda*m*12).toLocaleString()+'</b><br>';});
+    return '<b>Valuation Estimates ('+cur.month+')</b><br>Monthly EBITDA: <b>$'+ebitda.toLocaleString()+'</b> ('+ebitdaM.toFixed(1)+'% margin)<br><br><b>Annualized Valuation Range:</b><br>'+valLines+'<br><em>Top-performing MSPs trade at 8-12x EBITDA. Focus on recurring revenue and margin expansion.</em>';
+  }
+
+  if(q.match(/benchmark|compare|industry|msp/)){
+    var gpStatus=gpM>=MSP_BM.gpMtop?'\u2705 Top quartile':gpM>=MSP_BM.gpMtgt?'\u2705 Above target':gpM>=MSP_BM.gpMmed?'\u26A0\uFE0F Near median':'\u274C Below median';
+    var opStatus=opexPct<=MSP_BM.laborTop?'\u2705 Top quartile':opexPct<=MSP_BM.laborPct?'\u2705 Below target':opexPct<=MSP_BM.laborMed?'\u26A0\uFE0F Near median':'\u274C Above median';
+    return '<b>MSP Benchmark Comparison ('+cur.month+')</b><br><br><b>Gross Margin:</b> '+gpM.toFixed(1)+'% '+gpStatus+'<br>(Target: '+MSP_BM.gpMtgt+'% | Top: '+MSP_BM.gpMtop+'% | Median: '+MSP_BM.gpMmed+'%)<br><br><b>OpEx Ratio:</b> '+opexPct.toFixed(1)+'% '+opStatus+'<br>(Target: '+MSP_BM.laborPct+'% | Top: '+MSP_BM.laborTop+'% | Median: '+MSP_BM.laborMed+'%)<br><br><b>EBITDA Margin:</b> '+ebitdaM.toFixed(1)+'%<br><em>Healthy MSPs target 15-20% EBITDA margins.</em>';
+  }
+
+  return '<b>DAG Tech Summary ('+cur.month+')</b><br>Revenue: $'+totalRev.toLocaleString()+' | GP Margin: '+gpM.toFixed(1)+'% | EBITDA: $'+ebitda.toLocaleString()+'<br><br>Try asking about: <b>margins</b>, <b>expenses</b>, <b>growth</b>, <b>valuations</b>, or <b>benchmarks</b>.';
+}
+
+function initChat(){
+  var cur=DATA[DATA.length-1];var prev=DATA.length>1?DATA[DATA.length-2]:null;
+  var totalRev=cur.totRev||0;var gpM=cur.gpM||0;
+  var opexPct=totalRev>0?((cur.opex||0)/totalRev*100):0;
+  var revGrowth=prev&&prev.totRev>0?((totalRev-prev.totRev)/prev.totRev*100):0;
+  var deptLines='';
+  DEPTS.forEach(function(dept){
+    var dd=cur.d[dept.id];if(!dd)return;
+    var bm=BM[dept.id];
+    var status=dd.gpM>=bm.tgt?'\u2705':dd.gpM>=bm.med?'\u26A0\uFE0F':'\u274C';
+    deptLines+=status+' <b>'+dept.name+'</b>: '+dd.gpM.toFixed(1)+'% margin ($'+dd.rev.toLocaleString()+' rev)<br>';
+  });
+  var gpStatus=gpM>=MSP_BM.gpMtop?'\u2705 Top Quartile':gpM>=MSP_BM.gpMtgt?'\u2705 Above Target':'\u26A0\uFE0F Below Target';
+  var h='<b>\uD83D\uDCCA DAG Tech Intelligence Brief ('+cur.month+')</b><br><br>';
+  h+='<b>Key Metrics:</b><br>';
+  h+='Revenue: <b>$'+totalRev.toLocaleString()+'</b> ('+(revGrowth>=0?'+':'')+revGrowth.toFixed(1)+'% MoM)<br>';
+  h+='Gross Margin: <b>'+gpM.toFixed(1)+'%</b> '+gpStatus+'<br>';
+  h+='OpEx Ratio: <b>'+opexPct.toFixed(1)+'%</b> (benchmark: '+MSP_BM.laborPct+'%)<br>';
+  h+='EBITDA: <b>$'+(cur.ebitda||0).toLocaleString()+'</b><br><br>';
+  h+='<b>Department Performance:</b><br>'+deptLines;
+  h+='<br><em>Ask me about margins, expenses, growth, valuations, or benchmarks.</em>';
+  var el=document.getElementById('chatMessages');
+  if(el) el.innerHTML='<div class="chat-msg assistant"><div class="chat-bubble">'+h+'</div></div>';
+}
+
+function sendChat(msg){
+  if(!msg) msg=document.getElementById('chatInput').value.trim();
+  if(!msg) return;
+  var messages=document.getElementById('chatMessages');
+  messages.innerHTML+='<div class="chat-msg user"><div class="chat-bubble">'+msg+'</div></div>';
+  document.getElementById('chatInput').value='';
+  setTimeout(function(){
+    var response=generateResponse(msg);
+    messages.innerHTML+='<div class="chat-msg assistant"><div class="chat-bubble">'+response+'</div></div>';
+    messages.scrollTop=messages.scrollHeight;
+  },300);
+}
 
     function triggerFileInput() {
       document.getElementById('fileInput').click();
