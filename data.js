@@ -1,78 +1,1355 @@
 // DAG Tech P&L Data — Last updated: January 2026
-// Cowork: When adding a new month, append values to each array and update the months/ms/latest fields.
+// Cowork: When adding a new month, append a new month object to DATA and update related fields.
 // Do NOT modify the dashboard code (index.html). Only update this file.
 
-var DAG_DATA = {
-  months: ['Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26'],
-  ms: ['J25','F','M','A','M','J','J','A','S','O','N','D','J26'],
-  latest: 'January 2026',
-
-  rev: {
-    d1: [43054.81, 35895.23, 40898.15, 49359.05, 38961.50, 44676.51, 37894, 38036.25, 34725.97, 32094.86, 31396, 35122.19, 35442.50],
-    d2: [10722.60, 9301.99, 4824.84, 6463.88, 2125.03, 10077.76, 13362.70, 32302.90, 10280, 13370.17, 1053.32, 1588.87, 5375.52],
-    d3: [51127.73, 43681.11, 41893.06, 49957.85, 41930.04, 57672.48, 45100.64, 41078.12, 50876.08, 43920.27, 49826.94, 45843.86, 49901.20],
-    d4: [1372.36, 1788.85, 4497.46, 1665.58, 1506.79, 1500.15, 1757.25, 1623.40, 4909.65, 1501.14, 2511.95, 652.53, 4065.28],
-    d5a: [3631.99, 9675.36, 23318.08, 3568.55, 22078.11, 26643.33, 13718, 8450.43, 17320.52, 9437.50, 1450, 61360.93, 11125.91],
-    d5b: [7885.20, 7868.40, 7155.33, 34.53, 0, 20280.72, 13957.86, 1331.40, 45467.97, 4048.28, 0, 3819.55, 18240.90],
-    d5o: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2265.01],
-    d6: [3156.25, 3100, 3100, 5366.25, 3325, 5330, 5220, 4780, 8262.50, 6485, 4780, 4780, 5110],
-    d8: [85118.80, 83328.20, 82408.20, 83624.86, 85612.08, 95776.44, 92014.90, 92394.60, 98518.81, 96369.63, 119774.19, 125042.65, 124772.53]
+// Department definitions
+var DEPTS = [
+  {
+    "id": "d1",
+    "name": "Div 1 — IT Support",
+    "emoji": "🖥️",
+    "color": "#3b82f6",
+    "desc": "Managed IT helpdesk, Clarity platform support"
   },
-
-  cogs: {
-    d1: [26247.98, 19257.61, 18080.30, 17529.42, 19592.01, 17208.91, 22265.96, 19880.97, 18562.82, 16530.78, 10800.79, 11389.98, 13255.45],
-    d2a: [4355.68, 1794.24, 1540.25, 4083.73, 1549.61, 4685.57, 11993.05, 18629.57, 7881.64, 6829.24, 973.97, 1219.61, 3642.66],
-    d2n: [816.58, 802.32, 747.83, 745.27, 1117.91, 745.27, 745.27, 745.27, 745.27, 1117.90, 745.27, 745.27, 817.96],
-    d3: [30134.37, 35160.30, 31881.29, 40989.24, 32735.27, 45227.39, 36886.77, 32052.46, 40102.18, 36045.19, 38566.44, 36348.61, 39990.55],
-    d5a: [2883.73, 8331.29, 17306.07, 3754.83, 18699.80, 22018.80, 11566.53, 6624.64, 14330, 3920.16, 1173.74, 53250.35, 11269.28],
-    d5b: [7584.06, 6338.31, 3763.46, -49.90, 0, 16419.33, 12975.05, 1709.08, 39644.22, 3819.34, 0, 3780.33, 15052.83],
-    d5s: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 536.41],
-    d6: [995.57, 875.04, 747.83, 2037.83, 1536.55, 1732.54, 1961.18, 896.26, 2962.40, 2599.29, 2286.48, 1852.85, 2788.68],
-    d8c: [13058.91, 11364.24, 10403.44, 10462.76, 10747.49, 10778.83, 10685.88, 10693.16, 10959.68, 10197.20, 11425.16, 11118.52, 5038.34],
-    d8l: [23750.60, 18945.67, 18737.35, 20132.05, 24376.45, 23782.58, 22828.69, 24228.68, 29108.85, 26506.49, 30451.38, 29652.50, 27723.06],
-    d8r: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7342.75],
-    loh: [21804.45, 21076.66, 17828.99, 20649.23, 17112.65, 15917.25, 12899.06, 16388.45, 11008.97, 16236.51, 17299.39, 17243.65, 0],
-    rd: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25856.46]
+  {
+    "id": "d2",
+    "name": "Div 2 — Project Labor",
+    "emoji": "🔧",
+    "color": "#10b981",
+    "desc": "Project-based IT labor and implementations"
   },
-
-  opex: [33134.53, 29971.64, 36896.58, 31749.98, 26881.84, 33105.31, 32221.72, 27945.28, 35165.76, 28419, 35920.84, 34750.11, 44279.83],
-  growth: [28476.34, 28892.72, 24120.58, 28177.23, 31899.16, 28071.81, 29393.67, 26701.70, 29215.54, 32097.87, 27920.02, 30296.72, 39033.75],
-
-  opxD: {
-    'Bank charges': [5151.06, 4876.79, 6830.99, 6501.52],
-    'Bonus': [0, 0, 0, 3000],
-    'Commissions': [1340.10, 2683.18, 2683.18, 1663.48],
-    'Consulting': [0, 0, 0, 2468.47],
-    'Employee benefits': [546.24, 450.75, 751.98, 26.50],
-    'Financial admin': [5380.60, 5512.10, 7293.31, 5900.36],
-    'HR': [1400, 1400, 1400, 1400],
-    'Insurance': [1743.16, 1156.64, 1156.64, 1156.64],
-    'Legal & professional': [1117.90, 4419.27, 745.27, 5432.92],
-    'Office space': [1419.36, 1419.36, 1419.36, 1419.36],
-    'Office admin': [249.28, 78.66, 0, 68.74],
-    'Operational services': [9646.48, 12487.45, 8768.35, 12964.65],
-    'QB payments': [424.82, 1436.64, 3701.03, 2134.80],
-    'Taxes & licenses': [0, 0, 0, 107.09],
-    'Utilities': [0, 0, 0, 35.30]
+  {
+    "id": "d3",
+    "name": "Div 3 — Cloud VAR",
+    "emoji": "☁️",
+    "color": "#8b5cf6",
+    "desc": "Cloud services, managed services VAR"
   },
-
-  grwD: {
-    'Advertising': [8691.72, 8525.22, 8376.05, 8979.83],
-    'Business advisory (COO)': [5399, 5452.69, 10621.85, 10483],
-    'Business development': [7135.82, 6390.54, 6390.54, 6535.92],
-    'Marketing': [5146.24, 4689.48, 2609.48, 4469.35],
-    'R&D': [1117.90, 745.27, 745.27, 817.96],
-    'Travel & business': [4607.19, 2116.82, 1553.53, 7747.69]
+  {
+    "id": "d4",
+    "name": "Div 4 — Partner Network",
+    "emoji": "🤝",
+    "color": "#06b6d4",
+    "desc": "Partner network referral income"
   },
+  {
+    "id": "d5",
+    "name": "Div 5 — Materials",
+    "emoji": "📦",
+    "color": "#f59e0b",
+    "desc": "Hardware/software procurement and project materials"
+  },
+  {
+    "id": "d6",
+    "name": "Div 6 — CxO Consulting",
+    "emoji": "💼",
+    "color": "#ec4899",
+    "desc": "Strategic CxO advisory services"
+  },
+  {
+    "id": "d8",
+    "name": "Div 8 — Security Platform",
+    "emoji": "🛡️",
+    "color": "#ef4444",
+    "desc": "A+ Animal Suite, Diamond IT managed security"
+  }
+];
 
-  flags: [
-    { t: 'R&D in COGS — $25,856', p: 'New COGS line. Was ~$868/mo in Growth Expenses in 2025.', s: 'r', a: 'Get classification rationale from Bharat' },
-    { t: 'Travel & business — $7,748 (+144% vs avg)', p: '5x December, 2.4x trailing average.', s: 'r', a: 'Get line-item detail from Bharat' },
-    { t: 'Consulting expenses — $2,468', p: 'Brand new line. Who is the vendor?', s: 'r', a: 'Identify vendor and purpose' },
-    { t: 'Bonus — $3,000', p: '2x the entire 2025 annual total.', s: 'y', a: 'Confirm if one-time' },
-    { t: 'Operational services — $12,965 (+44% vs avg)', p: 'Annualized $156K vs $108K in 2025.', s: 'y', a: 'Review vendor contracts' },
-    { t: 'Div 3 Cloud GP% — 19.9% (target 60%)', p: 'Below 2025 avg of 22.5%.', s: 'y', a: 'Evaluate bundling into platform pricing' },
-    { t: 'Labor overhead $0 / R&D COGS $25.9K', p: 'Possible reclassification of non-billable hours.', s: 'r', a: 'Confirm with Bharat' },
-    { t: 'Div 8 Resold services COGS $7,343', p: 'New sub-line. Cloud/VAR dropped $6K simultaneously.', s: 'y', a: 'Verify with Bharat' }
+// Benchmarks per division (gross margin targets)
+var BM = {
+  "d1": {
+    "tgt": 60,
+    "top": 70,
+    "med": 50,
+    "desc": "IT Support gross margin targets"
+  },
+  "d2": {
+    "tgt": 55,
+    "top": 65,
+    "med": 45,
+    "desc": "Project labor margin targets"
+  },
+  "d3": {
+    "tgt": 25,
+    "top": 35,
+    "med": 18,
+    "desc": "Cloud VAR margin targets (historically low for DAG)"
+  },
+  "d4": {
+    "tgt": 90,
+    "top": 95,
+    "med": 80,
+    "desc": "Partner network (mostly referral income, low COGS)"
+  },
+  "d5": {
+    "tgt": 15,
+    "top": 25,
+    "med": 8,
+    "desc": "Materials margin targets"
+  },
+  "d6": {
+    "tgt": 55,
+    "top": 65,
+    "med": 45,
+    "desc": "Consulting margin targets"
+  },
+  "d8": {
+    "tgt": 50,
+    "top": 60,
+    "med": 40,
+    "desc": "Security platform margin targets"
+  }
+};
+
+// Monthly financial data
+var DATA = [
+  {
+    "month": "Jan 25",
+    "d": {
+      "d1": {
+        "rev": 43054.81,
+        "cogs": 26247.98,
+        "gp": 16806.83,
+        "gpM": 39.04
+      },
+      "d2": {
+        "rev": 10722.6,
+        "cogs": 5172.26,
+        "gp": 5550.34,
+        "gpM": 51.76
+      },
+      "d3": {
+        "rev": 51127.73,
+        "cogs": 30134.37,
+        "gp": 20993.36,
+        "gpM": 41.06
+      },
+      "d4": {
+        "rev": 1372.36,
+        "cogs": 0,
+        "gp": 1372.36,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 11517.19,
+        "cogs": 10467.79,
+        "gp": 1049.4,
+        "gpM": 9.11
+      },
+      "d6": {
+        "rev": 3156.25,
+        "cogs": 995.57,
+        "gp": 2160.68,
+        "gpM": 68.46
+      },
+      "d8": {
+        "rev": 85118.8,
+        "cogs": 36809.51,
+        "gp": 48309.29,
+        "gpM": 56.76
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 4355.68,
+        "cogsNonAllocatable": 816.58
+      },
+      "d5": {
+        "revNonProject": 3631.99,
+        "revProject": 7885.2,
+        "revShipping": 0,
+        "cogsNonProject": 2883.73,
+        "cogsProject": 7584.06,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 13058.91,
+        "cogsLabor": 23750.6,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 21804.45,
+      "rd": 0
+    },
+    "totRev": 206069.74,
+    "totCogs": 131631.93,
+    "gp": 74437.81,
+    "gpM": 36.12,
+    "opex": 33134.53,
+    "growth": 28476.34,
+    "ebitda": 12826.94,
+    "ebitdaM": 6.22,
+    "netIncome": 12826.94
+  },
+  {
+    "month": "Feb 25",
+    "d": {
+      "d1": {
+        "rev": 35895.23,
+        "cogs": 19257.61,
+        "gp": 16637.62,
+        "gpM": 46.35
+      },
+      "d2": {
+        "rev": 9301.99,
+        "cogs": 2596.56,
+        "gp": 6705.43,
+        "gpM": 72.09
+      },
+      "d3": {
+        "rev": 43681.11,
+        "cogs": 35160.3,
+        "gp": 8520.81,
+        "gpM": 19.51
+      },
+      "d4": {
+        "rev": 1788.85,
+        "cogs": 0,
+        "gp": 1788.85,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 17543.76,
+        "cogs": 14669.6,
+        "gp": 2874.16,
+        "gpM": 16.38
+      },
+      "d6": {
+        "rev": 3100,
+        "cogs": 875.04,
+        "gp": 2224.96,
+        "gpM": 71.77
+      },
+      "d8": {
+        "rev": 83328.2,
+        "cogs": 30309.91,
+        "gp": 53018.29,
+        "gpM": 63.63
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 1794.24,
+        "cogsNonAllocatable": 802.32
+      },
+      "d5": {
+        "revNonProject": 9675.36,
+        "revProject": 7868.4,
+        "revShipping": 0,
+        "cogsNonProject": 8331.29,
+        "cogsProject": 6338.31,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 11364.24,
+        "cogsLabor": 18945.67,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 21076.66,
+      "rd": 0
+    },
+    "totRev": 194639.14,
+    "totCogs": 123945.68,
+    "gp": 70693.46,
+    "gpM": 36.32,
+    "opex": 29971.64,
+    "growth": 28892.72,
+    "ebitda": 11829.1,
+    "ebitdaM": 6.08,
+    "netIncome": 11829.1
+  },
+  {
+    "month": "Mar 25",
+    "d": {
+      "d1": {
+        "rev": 40898.15,
+        "cogs": 18080.3,
+        "gp": 22817.85,
+        "gpM": 55.79
+      },
+      "d2": {
+        "rev": 4824.84,
+        "cogs": 2288.08,
+        "gp": 2536.76,
+        "gpM": 52.58
+      },
+      "d3": {
+        "rev": 41893.06,
+        "cogs": 31881.29,
+        "gp": 10011.77,
+        "gpM": 23.9
+      },
+      "d4": {
+        "rev": 4497.46,
+        "cogs": 0,
+        "gp": 4497.46,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 30473.41,
+        "cogs": 21069.53,
+        "gp": 9403.88,
+        "gpM": 30.86
+      },
+      "d6": {
+        "rev": 3100,
+        "cogs": 747.83,
+        "gp": 2352.17,
+        "gpM": 75.88
+      },
+      "d8": {
+        "rev": 82408.2,
+        "cogs": 29140.79,
+        "gp": 53267.41,
+        "gpM": 64.64
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 1540.25,
+        "cogsNonAllocatable": 747.83
+      },
+      "d5": {
+        "revNonProject": 23318.08,
+        "revProject": 7155.33,
+        "revShipping": 0,
+        "cogsNonProject": 17306.07,
+        "cogsProject": 3763.46,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10403.44,
+        "cogsLabor": 18737.35,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 17828.99,
+      "rd": 0
+    },
+    "totRev": 208095.12,
+    "totCogs": 121036.81,
+    "gp": 87058.31,
+    "gpM": 41.84,
+    "opex": 36896.58,
+    "growth": 24120.58,
+    "ebitda": 26041.15,
+    "ebitdaM": 12.51,
+    "netIncome": 26041.15
+  },
+  {
+    "month": "Apr 25",
+    "d": {
+      "d1": {
+        "rev": 49359.05,
+        "cogs": 17529.42,
+        "gp": 31829.63,
+        "gpM": 64.49
+      },
+      "d2": {
+        "rev": 6463.88,
+        "cogs": 4829,
+        "gp": 1634.88,
+        "gpM": 25.29
+      },
+      "d3": {
+        "rev": 49957.85,
+        "cogs": 40989.24,
+        "gp": 8968.61,
+        "gpM": 17.95
+      },
+      "d4": {
+        "rev": 1665.58,
+        "cogs": 0,
+        "gp": 1665.58,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 3603.08,
+        "cogs": 3704.93,
+        "gp": -101.85,
+        "gpM": -2.83
+      },
+      "d6": {
+        "rev": 5366.25,
+        "cogs": 2037.83,
+        "gp": 3328.42,
+        "gpM": 62.03
+      },
+      "d8": {
+        "rev": 83624.86,
+        "cogs": 30594.81,
+        "gp": 53030.05,
+        "gpM": 63.41
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 4083.73,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 3568.55,
+        "revProject": 34.53,
+        "revShipping": 0,
+        "cogsNonProject": 3754.83,
+        "cogsProject": -49.9,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10462.76,
+        "cogsLabor": 20132.05,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 20649.23,
+      "rd": 0
+    },
+    "totRev": 200040.55,
+    "totCogs": 120334.46,
+    "gp": 79706.09,
+    "gpM": 39.84,
+    "opex": 31749.98,
+    "growth": 28177.23,
+    "ebitda": 19778.88,
+    "ebitdaM": 9.89,
+    "netIncome": 19778.88
+  },
+  {
+    "month": "May 25",
+    "d": {
+      "d1": {
+        "rev": 38961.5,
+        "cogs": 19592.01,
+        "gp": 19369.49,
+        "gpM": 49.71
+      },
+      "d2": {
+        "rev": 2125.03,
+        "cogs": 2667.52,
+        "gp": -542.49,
+        "gpM": -25.53
+      },
+      "d3": {
+        "rev": 41930.04,
+        "cogs": 32735.27,
+        "gp": 9194.77,
+        "gpM": 21.93
+      },
+      "d4": {
+        "rev": 1506.79,
+        "cogs": 0,
+        "gp": 1506.79,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 22078.11,
+        "cogs": 18699.8,
+        "gp": 3378.31,
+        "gpM": 15.3
+      },
+      "d6": {
+        "rev": 3325,
+        "cogs": 1536.55,
+        "gp": 1788.45,
+        "gpM": 53.79
+      },
+      "d8": {
+        "rev": 85612.08,
+        "cogs": 35123.94,
+        "gp": 50488.14,
+        "gpM": 58.97
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 1549.61,
+        "cogsNonAllocatable": 1117.91
+      },
+      "d5": {
+        "revNonProject": 22078.11,
+        "revProject": 0,
+        "revShipping": 0,
+        "cogsNonProject": 18699.8,
+        "cogsProject": 0,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10747.49,
+        "cogsLabor": 24376.45,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 17112.65,
+      "rd": 0
+    },
+    "totRev": 195538.55,
+    "totCogs": 127467.74,
+    "gp": 68070.81,
+    "gpM": 34.81,
+    "opex": 26881.84,
+    "growth": 31899.16,
+    "ebitda": 9289.81,
+    "ebitdaM": 4.75,
+    "netIncome": 9289.81
+  },
+  {
+    "month": "Jun 25",
+    "d": {
+      "d1": {
+        "rev": 44676.51,
+        "cogs": 17208.91,
+        "gp": 27467.6,
+        "gpM": 61.48
+      },
+      "d2": {
+        "rev": 10077.76,
+        "cogs": 5430.84,
+        "gp": 4646.92,
+        "gpM": 46.11
+      },
+      "d3": {
+        "rev": 57672.48,
+        "cogs": 45227.39,
+        "gp": 12445.09,
+        "gpM": 21.58
+      },
+      "d4": {
+        "rev": 1500.15,
+        "cogs": 0,
+        "gp": 1500.15,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 46924.05,
+        "cogs": 38438.13,
+        "gp": 8485.92,
+        "gpM": 18.08
+      },
+      "d6": {
+        "rev": 5330,
+        "cogs": 1732.54,
+        "gp": 3597.46,
+        "gpM": 67.49
+      },
+      "d8": {
+        "rev": 95776.44,
+        "cogs": 34561.41,
+        "gp": 61215.03,
+        "gpM": 63.91
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 4685.57,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 26643.33,
+        "revProject": 20280.72,
+        "revShipping": 0,
+        "cogsNonProject": 22018.8,
+        "cogsProject": 16419.33,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10778.83,
+        "cogsLabor": 23782.58,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 15917.25,
+      "rd": 0
+    },
+    "totRev": 261957.39,
+    "totCogs": 158516.47,
+    "gp": 103440.92,
+    "gpM": 39.49,
+    "opex": 33105.31,
+    "growth": 28071.81,
+    "ebitda": 42263.8,
+    "ebitdaM": 16.13,
+    "netIncome": 42263.8
+  },
+  {
+    "month": "Jul 25",
+    "d": {
+      "d1": {
+        "rev": 37894,
+        "cogs": 22265.96,
+        "gp": 15628.04,
+        "gpM": 41.24
+      },
+      "d2": {
+        "rev": 13362.7,
+        "cogs": 12738.32,
+        "gp": 624.38,
+        "gpM": 4.67
+      },
+      "d3": {
+        "rev": 45100.64,
+        "cogs": 36886.77,
+        "gp": 8213.87,
+        "gpM": 18.21
+      },
+      "d4": {
+        "rev": 1757.25,
+        "cogs": 0,
+        "gp": 1757.25,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 27675.86,
+        "cogs": 24541.58,
+        "gp": 3134.28,
+        "gpM": 11.32
+      },
+      "d6": {
+        "rev": 5220,
+        "cogs": 1961.18,
+        "gp": 3258.82,
+        "gpM": 62.43
+      },
+      "d8": {
+        "rev": 92014.9,
+        "cogs": 33514.57,
+        "gp": 58500.33,
+        "gpM": 63.58
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 11993.05,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 13718,
+        "revProject": 13957.86,
+        "revShipping": 0,
+        "cogsNonProject": 11566.53,
+        "cogsProject": 12975.05,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10685.88,
+        "cogsLabor": 22828.69,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 12899.06,
+      "rd": 0
+    },
+    "totRev": 223025.35,
+    "totCogs": 144807.44,
+    "gp": 78217.91,
+    "gpM": 35.07,
+    "opex": 32221.72,
+    "growth": 29393.67,
+    "ebitda": 16602.52,
+    "ebitdaM": 7.44,
+    "netIncome": 16602.52
+  },
+  {
+    "month": "Aug 25",
+    "d": {
+      "d1": {
+        "rev": 38036.25,
+        "cogs": 19880.97,
+        "gp": 18155.28,
+        "gpM": 47.73
+      },
+      "d2": {
+        "rev": 32302.9,
+        "cogs": 19374.84,
+        "gp": 12928.06,
+        "gpM": 40.02
+      },
+      "d3": {
+        "rev": 41078.12,
+        "cogs": 32052.46,
+        "gp": 9025.66,
+        "gpM": 21.97
+      },
+      "d4": {
+        "rev": 1623.4,
+        "cogs": 0,
+        "gp": 1623.4,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 9781.83,
+        "cogs": 8333.72,
+        "gp": 1448.11,
+        "gpM": 14.8
+      },
+      "d6": {
+        "rev": 4780,
+        "cogs": 896.26,
+        "gp": 3883.74,
+        "gpM": 81.25
+      },
+      "d8": {
+        "rev": 92394.6,
+        "cogs": 34921.84,
+        "gp": 57472.76,
+        "gpM": 62.2
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 18629.57,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 8450.43,
+        "revProject": 1331.4,
+        "revShipping": 0,
+        "cogsNonProject": 6624.64,
+        "cogsProject": 1709.08,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10693.16,
+        "cogsLabor": 24228.68,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 16388.45,
+      "rd": 0
+    },
+    "totRev": 219997.1,
+    "totCogs": 131848.54,
+    "gp": 88148.56,
+    "gpM": 40.07,
+    "opex": 27945.28,
+    "growth": 26701.7,
+    "ebitda": 33501.58,
+    "ebitdaM": 15.23,
+    "netIncome": 33501.58
+  },
+  {
+    "month": "Sep 25",
+    "d": {
+      "d1": {
+        "rev": 34725.97,
+        "cogs": 18562.82,
+        "gp": 16163.15,
+        "gpM": 46.54
+      },
+      "d2": {
+        "rev": 10280,
+        "cogs": 8626.91,
+        "gp": 1653.09,
+        "gpM": 16.08
+      },
+      "d3": {
+        "rev": 50876.08,
+        "cogs": 40102.18,
+        "gp": 10773.9,
+        "gpM": 21.18
+      },
+      "d4": {
+        "rev": 4909.65,
+        "cogs": 0,
+        "gp": 4909.65,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 62788.49,
+        "cogs": 53974.22,
+        "gp": 8814.27,
+        "gpM": 14.04
+      },
+      "d6": {
+        "rev": 8262.5,
+        "cogs": 2962.4,
+        "gp": 5300.1,
+        "gpM": 64.15
+      },
+      "d8": {
+        "rev": 98518.81,
+        "cogs": 40068.53,
+        "gp": 58450.28,
+        "gpM": 59.33
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 7881.64,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 17320.52,
+        "revProject": 45467.97,
+        "revShipping": 0,
+        "cogsNonProject": 14330,
+        "cogsProject": 39644.22,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10959.68,
+        "cogsLabor": 29108.85,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 11008.97,
+      "rd": 0
+    },
+    "totRev": 270361.5,
+    "totCogs": 175306.03,
+    "gp": 95055.47,
+    "gpM": 35.16,
+    "opex": 35165.76,
+    "growth": 29215.54,
+    "ebitda": 30674.17,
+    "ebitdaM": 11.35,
+    "netIncome": 30674.17
+  },
+  {
+    "month": "Oct 25",
+    "d": {
+      "d1": {
+        "rev": 32094.86,
+        "cogs": 16530.78,
+        "gp": 15564.08,
+        "gpM": 48.49
+      },
+      "d2": {
+        "rev": 13370.17,
+        "cogs": 7947.14,
+        "gp": 5423.03,
+        "gpM": 40.56
+      },
+      "d3": {
+        "rev": 43920.27,
+        "cogs": 36045.19,
+        "gp": 7875.08,
+        "gpM": 17.93
+      },
+      "d4": {
+        "rev": 1501.14,
+        "cogs": 0,
+        "gp": 1501.14,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 13485.78,
+        "cogs": 7739.5,
+        "gp": 5746.28,
+        "gpM": 42.61
+      },
+      "d6": {
+        "rev": 6485,
+        "cogs": 2599.29,
+        "gp": 3885.71,
+        "gpM": 59.92
+      },
+      "d8": {
+        "rev": 96369.63,
+        "cogs": 36703.69,
+        "gp": 59665.94,
+        "gpM": 61.91
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 6829.24,
+        "cogsNonAllocatable": 1117.9
+      },
+      "d5": {
+        "revNonProject": 9437.5,
+        "revProject": 4048.28,
+        "revShipping": 0,
+        "cogsNonProject": 3920.16,
+        "cogsProject": 3819.34,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 10197.2,
+        "cogsLabor": 26506.49,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 16236.51,
+      "rd": 0
+    },
+    "totRev": 207226.85,
+    "totCogs": 123802.1,
+    "gp": 83424.75,
+    "gpM": 40.26,
+    "opex": 28419,
+    "growth": 32097.87,
+    "ebitda": 22907.88,
+    "ebitdaM": 11.05,
+    "netIncome": 22907.88
+  },
+  {
+    "month": "Nov 25",
+    "d": {
+      "d1": {
+        "rev": 31396,
+        "cogs": 10800.79,
+        "gp": 20595.21,
+        "gpM": 65.6
+      },
+      "d2": {
+        "rev": 1053.32,
+        "cogs": 1719.24,
+        "gp": -665.92,
+        "gpM": -63.22
+      },
+      "d3": {
+        "rev": 49826.94,
+        "cogs": 38566.44,
+        "gp": 11260.5,
+        "gpM": 22.6
+      },
+      "d4": {
+        "rev": 2511.95,
+        "cogs": 0,
+        "gp": 2511.95,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 1450,
+        "cogs": 1173.74,
+        "gp": 276.26,
+        "gpM": 19.05
+      },
+      "d6": {
+        "rev": 4780,
+        "cogs": 2286.48,
+        "gp": 2493.52,
+        "gpM": 52.17
+      },
+      "d8": {
+        "rev": 119774.19,
+        "cogs": 41876.54,
+        "gp": 77897.65,
+        "gpM": 65.04
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 973.97,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 1450,
+        "revProject": 0,
+        "revShipping": 0,
+        "cogsNonProject": 1173.74,
+        "cogsProject": 0,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 11425.16,
+        "cogsLabor": 30451.38,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 17299.39,
+      "rd": 0
+    },
+    "totRev": 210792.4,
+    "totCogs": 113722.62,
+    "gp": 97069.78,
+    "gpM": 46.05,
+    "opex": 35920.84,
+    "growth": 27920.02,
+    "ebitda": 33228.92,
+    "ebitdaM": 15.76,
+    "netIncome": 33228.92
+  },
+  {
+    "month": "Dec 25",
+    "d": {
+      "d1": {
+        "rev": 35122.19,
+        "cogs": 11389.98,
+        "gp": 23732.21,
+        "gpM": 67.57
+      },
+      "d2": {
+        "rev": 1588.87,
+        "cogs": 1964.88,
+        "gp": -376.01,
+        "gpM": -23.67
+      },
+      "d3": {
+        "rev": 45843.86,
+        "cogs": 36348.61,
+        "gp": 9495.25,
+        "gpM": 20.71
+      },
+      "d4": {
+        "rev": 652.53,
+        "cogs": 0,
+        "gp": 652.53,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 65180.48,
+        "cogs": 57030.68,
+        "gp": 8149.8,
+        "gpM": 12.5
+      },
+      "d6": {
+        "rev": 4780,
+        "cogs": 1852.85,
+        "gp": 2927.15,
+        "gpM": 61.24
+      },
+      "d8": {
+        "rev": 125042.65,
+        "cogs": 40771.02,
+        "gp": 84271.63,
+        "gpM": 67.39
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 1219.61,
+        "cogsNonAllocatable": 745.27
+      },
+      "d5": {
+        "revNonProject": 61360.93,
+        "revProject": 3819.55,
+        "revShipping": 0,
+        "cogsNonProject": 53250.35,
+        "cogsProject": 3780.33,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 11118.52,
+        "cogsLabor": 29652.5,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 17243.65,
+      "rd": 0
+    },
+    "totRev": 278210.58,
+    "totCogs": 166601.67,
+    "gp": 111608.91,
+    "gpM": 40.12,
+    "opex": 34750.11,
+    "growth": 30296.72,
+    "ebitda": 46562.08,
+    "ebitdaM": 16.74,
+    "netIncome": 46562.08
+  },
+  {
+    "month": "Jan 26",
+    "d": {
+      "d1": {
+        "rev": 35442.5,
+        "cogs": 13255.45,
+        "gp": 22187.05,
+        "gpM": 62.6
+      },
+      "d2": {
+        "rev": 5375.52,
+        "cogs": 4460.62,
+        "gp": 914.9,
+        "gpM": 17.02
+      },
+      "d3": {
+        "rev": 49901.2,
+        "cogs": 39990.55,
+        "gp": 9910.65,
+        "gpM": 19.86
+      },
+      "d4": {
+        "rev": 4065.28,
+        "cogs": 0,
+        "gp": 4065.28,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 31631.82,
+        "cogs": 26858.52,
+        "gp": 4773.3,
+        "gpM": 15.09
+      },
+      "d6": {
+        "rev": 5110,
+        "cogs": 2788.68,
+        "gp": 2321.32,
+        "gpM": 45.43
+      },
+      "d8": {
+        "rev": 124772.53,
+        "cogs": 40103.15,
+        "gp": 84669.38,
+        "gpM": 67.86
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 3642.66,
+        "cogsNonAllocatable": 817.96
+      },
+      "d5": {
+        "revNonProject": 11125.91,
+        "revProject": 18240.9,
+        "revShipping": 2265.01,
+        "cogsNonProject": 11269.28,
+        "cogsProject": 15052.83,
+        "cogsShipping": 536.41
+      },
+      "d8": {
+        "cogsCloud": 5038.34,
+        "cogsLabor": 27723.06,
+        "cogsResold": 7342.75
+      }
+    },
+    "unalloc": {
+      "loh": 0,
+      "rd": 25856.46
+    },
+    "totRev": 256298.85,
+    "totCogs": 153313.43,
+    "gp": 102985.42,
+    "gpM": 40.18,
+    "opex": 44279.83,
+    "growth": 39033.75,
+    "ebitda": 19671.84,
+    "ebitdaM": 7.68,
+    "netIncome": 19671.84
+  }
+];
+
+// Operating expense detail (last 4 months: Oct 25, Nov 25, Dec 25, Jan 26)
+var opxD = {
+  "Bank charges": [
+    6501.52,
+    5151.06,
+    4876.79,
+    6830.99
+  ],
+  "Bonus": [
+    3000,
+    0,
+    0,
+    0
+  ],
+  "Commissions": [
+    1663.48,
+    1340.1,
+    2683.18,
+    2683.18
+  ],
+  "Consulting": [
+    2468.47,
+    0,
+    0,
+    0
+  ],
+  "Employee benefits": [
+    26.5,
+    546.24,
+    450.75,
+    751.98
+  ],
+  "Financial admin": [
+    5900.36,
+    5380.6,
+    5512.1,
+    7293.31
+  ],
+  "HR": [
+    1400,
+    1400,
+    1400,
+    1400
+  ],
+  "Insurance": [
+    1156.64,
+    1743.16,
+    1156.64,
+    1156.64
+  ],
+  "Legal & professional": [
+    5432.92,
+    1117.9,
+    4419.27,
+    745.27
+  ],
+  "Office space": [
+    1419.36,
+    1419.36,
+    1419.36,
+    1419.36
+  ],
+  "Office admin": [
+    68.74,
+    249.28,
+    78.66,
+    0
+  ],
+  "Operational services": [
+    12964.65,
+    9646.48,
+    12487.45,
+    8768.35
+  ],
+  "QB payments": [
+    2134.8,
+    424.82,
+    1436.64,
+    3701.03
+  ],
+  "Taxes & licenses": [
+    107.09,
+    0,
+    0,
+    0
+  ],
+  "Utilities": [
+    35.3,
+    0,
+    0,
+    0
+  ]
+};
+
+// Growth expense detail (last 4 months)
+var grwD = {
+  "Advertising": [
+    8979.83,
+    8691.72,
+    8525.22,
+    8376.05
+  ],
+  "Business advisory (COO)": [
+    10483,
+    5399,
+    5452.69,
+    10621.85
+  ],
+  "Business development": [
+    6535.92,
+    7135.82,
+    6390.54,
+    6390.54
+  ],
+  "Marketing": [
+    4469.35,
+    5146.24,
+    4689.48,
+    2609.48
+  ],
+  "R&D": [
+    817.96,
+    1117.9,
+    745.27,
+    745.27
+  ],
+  "Travel & business": [
+    7747.69,
+    4607.19,
+    2116.82,
+    1553.53
+  ]
+};
+
+// Anomalies and flags
+var ANOMALIES = {
+  "Jan 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "KHHAITE billed extra for past licenses — income inflated", "impact": -7570.37, "dept": "d3", "action": "One-time adjustment; will normalize next month"},
+    {"type": "anomaly", "category": "Revenue", "description": "WESRIBE showing negative $3,319 — client double-charged from Aug 2024", "impact": -3319, "dept": "d1", "action": "Credit adjustment applied"},
+    {"type": "anomaly", "category": "Revenue", "description": "FNDIGS01-ODA1 — billing pending, rate not confirmed. Client signed Clarity contract", "impact": 3120, "dept": "d1", "action": "Invoice to be sent now that contract is signed"},
+    {"type": "anomaly", "category": "Revenue", "description": "ADHEAL01 — billing pending, client status unpaid in Maxio", "impact": 86, "dept": "d3", "action": "Client has been contacted"},
+    {"type": "anomaly", "category": "Revenue", "description": "212TAX01 — billing pending, client raised query on other charges", "impact": 0, "dept": "d3", "action": "Will bill once query resolved"},
+    {"type": "anomaly", "category": "Revenue", "description": "MDFIRE01 — billing pending, client status unpaid in Maxio", "impact": 450, "dept": "d3", "action": "Client has been contacted"}
+  ],
+  "Feb 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "212TAX01 — billing still pending due to client query", "impact": 0, "dept": "d3", "action": "Awaiting client resolution"},
+    {"type": "anomaly", "category": "Revenue", "description": "ADHEAL01 — billing still pending, unpaid in Maxio", "impact": 86, "dept": "d3", "action": "Follow-up in progress"},
+    {"type": "anomaly", "category": "Revenue", "description": "MDFIRE01 — billing still pending, unpaid in Maxio", "impact": 450, "dept": "d3", "action": "Follow-up in progress"}
+  ],
+  "Mar 25": [
+    {"type": "adjustment", "category": "Revenue", "description": "ERC check received — $31,247 net ($35,167 check minus $3,920 commission)", "impact": 31246.77, "dept": "exceptional", "action": "Recorded as exceptional item"},
+    {"type": "anomaly", "category": "Revenue", "description": "HMCB01 — charged client in March and refunded in April, causing ~$6K swing", "impact": -3135.60, "dept": "d3", "action": "Two-month impact: Mar inflated, Apr reduced"}
+  ],
+  "Apr 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "HMCB01 — April refund from March charge creating ~$3K negative impact", "impact": -3135.60, "dept": "d3", "action": "Offset of March overbilling"},
+    {"type": "anomaly", "category": "Revenue", "description": "WHIDCA01-SLA2 — extra on-demand billing to client", "impact": 9230.52, "dept": "d1", "action": "One-time on-demand surge"},
+    {"type": "anomaly", "category": "Revenue", "description": "STLPNT01-OD1 — emergency on-demand billing", "impact": 1233.62, "dept": "d1", "action": "Emergency engagement"},
+    {"type": "anomaly", "category": "Revenue", "description": "SKFAPR01 — Adobe subscription billed to client", "impact": 5540.76, "dept": "d3", "action": "Subscription pass-through"},
+    {"type": "anomaly", "category": "Revenue", "description": "MDFIRE01 — billing still pending, unpaid in Maxio", "impact": 1942, "dept": "d3", "action": "Continued follow-up"}
+  ],
+  "May 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "MCRRCY01 — new office move project invoice still pending", "impact": 430.50, "dept": "d2", "action": "Invoice to be sent"},
+    {"type": "anomaly", "category": "Revenue", "description": "SHALOM01-POD1 server closet cleanup — project invoice pending", "impact": 30, "dept": "d2", "action": "Invoice to be sent"},
+    {"type": "anomaly", "category": "Revenue", "description": "HMCBLD01-PA1-S2 (7th Floor) — project invoiced Dec 2023, still showing", "impact": 7.89, "dept": "d2", "action": "Legacy entry to be cleared"},
+    {"type": "anomaly", "category": "Revenue", "description": "HOLAPA01-PA1 (192 Lex Office) — project invoiced Dec 2023, still showing", "impact": 102.50, "dept": "d2", "action": "Legacy entry to be cleared"},
+    {"type": "expense", "category": "COGS", "description": "Non-allocatable labor (Dan's payroll) ~$373 higher — 5 Thursdays in month", "impact": 372.64, "dept": "d2", "action": "Calendar-driven variance; no action needed"},
+    {"type": "expense", "category": "OpEx", "description": "Alex Shadraw extra payment for Google Ads + Dan's payroll higher than usual", "impact": 2695, "dept": "marketing", "action": "Confirm if recurring"}
+  ],
+  "Jun 25": [
+    {"type": "anomaly", "category": "COGS", "description": "SCILUC01 — Adobe yearly subscriptions", "impact": 12478, "dept": "d3", "action": "Annual renewal; one-time spike"},
+    {"type": "anomaly", "category": "Revenue", "description": "WHIDCA01-CxO $2,400 not received — credit card expired, will record in July", "impact": 2400, "dept": "d6", "action": "Payment shifted to July"},
+    {"type": "anomaly", "category": "COGS", "description": "Multiple projects showing negative income — higher labor cost than invoiced", "impact": 0, "dept": "d2", "action": "Review VRLVL01-Dallas, VRLVRY01-Chicago/Boston, NCJWOM01, BHSTRT01, HMCBLD01 projects"}
+  ],
+  "Jul 25": [
+    {"type": "anomaly", "category": "COGS", "description": "SHALOM01 — client shifted from Timothy to Craig, higher on-demand costs", "impact": 0, "dept": "d1", "action": "New engineer assignment driving cost increase"},
+    {"type": "anomaly", "category": "COGS", "description": "RDKSTG01-CxO — Hammer logged time at high rate, reducing Div 6 profit", "impact": 0, "dept": "d6", "action": "Review CxO labor allocation"}
+  ],
+  "Aug 25": [
+    {"type": "anomaly", "category": "Margin", "description": "Minimal time on WHIDCA-CxO and RDKSTG01-CxO — higher Div 6 profit than usual", "impact": 0, "dept": "d6", "action": "Low activity month; profit % inflated"},
+    {"type": "expense", "category": "OpEx", "description": "Traveler insurance $372.60 accrued monthly but no cost recorded in August", "impact": -372.60, "dept": "opex", "action": "Bank timing difference"},
+    {"type": "anomaly", "category": "OpEx", "description": "No employee cost overhead recorded in August", "impact": 0, "dept": "opex", "action": "Verify with accounting"},
+    {"type": "anomaly", "category": "Revenue", "description": "KRAOCS01-AUS — flagged for review", "impact": 0, "dept": "d1", "action": "Investigate billing status"}
+  ],
+  "Sep 25": [
+    {"type": "anomaly", "category": "COGS", "description": "VRLVL01 — Dallas and Chicago project hours exceed estimates (Jun-Aug carryover)", "impact": 0, "dept": "d2", "action": "Review project scope and billing"},
+    {"type": "anomaly", "category": "COGS", "description": "Non-project expense $5,629 unattributable — asked Stanley and G, no clarity", "impact": 5629.48, "dept": "d5a", "action": "Needs further investigation"},
+    {"type": "anomaly", "category": "Revenue", "description": "FNDIGS01-SLA1 Clarity 16 — increase in overage billing", "impact": 5175, "dept": "d1", "action": "Overage reflects higher client usage"},
+    {"type": "anomaly", "category": "Revenue", "description": "KHHITT01 — users jumped from 66 to 184 for Microsoft Premium", "impact": 3115.20, "dept": "d3", "action": "Seat count increase driving revenue spike"},
+    {"type": "anomaly", "category": "COGS", "description": "WHIDAC01 — Cloudflare renewal", "impact": 8400, "dept": "d3", "action": "Annual renewal; one-time cost spike"},
+    {"type": "anomaly", "category": "Revenue", "description": "SCILUC01-CxO — new CxO engagement", "impact": 675, "dept": "d6", "action": "New client engagement"},
+    {"type": "anomaly", "category": "Revenue", "description": "VILOCA01-CxO (On Demand) — new engagement", "impact": 2695, "dept": "d6", "action": "On-demand CxO revenue"},
+    {"type": "anomaly", "category": "Revenue", "description": "SWTLNE01-SLA1 A+ Animal — new client onboarded", "impact": 7199.82, "dept": "d8", "action": "New recurring revenue"},
+    {"type": "anomaly", "category": "Revenue", "description": "KHHAITE extra billing for past licenses — income inflated", "impact": 0, "dept": "d3", "action": "One-time adjustment"}
+  ],
+  "Oct 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "Shiraz & Swiftline A+ Animal seat count reduced", "impact": -2183.32, "dept": "d8", "action": "Client downsized seats"},
+    {"type": "anomaly", "category": "Revenue", "description": "RGCEN — invoice recorded but no related expense", "impact": 0, "dept": "d5", "action": "Verify cost entry"}
+  ],
+  "Nov 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "Shiraz & Swiftline A+ Animal seat count reduced (continued)", "impact": -2183.32, "dept": "d8", "action": "Ongoing reduction from October"},
+    {"type": "anomaly", "category": "Revenue", "description": "AGU onboarded — new A+ Animal client", "impact": 20651.40, "dept": "d8", "action": "Major new client; recurring revenue"},
+    {"type": "anomaly", "category": "COGS", "description": "EVE point material purchased, categorized under project material by G", "impact": 600, "dept": "d5a", "action": "Classification directed by management"}
+  ],
+  "Dec 25": [
+    {"type": "anomaly", "category": "Revenue", "description": "Los Angeles Country Club onboarded — new client boosting Div 1 and Div 8", "impact": 11618, "dept": "d1", "action": "New recurring revenue from major client"},
+    {"type": "anomaly", "category": "Revenue", "description": "AGU onboarding (from November) continuing to boost Div 8 revenue", "impact": 20651.40, "dept": "d8", "action": "Recurring revenue now stabilized"},
+    {"type": "anomaly", "category": "COGS", "description": "Multiple projects with actual hours exceeding estimates — loss in Div 2", "impact": 0, "dept": "d2", "action": "Review project scoping and estimation process"},
+    {"type": "anomaly", "category": "Revenue", "description": "RGCENG $25,752 + Scilucent $24,182 non-project material purchases — big revenue spike in Div 5A", "impact": 49934.43, "dept": "d5a", "action": "Large one-time material orders"},
+    {"type": "expense", "category": "COGS", "description": "VRLVRY01-Boston and KHHITT01 M365 migration — $2,738 material cost with no matching material revenue (labor-only agreement)", "impact": 2738, "dept": "d5b", "action": "Cost recorded in Div 5B but income in Div 2"}
+  ],
+  "Jan 26": [
+    {"type": "expense", "category": "COGS", "description": "R&D in COGS — $25,856", "impact": 0, "dept": "unalloc", "action": "Get classification rationale from Bharat"},
+    {"type": "expense", "category": "Growth", "description": "Travel & business — $7,748 (+144% vs avg)", "impact": 0, "dept": "growth", "action": "Get line-item detail from Bharat"},
+    {"type": "expense", "category": "OpEx", "description": "Consulting expenses — $2,468", "impact": 0, "dept": "opex", "action": "Identify vendor and purpose"},
+    {"type": "adjustment", "category": "OpEx", "description": "Bonus — $3,000", "impact": 0, "dept": "opex", "action": "Confirm if one-time"},
+    {"type": "adjustment", "category": "OpEx", "description": "Operational services — $12,965 (+44% vs avg)", "impact": 0, "dept": "opex", "action": "Review vendor contracts"},
+    {"type": "adjustment", "category": "Margin", "description": "Div 3 Cloud GP% — 19.9% (target 60%)", "impact": 0, "dept": "d3", "action": "Evaluate bundling into platform pricing"},
+    {"type": "expense", "category": "COGS", "description": "Labor overhead $0 / R&D COGS $25.9K", "impact": 0, "dept": "unalloc", "action": "Confirm with Bharat"},
+    {"type": "adjustment", "category": "Revenue", "description": "Div 8 Resold services COGS $7,343", "impact": 0, "dept": "d8", "action": "Verify with Bharat"}
   ]
 };
