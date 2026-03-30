@@ -995,7 +995,7 @@
   <div class="drilldown-panel" id="drilldownPanel">
     <div class="drilldown-header">
       <div class="drilldown-title" id="drilldownTitle"></div>
-      <button class="close-btn" onclick="closeDrilldown()">Ã</button>
+      <button class="close-btn" onclick="closeDrilldown()">×</button>
     </div>
     <div class="drilldown-content" id="drilldownContent"></div>
   </div>
@@ -1509,10 +1509,10 @@
         <th>${DATA[DATA.length - 3].month}</th>
         <th>${DATA[DATA.length - 2].month}</th>
         <th>${data.month}</th>
-        <th>MOM Î</th>
+        <th>MOM Δ</th>
         <th>MOM %</th>
         <th>3-MO AVG</th>
-        <th>VS AVG Î</th>
+        <th>VS AVG Δ</th>
         <th>VS AVG %</th>
       </tr></thead><tbody>`;
 
@@ -1539,7 +1539,7 @@
         const d0 = m0.d[dept.id], d1 = m1.d[dept.id], d2 = m2.d[dept.id], d3 = m3.d[dept.id];
         const avgRev3 = (d1.rev + d2.rev + d3.rev) / 3;
 
-        html += `<tr class="pnl-bold"><td>${dept.name} â Revenue</td>
+        html += `<tr class="pnl-bold"><td>${dept.name} — Revenue</td>
           <td>$${formatNum(d0.rev)}</td><td>$${formatNum(d1.rev)}</td><td>$${formatNum(d2.rev)}</td>
           <td>$${formatNum(d3.rev)}</td><td>$${formatNum(d3.rev - d2.rev)}</td>
           <td>${d2.rev ? ((d3.rev - d2.rev) / d2.rev * 100).toFixed(1) : '0'}%</td>
@@ -1692,7 +1692,7 @@
         <th>${m[1] ? m[1].month : ''}</th>
         <th>${m[2] ? m[2].month : ''}</th>
         <th class="col-current">${cur.month}</th>
-        <th class="col-delta">MOM Î</th><th>MOM %</th>
+        <th class="col-delta">MOM Δ</th><th>MOM %</th>
         <th>3-MO AVG</th><th>VS AVG</th>
       </tr></thead><tbody>`;
 
@@ -1716,9 +1716,9 @@
           m.map(d => d ? d.d[dept.id].cogs : null), 'pnl-indent');
       });
 
-      html += dataRow('&nbsp;&nbsp;&nbsp;Unallocated â Labor Overhead',
+      html += dataRow('&nbsp;&nbsp;&nbsp;Unallocated — Labor Overhead',
         m.map(d => d ? d.unalloc.loh : null), 'pnl-indent');
-      html += dataRow('&nbsp;&nbsp;&nbsp;Unallocated â R&D',
+      html += dataRow('&nbsp;&nbsp;&nbsp;Unallocated — R&D',
         m.map(d => d ? d.unalloc.rd : null), 'pnl-indent');
 
       // --- Gross Profit ---
@@ -1771,7 +1771,7 @@
         <td>&nbsp;&nbsp;&nbsp;EBITDA Margin %</td>
         ${m.map((d, i) => {
           if (!d) return '<td></td>';
-          const pct = d.totRev ? (d.ebitda / d.totRev * 100).toFixed(1) + '%' : 'â';
+          const pct = d.totRev ? (d.ebitda / d.totRev * 100).toFixed(1) + '%' : '—';
           const cls = i === 3 ? ' class="col-current"' : '';
           return `<td${cls}>${pct}</td>`;
         }).join('')}
@@ -1793,7 +1793,7 @@
         <td>&nbsp;&nbsp;&nbsp;Net Margin %</td>
         ${m.map((d, i) => {
           if (!d) return '<td></td>';
-          const pct = d.totRev ? (d.netIncome / d.totRev * 100).toFixed(1) + '%' : 'â';
+          const pct = d.totRev ? (d.netIncome / d.totRev * 100).toFixed(1) + '%' : '—';
           const cls = i === 3 ? ' class="col-current"' : '';
           return `<td${cls}>${pct}</td>`;
         }).join('')}
@@ -1868,7 +1868,7 @@
           if (imp > 0) { impClass = 'positive'; impText = '+' + fmt(imp); }
           else if (imp < 0) { impClass = 'negative'; impText = '-' + fmt(Math.abs(imp)); }
 
-          const titleText = a.category || a.description.split('â')[0].trim();
+          const titleText = a.category || a.description.split('—')[0].trim();
 
           return `
             <div class="intel-card">
@@ -1906,7 +1906,7 @@
         </div>
         <div class="intel-section">
           <div class="intel-section-header">
-            <div class="intel-section-title">â¡ Anomalies & One-Time Items</div>
+            <div class="intel-section-title">⚡ Anomalies & One-Time Items</div>
             <div class="intel-section-subtitle">Non-recurring items by month</div>
           </div>
           <div class="intel-stats">
@@ -1937,91 +1937,20 @@
     ];
 
     function initChat() {
-      const cur = DATA[DATA.length - 1];
-      const prev = DATA.length > 1 ? DATA[DATA.length - 2] : null;
-      const bm = BM.overall;
-      let totalRev = 0, totalCOGS = 0, totalGP = 0;
-      DEPTS.forEach(dept => { const dd = cur.d[dept.id]; if (dd) { totalRev += dd.rev || 0; totalCOGS += dd.cogs || 0; totalGP += dd.gp || 0; } });
-      const gpM = totalRev > 0 ? (totalGP / totalRev * 100) : 0;
-      const laborPct = totalRev > 0 ? ((cur.opx.payroll || 0) / totalRev * 100) : 0;
-      let prevRev = 0;
-      if (prev) { DEPTS.forEach(dept => { const dd = prev.d[dept.id]; if (dd) prevRev += dd.rev || 0; }); }
-      const revGrowth = prevRev > 0 ? ((totalRev - prevRev) / prevRev * 100) : 0;
-      let deptLines = '';
-      DEPTS.forEach(dept => {
-        const dd = cur.d[dept.id]; const b = BM[dept.id];
-        if (dd && b && dd.rev > 0) {
-          const gap = dd.gpM - b.tgt;
-          const icon = gap >= 0 ? '\u2705' : (gap > -10 ? '\u26A0\uFE0F' : '\uD83D\uDD34');
-          const label = dept.name.split(' \u2014 ')[1] || dept.name;
-          deptLines += icon + ' ' + label + ': ' + dd.gpM.toFixed(1) + '% (target: ' + b.tgt + '%)<br>';
-        }
-      });
-      const kpiHtml = 'Gross Margin (after labor): <strong>' + gpM.toFixed(1) + '%</strong><br>&nbsp;&nbsp;(Median: ' + bm.gpMmed + '%, Top: ' + bm.gpMtop + '%)<br>Gross Margin (before labor): <strong>' + (totalRev > 0 ? (totalGP / totalRev * 100).toFixed(1) : 0) + '%</strong><br>MoM Revenue Growth: <strong>' + revGrowth.toFixed(1) + '%</strong><br>All-In Labor: <strong>' + laborPct.toFixed(1) + '% of rev</strong><br><br>Dept Margins vs. Targets:<br>' + deptLines;
-      document.getElementById('chatMessages').innerHTML = '<div class="chat-msg assistant"><div class="chat-bubble">' + kpiHtml + '</div></div>';
-    }
+      document.getElementById('chatMessages').innerHTML = `
+        <div class="chat-msg assistant">
+          <div class="chat-bubble">Hi! I'm the MSP Advisor for DAG Tech. I can help you analyze financial performance, spot trends, and recommend actions. What would you like to explore?</div>
+        </div>
+      `;
 
-    function generateResponse(msg) {
-      const cur = DATA[DATA.length - 1];
-      const prev = DATA.length > 1 ? DATA[DATA.length - 2] : null;
-      const q = msg.toLowerCase();
-      let totalRev = 0, totalCOGS = 0, totalGP = 0;
-      DEPTS.forEach(dept => { const dd = cur.d[dept.id]; if (dd) { totalRev += dd.rev || 0; totalCOGS += dd.cogs || 0; totalGP += dd.gp || 0; } });
-      const gpM = totalRev > 0 ? (totalGP / totalRev * 100) : 0;
-      const totalOpx = Object.values(cur.opx || {}).reduce((s,v) => s + (v||0), 0);
-      const laborPct = totalRev > 0 ? ((cur.opx.payroll || 0) / totalRev * 100) : 0;
-      const netIncome = totalGP - totalOpx;
-      const netMargin = totalRev > 0 ? (netIncome / totalRev * 100) : 0;
-      let prevRev = 0;
-      if (prev) { DEPTS.forEach(dept => { const dd = prev.d[dept.id]; if (dd) prevRev += dd.rev || 0; }); }
-      const revGrowth = prevRev > 0 ? ((totalRev - prevRev) / prevRev * 100) : 0;
-      const bm = BM.overall;
-      function getDeptStatus() {
-        let results = [];
-        DEPTS.forEach(dept => {
-          const dd = cur.d[dept.id]; const b = BM[dept.id];
-          if (dd && b && dd.rev > 0) {
-            const gap = dd.gpM - b.tgt;
-            const icon = gap >= 0 ? '\u2705' : (gap > -10 ? '\u26A0\uFE0F' : '\uD83D\uDD34');
-            results.push({name: dept.name.split(' \u2014 ')[1] || dept.name, margin: dd.gpM, target: b.tgt, gap: gap, icon: icon, rev: dd.rev});
-          }
-        });
-        return results;
-      }
-      if (q.includes('margin') || q.includes('gross profit') || q.includes('gp')) {
-        const depts = getDeptStatus();
-        let deptLines = depts.map(d => d.icon + ' ' + d.name + ': ' + d.margin.toFixed(1) + '% (target: ' + d.target + '%)').join('<br>');
-        return '<strong>Gross Margin Analysis (' + cur.month + ')</strong><br><br>Overall GP Margin: <strong>' + gpM.toFixed(1) + '%</strong><br>MSP Median: ' + bm.gpMmed + '% | Top Quartile: ' + bm.gpMtop + '%<br><br><strong>By Department:</strong><br>' + deptLines;
-      }
-      if (q.includes('labor') || q.includes('payroll') || q.includes('staff')) {
-        return '<strong>Labor Analysis (' + cur.month + ')</strong><br><br>All-In Labor: <strong>' + laborPct.toFixed(1) + '% of revenue</strong><br>Payroll: $' + (cur.opx.payroll || 0).toLocaleString() + '<br>MSP Benchmark: ' + bm.laborPct + '% (Top: ' + bm.laborTop + '%, Median: ' + bm.laborMed + '%)<br><br>' + (laborPct < bm.laborPct ? '\u2705 Labor costs are below the MSP benchmark target.' : '\u26A0\uFE0F Labor costs are above the ' + bm.laborPct + '% benchmark. Consider reviewing staffing efficiency or increasing revenue per head.');
-      }
-      if (q.includes('growth') || q.includes('revenue') || q.includes('trend')) {
-        let trend = '';
-        if (DATA.length >= 3) {
-          const last3 = DATA.slice(-3);
-          trend = '<br><strong>3-Month Revenue Trend:</strong><br>';
-          last3.forEach(m => { let r = 0; DEPTS.forEach(dept => { const dd = m.d[dept.id]; if (dd) r += dd.rev || 0; }); trend += m.month + ': $' + r.toLocaleString(undefined, {maximumFractionDigits: 0}) + '<br>'; });
-        }
-        return '<strong>Growth Analysis (' + cur.month + ')</strong><br><br>Total Revenue: <strong>$' + totalRev.toLocaleString(undefined, {maximumFractionDigits: 0}) + '</strong><br>MoM Growth: <strong>' + revGrowth.toFixed(1) + '%</strong><br>' + (cur.grw ? 'New Clients: ' + (cur.grw.newClients || 0) + ' | Churned: ' + (cur.grw.churned || 0) + ' | NRR: ' + (cur.grw.nrr || 100) + '%' : '') + trend;
-      }
-      if (q.includes('valuation') || q.includes('ebitda') || q.includes('multiple') || q.includes('worth')) {
-        const annRev = totalRev * 12, annGP = totalGP * 12, annOpx = totalOpx * 12;
-        const ebitda = annGP - annOpx;
-        return '<strong>Valuation Estimates</strong><br><br>Annualized Revenue: $' + annRev.toLocaleString(undefined, {maximumFractionDigits: 0}) + '<br>Annualized EBITDA (est): $' + ebitda.toLocaleString(undefined, {maximumFractionDigits: 0}) + '<br><br><strong>Revenue Multiple (0.8x-1.5x):</strong><br>$' + (annRev * 0.8).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' \u2013 $' + (annRev * 1.5).toLocaleString(undefined, {maximumFractionDigits: 0}) + '<br><br><strong>EBITDA Multiple (6x-10x):</strong><br>' + (ebitda > 0 ? '$' + (ebitda * 6).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' \u2013 $' + (ebitda * 10).toLocaleString(undefined, {maximumFractionDigits: 0}) : 'N/A (negative EBITDA)') + '<br><br><em>Based on typical MSP market multiples.</em>';
-      }
-      if (q.includes('expense') || q.includes('opex') || q.includes('cost') || q.includes('overhead')) {
-        let expLines = '';
-        opxD.forEach(e => { const val = cur.opx[e.k] || 0; if (val > 0) expLines += e.l + ': $' + val.toLocaleString() + '<br>'; });
-        return '<strong>Operating Expenses (' + cur.month + ')</strong><br><br>' + expLines + '<br><strong>Total OpEx:</strong> $' + totalOpx.toLocaleString(undefined, {maximumFractionDigits: 0}) + '<br>OpEx as % of Revenue: ' + (totalRev > 0 ? (totalOpx / totalRev * 100).toFixed(1) : 0) + '%<br>Net Income: <strong>$' + netIncome.toLocaleString(undefined, {maximumFractionDigits: 0}) + '</strong> (' + netMargin.toFixed(1) + '% net margin)';
-      }
-      if (q.includes('benchmark') || q.includes('compare') || q.includes('how do') || q.includes('vs')) {
-        const depts = getDeptStatus();
-        let summary = depts.map(d => d.icon + ' ' + d.name + ': ' + d.margin.toFixed(1) + '% vs ' + d.target + '% target (' + (d.gap >= 0 ? '+' : '') + d.gap.toFixed(1) + '%)').join('<br>');
-        return '<strong>Benchmark Comparison (' + cur.month + ')</strong><br><br>Overall GP: ' + gpM.toFixed(1) + '% (Median: ' + bm.gpMmed + '%, Top: ' + bm.gpMtop + '%)<br>Labor: ' + laborPct.toFixed(1) + '% of rev (Target: ' + bm.laborPct + '%)<br><br><strong>Dept Margins vs Targets:</strong><br>' + summary;
-      }
-      const depts = getDeptStatus();
-      return '<strong>Quick Summary (' + cur.month + ')</strong><br><br>Revenue: $' + totalRev.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' | GP Margin: ' + gpM.toFixed(1) + '% (MSP Median: ' + bm.gpMmed + '%)<br>Labor: ' + laborPct.toFixed(1) + '% of rev | Net: $' + netIncome.toLocaleString(undefined, {maximumFractionDigits: 0}) + '<br><br>Try asking about: <em>margins, labor, growth, valuations, expenses, or benchmarks</em>';
+      document.getElementById('quickBtns').innerHTML = [
+        'Margin trends by division',
+        'Expense analysis',
+        'Revenue mix insights',
+        'Growth recommendations'
+      ].map(q => `<button class="quick-btn" onclick="sendChat('${q}')">${q}</button>`).join('');
+
+      document.getElementById('chatInput').value = '';
     }
 
     function sendChat(msg) {
