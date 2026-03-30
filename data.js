@@ -1357,14 +1357,10 @@ var ANOMALIES = {
 // Flagged Items — color-coded action/monitor cards per month
 var FLAGS = {
   "Jan 26": [
-    {"status":"action","title":"R&D in COGS — $25,856","desc":"New COGS line. Was ~$868/mo in Growth Expenses in 2025.","next":"Get classification rationale from Bharat","dept":"COGS / UNALLOC"},
-    {"status":"action","title":"Travel & business — $7,748 (+144% vs avg)","desc":"5x December, 2.4x trailing average.","next":"Get line-item detail from Bharat","dept":"Growth / OPEX"},
-    {"status":"action","title":"Consulting expenses — $2,468","desc":"Brand new line item. No prior history.","next":"Identify vendor and purpose","dept":"OPEX"},
-    {"status":"monitor","title":"Bonus — $3,000","desc":"2x the entire 2025 annual total.","next":"Confirm if one-time","dept":"OPEX"},
-    {"status":"monitor","title":"Operational services — $12,965 (+44% vs avg)","desc":"Annualized $156K vs $108K in 2025.","next":"Review vendor contracts","dept":"OPEX"},
-    {"status":"monitor","title":"Div 3 Cloud GP% — 19.9% (target 60%)","desc":"Below 2025 avg of 22.5%. Persistent margin compression.","next":"Evaluate bundling into platform pricing","dept":"Margin / D3"},
-    {"status":"action","title":"Labor overhead $0 / R&D COGS $25.9K","desc":"Possible reclassification of non-billable hours. LOH was ~$17K/mo in 2025.","next":"Confirm with Bharat","dept":"COGS / UNALLOC"},
-    {"status":"monitor","title":"Div 8 Resold services COGS $7,343","desc":"New sub-line. Cloud/VAR dropped $6K simultaneously.","next":"Verify with Bharat","dept":"COGS / D8"}
+    {"status":"resolved","title":"R&D in COGS — $25,856","desc":"Normal tech overhead is ~$17K/mo. January was $25,856 — the increase of ~$8.9K is the delta above normal. Was previously booked under Growth Expenses at ~$868/mo in 2025.","next":"Resolved — delta is $8.9K above $17K baseline","dept":"COGS / UNALLOC"},
+    {"status":"resolved","title":"Travel & business — $7,748 (+144% vs avg)","desc":"Dan and Kristin traveled to LA for extended stay + launch of LA Country Club (LACC), a large new client.","next":"Resolved — justified by LACC client launch","dept":"Growth / OPEX"},
+    {"status":"resolved","title":"Consulting expenses — $2,468","desc":"AG MSP helping DAG migrate fully to Autotask. Two more payments coming — total project cost ~$8K spread throughout 2026.","next":"P&L to be updated to reflect this. Will re-ingest data once done.","dept":"OPEX"},
+    {"status":"resolved","title":"Bonus — $3,000","desc":"One-time bonus for Justin.","next":"Resolved — confirmed one-time","dept":"OPEX"}
   ],
   "Dec 25": [
     {"status":"action","title":"Div 5 Materials rev spiked to $65.2K","desc":"From $1.5K prior month — 43x increase. Largest single-month swing.","next":"Clarify what drove this spike","dept":"Revenue / D5"},
