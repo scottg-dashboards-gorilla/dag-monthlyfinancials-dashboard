@@ -1927,11 +1927,25 @@
       document.getElementById('intelReport').innerHTML = `
         <div class="intel-header">
           <h2>Intelligence Report</h2>
-          <p>Anomalies & one-time items alongside AI-powered MSP strategy analysis</p>
+          <p>AI-powered MSP strategy analysis alongside anomalies & one-time items</p>
         </div>
         <div class="intel-section">
           <div class="intel-section-header">
-            <div class="intel-section-title">⚡ Anomalies & One-Time Items</div>
+            <div class="intel-section-title">\uD83E\uDDE0 MSP Strategy Advisor</div>
+            <div class="intel-section-subtitle">Benchmarks & Analysis</div>
+          </div>
+          <div class="chat-wrap">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="quick-btns" id="quickBtns"></div>
+            <div class="chat-input-wrap">
+              <input id="chatInput" placeholder="Ask about margins, valuations, labor, growth..." onkeydown="if(event.key==='Enter')sendChat()">
+              <button onclick="sendChat()">\u25B6</button>
+            </div>
+          </div>
+        </div>
+        <div class="intel-section" style="margin-top:24px;">
+          <div class="intel-section-header">
+            <div class="intel-section-title">\u26A1 Anomalies & One-Time Items</div>
             <div class="intel-section-subtitle">Non-recurring items by month</div>
           </div>
           <div class="intel-stats">
@@ -1949,19 +1963,6 @@
             </div>
           </div>
           ${monthsHtml}
-        </div>
-        <div class="intel-section" style="margin-top:24px;">
-          <div class="intel-section-header">
-            <div class="intel-section-title">\uD83E\uDDE0 MSP Strategy Advisor</div>
-            <div class="intel-section-subtitle">Benchmarks & Analysis</div>
-          </div>
-          <div class="chat-wrap">
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-wrap">
-              <input id="chatInput" placeholder="Ask about margins, valuations, labor, growth..." onkeydown="if(event.key==='Enter')sendChat()">
-              <button onclick="sendChat()">\u25B6</button>
-            </div>
-          </div>
         </div>`;
       initChat();
     }
@@ -2020,6 +2021,23 @@
       return '<b>DAG Tech Summary ('+cur.month+')</b><br>Revenue: $'+totalRev.toLocaleString()+' | GP Margin: '+gpM.toFixed(1)+'% | EBITDA: $'+ebitda.toLocaleString()+'<br><br>Try asking about: <b>margins</b>, <b>expenses</b>, <b>growth</b>, <b>valuations</b>, or <b>benchmarks</b>.';
     }
 
+    var SUGGESTED_QUESTIONS = [
+      'How are our margins vs MSP benchmarks?',
+      'Show me expense breakdown',
+      'Revenue & growth trends',
+      'What is DAG Tech worth?',
+      'Compare us to the industry',
+      'Which divisions need attention?'
+    ];
+
+    function renderSuggestedQuestions(){
+      var el=document.getElementById('quickBtns');
+      if(!el) return;
+      el.innerHTML=SUGGESTED_QUESTIONS.map(function(q){
+        return '<button class="quick-btn" onclick="sendChat(\''+q+'\')">'+q+'</button>';
+      }).join('');
+    }
+
     function initChat(){
       var cur=DATA[DATA.length-1];var prev=DATA.length>1?DATA[DATA.length-2]:null;
       var totalRev=cur.totRev||0;var gpM=cur.gpM||0;
@@ -2040,9 +2058,9 @@
       h+='OpEx Ratio: <b>'+opexPct.toFixed(1)+'%</b> (benchmark: '+MSP_BM.laborPct+'%)<br>';
       h+='EBITDA: <b>$'+(cur.ebitda||0).toLocaleString()+'</b><br><br>';
       h+='<b>Department Performance:</b><br>'+deptLines;
-      h+='<br><em>Ask me about margins, expenses, growth, valuations, or benchmarks.</em>';
       var el=document.getElementById('chatMessages');
       if(el) el.innerHTML='<div class="chat-msg assistant"><div class="chat-bubble">'+h+'</div></div>';
+      renderSuggestedQuestions();
     }
 
     function sendChat(msg){
@@ -2055,6 +2073,7 @@
         var response=generateResponse(msg);
         messages.innerHTML+='<div class="chat-msg assistant"><div class="chat-bubble">'+response+'</div></div>';
         messages.scrollTop=messages.scrollHeight;
+        renderSuggestedQuestions();
       },300);
     }
 
