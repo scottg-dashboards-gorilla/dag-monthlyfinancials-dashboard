@@ -1353,3 +1353,82 @@ var ANOMALIES = {
     {"type": "adjustment", "category": "Revenue", "description": "Div 8 Resold services COGS $7,343", "impact": 0, "dept": "d8", "action": "Verify with Bharat"}
   ]
 };
+
+// Flagged Items — color-coded action/monitor cards per month
+var FLAGS = {
+  "Jan 26": [
+    {"status":"action","title":"R&D in COGS — $25,856","desc":"New COGS line. Was ~$868/mo in Growth Expenses in 2025.","next":"Get classification rationale from Bharat","dept":"COGS / UNALLOC"},
+    {"status":"action","title":"Travel & business — $7,748 (+144% vs avg)","desc":"5x December, 2.4x trailing average.","next":"Get line-item detail from Bharat","dept":"Growth / OPEX"},
+    {"status":"action","title":"Consulting expenses — $2,468","desc":"Brand new line item. No prior history.","next":"Identify vendor and purpose","dept":"OPEX"},
+    {"status":"monitor","title":"Bonus — $3,000","desc":"2x the entire 2025 annual total.","next":"Confirm if one-time","dept":"OPEX"},
+    {"status":"monitor","title":"Operational services — $12,965 (+44% vs avg)","desc":"Annualized $156K vs $108K in 2025.","next":"Review vendor contracts","dept":"OPEX"},
+    {"status":"monitor","title":"Div 3 Cloud GP% — 19.9% (target 60%)","desc":"Below 2025 avg of 22.5%. Persistent margin compression.","next":"Evaluate bundling into platform pricing","dept":"Margin / D3"},
+    {"status":"action","title":"Labor overhead $0 / R&D COGS $25.9K","desc":"Possible reclassification of non-billable hours. LOH was ~$17K/mo in 2025.","next":"Confirm with Bharat","dept":"COGS / UNALLOC"},
+    {"status":"monitor","title":"Div 8 Resold services COGS $7,343","desc":"New sub-line. Cloud/VAR dropped $6K simultaneously.","next":"Verify with Bharat","dept":"COGS / D8"}
+  ],
+  "Dec 25": [
+    {"status":"action","title":"Div 5 Materials rev spiked to $65.2K","desc":"From $1.5K prior month — 43x increase. Largest single-month swing.","next":"Clarify what drove this spike","dept":"Revenue / D5"},
+    {"status":"monitor","title":"Div 2 Project Labor GP% at -23.7%","desc":"Negative margin for second consecutive month.","next":"Review project profitability","dept":"Margin / D2"},
+    {"status":"monitor","title":"Div 8 Security Platform crossed $125K rev","desc":"Represents 49% of total company revenue. Concentration risk.","next":"Monitor concentration risk","dept":"Revenue / D8"}
+  ],
+  "Nov 25": [
+    {"status":"action","title":"Div 2 Project Labor GP% at -63.2%","desc":"Worst month on record. Deeply negative margin.","next":"Identify which projects caused the loss","dept":"Margin / D2"},
+    {"status":"action","title":"Div 5 Materials rev collapsed to $1,450","desc":"Down from $13.5K prior month — 89% drop.","next":"Clarify if client loss or timing","dept":"Revenue / D5"},
+    {"status":"monitor","title":"OpEx at $35.9K (+13% above trailing avg)","desc":"Above the $31.7K trailing 12-month average.","next":"Review what drove the increase","dept":"OPEX"}
+  ],
+  "Oct 25": [
+    {"status":"monitor","title":"Div 5 Materials GP% spiked to 42.6%","desc":"Vs avg ~15%. Unusually high margin.","next":"Verify if sustainable or one-time favorable mix","dept":"Margin / D5"}
+  ],
+  "Sep 25": [
+    {"status":"action","title":"Div 5 Materials rev spiked to $62.8K","desc":"4x prior month ($9.8K). Largest Materials month of 2025.","next":"Clarify what project/client drove this","dept":"Revenue / D5"},
+    {"status":"monitor","title":"OpEx at $35.2K (above avg)","desc":"9 anomaly items logged — most of any month in 2025.","next":"Review anomalies list for resolution","dept":"OPEX"}
+  ],
+  "Aug 25": [
+    {"status":"action","title":"Div 2 Project Labor rev tripled to $32.3K","desc":"From ~$10K avg. Single largest D2 month.","next":"Identify the project driving this","dept":"Revenue / D2"},
+    {"status":"monitor","title":"Div 6 CxO Consulting GP% at 81.3%","desc":"Unusually high vs avg ~64%.","next":"Verify COGS is correctly allocated","dept":"Margin / D6"}
+  ],
+  "Jul 25": [
+    {"status":"monitor","title":"Div 1 IT Support GP% dropped to 41.2%","desc":"From 61.5% prior month — 20 pt swing.","next":"Review staffing costs","dept":"Margin / D1"},
+    {"status":"monitor","title":"Div 2 Project Labor GP% at 4.7%","desc":"Near break-even. Pricing may not cover labor.","next":"Review project pricing","dept":"Margin / D2"}
+  ],
+  "Jun 25": [
+    {"status":"monitor","title":"Total revenue spiked to $262K","desc":"35% above prior month. Highest month until Dec 25.","next":"Understand if sustainable growth","dept":"Revenue"},
+    {"status":"monitor","title":"Div 5 Materials rev doubled to $46.9K","desc":"From $22K prior month.","next":"Identify the client/project","dept":"Revenue / D5"}
+  ],
+  "May 25": [
+    {"status":"action","title":"Div 2 Project Labor GP% at -25.5%","desc":"Negative margin. Revenue dropped to $2.1K.","next":"Identify loss-making projects","dept":"Margin / D2"},
+    {"status":"monitor","title":"Div 5 Materials rev 6x to $22K","desc":"From $3.6K prior month.","next":"Clarify what client drove this","dept":"Revenue / D5"}
+  ],
+  "Apr 25": [
+    {"status":"action","title":"Div 5 Materials GP% at -2.8%","desc":"Negative margin with revenue drop to $3.6K (from $30.5K).","next":"Review this department viability","dept":"Margin / D5"},
+    {"status":"monitor","title":"Div 2 Project Labor GP% dropped to 25.3%","desc":"From 52.6% prior month.","next":"Review project mix","dept":"Margin / D2"}
+  ],
+  "Mar 25": [
+    {"status":"monitor","title":"OpEx at $36.9K (highest of Q1)","desc":"15% above trailing average.","next":"Review what drove the spike","dept":"OPEX"},
+    {"status":"monitor","title":"Div 5 Materials rev spiked to $30.5K","desc":"74% increase from $17.5K.","next":"Identify the driver","dept":"Revenue / D5"}
+  ],
+  "Feb 25": [
+    {"status":"action","title":"Div 3 Cloud VAR GP% crashed to 19.5%","desc":"From 41.1% prior month — 21 pt drop.","next":"Investigate COGS increase","dept":"Margin / D3"},
+    {"status":"monitor","title":"Div 2 Project Labor GP% spiked to 72.1%","desc":"Unusually high vs avg ~30%.","next":"Verify COGS allocation","dept":"Margin / D2"}
+  ],
+  "Jan 25": [
+    {"status":"monitor","title":"Div 5 Materials GP% at 9.1%","desc":"Well below target 15%. Lowest of any month.","next":"Review vendor pricing","dept":"Margin / D5"},
+    {"status":"monitor","title":"Labor overhead at $21.8K","desc":"Highest of all months. Baseline for future tracking.","next":"Benchmark for future tracking","dept":"COGS / UNALLOC"}
+  ]
+};
+
+var FLAG_SUMMARY = {
+  "Jan 26": "Revenue at $256K grew 24% YoY. GP margin at 40.2%. Net margin at 7.7% compressed by expense anomalies. A+ Animal/Diamond at $125K represents 49% of revenue. Normalize for the R&D COGS reclassification and GP would be 50.3%.",
+  "Dec 25": "Revenue at $278K — record month. GP margin 40.1%. D8 Security Platform at $125K is 45% of revenue. D5 Materials had massive $65K spike. D2 continued negative margins.",
+  "Nov 25": "Revenue at $211K. GP margin improved to 46.1% (best of 2025). D2 Project Labor posted worst-ever -63.2% margin. D5 Materials nearly zeroed out at $1.5K.",
+  "Oct 25": "Revenue at $207K. GP margin 40.3%. Relatively stable month. D5 Materials showed unusually high 42.6% margin.",
+  "Sep 25": "Revenue at $270K — second highest month. GP margin 35.2%. D5 Materials spiked to $62.8K. Most anomaly items (9) of any month.",
+  "Aug 25": "Revenue at $220K. GP margin 40.1%. D2 Project Labor tripled to $32.3K. D6 CxO posted unusually high 81.3% margin.",
+  "Jul 25": "Revenue at $223K. GP margin 35.1%. D1 IT Support margin dropped 20 pts. D2 near break-even at 4.7% margin.",
+  "Jun 25": "Revenue spiked to $262K (+35% MoM). GP margin 39.5%. Strong growth across D5 Materials and D8 Security Platform.",
+  "May 25": "Revenue at $196K. GP margin 34.8% (lowest of 2025). D2 posted -25.5% margin. D5 rebounded 6x from April.",
+  "Apr 25": "Revenue at $200K. GP margin 35.9%. D5 Materials margin went negative at -2.8% with revenue collapsing to $3.6K.",
+  "Mar 25": "Revenue at $208K. GP margin 37.2%. OpEx at $36.9K was highest of Q1. D5 Materials had strong $30.5K month.",
+  "Feb 25": "Revenue at $195K. GP margin 36.3%. D3 Cloud VAR margin crashed 21 pts to 19.5%. D2 posted unusually high 72.1% margin.",
+  "Jan 25": "Revenue at $206K. GP margin 36.1%. Baseline month. D5 Materials at 9.1% margin — lowest performer. Labor overhead at $21.8K — highest of all months."
+};
