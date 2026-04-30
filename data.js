@@ -1,4 +1,4 @@
-// DAG Tech P&L Data — Last updated: January 2026
+// DAG Tech P&L Data — Last updated: February 2026
 // Cowork: When adding a new month, append a new month object to DATA and update related fields.
 // Do NOT modify the dashboard code (index.html). Only update this file.
 
@@ -1129,46 +1129,125 @@ var DATA = [
     "ebitda": 19671.84,
     "ebitdaM": 7.68,
     "netIncome": 19671.84
+  },
+  {
+    "month": "Feb 26",
+    "d": {
+      "d1": {
+        "rev": 30688.39,
+        "cogs": 13342.13,
+        "gp": 17346.26,
+        "gpM": 56.52
+      },
+      "d2": {
+        "rev": 2557.85,
+        "cogs": 7530.68,
+        "gp": -4972.83,
+        "gpM": -194.41
+      },
+      "d3": {
+        "rev": 55803.96,
+        "cogs": 44248.08,
+        "gp": 11555.88,
+        "gpM": 20.71
+      },
+      "d4": {
+        "rev": 4851.31,
+        "cogs": 0,
+        "gp": 4851.31,
+        "gpM": 100
+      },
+      "d5": {
+        "rev": 6532,
+        "cogs": 9564.55,
+        "gp": -3032.55,
+        "gpM": -46.43
+      },
+      "d6": {
+        "rev": 6805,
+        "cogs": 3017.4,
+        "gp": 3787.6,
+        "gpM": 55.66
+      },
+      "d8": {
+        "rev": 123701.74,
+        "cogs": 47918.33,
+        "gp": 75783.41,
+        "gpM": 61.26
+      }
+    },
+    "detail": {
+      "d2": {
+        "cogsAllocatable": 6728.36,
+        "cogsNonAllocatable": 802.32
+      },
+      "d5": {
+        "revNonProject": 4136,
+        "revProject": 2396,
+        "revShipping": 0,
+        "cogsNonProject": 6142.35,
+        "cogsProject": 3422.2,
+        "cogsShipping": 0
+      },
+      "d8": {
+        "cogsCloud": 12525.82,
+        "cogsLabor": 35392.51,
+        "cogsResold": 0
+      }
+    },
+    "unalloc": {
+      "loh": 21213.18,
+      "rd": 0
+    },
+    "totRev": 230940.25,
+    "totCogs": 146834.35,
+    "gp": 84105.9,
+    "gpM": 36.42,
+    "opex": 28456.91,
+    "growth": 34050.14,
+    "ebitda": 21598.85,
+    "ebitdaM": 9.35,
+    "netIncome": 17048.99
   }
 ];
 
-// Operating expense detail (last 4 months: Oct 25, Nov 25, Dec 25, Jan 26)
+// Operating expense detail (last 4 months: Nov 25, Dec 25, Jan 26, Feb 26)
 var opxD = {
   "Bank charges": [
-    6501.52,
     5151.06,
     4876.79,
-    6830.99
+    6830.99,
+    5456.56
   ],
   "Bonus": [
-    3000,
+    0,
     0,
     0,
     0
   ],
   "Commissions": [
-    1663.48,
     1340.1,
     2683.18,
-    2683.18
+    2683.18,
+    1663.48
   ],
   "Consulting": [
-    2468.47,
+    0,
     0,
     0,
     0
   ],
   "Employee benefits": [
-    26.5,
     546.24,
     450.75,
-    751.98
+    751.98,
+    628.7
   ],
   "Financial admin": [
-    5900.36,
     5380.6,
     5512.1,
-    7293.31
+    7293.31,
+    4957.88
   ],
   "HR": [
     1400,
@@ -1177,16 +1256,16 @@ var opxD = {
     1400
   ],
   "Insurance": [
-    1156.64,
     1743.16,
     1156.64,
-    1156.64
+    1156.64,
+    2780.99
   ],
   "Legal & professional": [
-    5432.92,
     1117.9,
     4419.27,
-    745.27
+    745.27,
+    802.32
   ],
   "Office space": [
     1419.36,
@@ -1195,31 +1274,31 @@ var opxD = {
     1419.36
   ],
   "Office admin": [
-    68.74,
     249.28,
     78.66,
-    0
+    0,
+    1735.97
   ],
   "Operational services": [
-    12964.65,
     9646.48,
     12487.45,
-    8768.35
+    8768.35,
+    6811.23
   ],
   "QB payments": [
-    2134.8,
     424.82,
     1436.64,
-    3701.03
+    3701.03,
+    800.42
   ],
   "Taxes & licenses": [
-    107.09,
+    0,
     0,
     0,
     0
   ],
   "Utilities": [
-    35.3,
+    0,
     0,
     0,
     0
@@ -1229,40 +1308,40 @@ var opxD = {
 // Growth expense detail (last 4 months)
 var grwD = {
   "Advertising": [
-    8979.83,
     8691.72,
     8525.22,
-    8376.05
+    8376.05,
+    6730.53
   ],
   "Business advisory (COO)": [
-    10483,
     5399,
     5452.69,
-    10621.85
+    10621.85,
+    10403.1
   ],
   "Business development": [
-    6535.92,
     7135.82,
     6390.54,
-    6390.54
+    6390.54,
+    6587.98
   ],
   "Marketing": [
-    4469.35,
     5146.24,
     4689.48,
-    2609.48
+    2609.48,
+    3275.26
   ],
   "R&D": [
-    817.96,
     1117.9,
     745.27,
-    745.27
+    745.27,
+    802.32
   ],
   "Travel & business": [
-    7747.69,
     4607.19,
     2116.82,
-    1553.53
+    1553.53,
+    6250.95
   ]
 };
 
@@ -1343,19 +1422,37 @@ var ANOMALIES = {
     {"type": "expense", "category": "COGS", "description": "VRLVRY01-Boston and KHHITT01 M365 migration — $2,738 material cost with no matching material revenue (labor-only agreement)", "impact": 2738, "dept": "d5b", "action": "Cost recorded in Div 5B but income in Div 2"}
   ],
   "Jan 26": [
-    {"type": "expense", "category": "COGS", "description": "R&D in COGS — $25,856", "impact": 0, "dept": "unalloc", "action": "Get classification rationale from Bharat"},
-    {"type": "expense", "category": "Growth", "description": "Travel & business — $7,748 (+144% vs avg)", "impact": 0, "dept": "growth", "action": "Get line-item detail from Bharat"},
-    {"type": "expense", "category": "OpEx", "description": "Consulting expenses — $2,468", "impact": 0, "dept": "opex", "action": "Identify vendor and purpose"},
-    {"type": "adjustment", "category": "OpEx", "description": "Bonus — $3,000", "impact": 0, "dept": "opex", "action": "Confirm if one-time"},
-    {"type": "adjustment", "category": "OpEx", "description": "Operational services — $12,965 (+44% vs avg)", "impact": 0, "dept": "opex", "action": "Review vendor contracts"},
+    {"type": "expense", "category": "COGS", "description": "$7,232 Microsourcing employees time logged under DAGtech internal R&D", "impact": 7231.94, "dept": "unalloc", "action": "Reclassified from Growth to COGS"},
+    {"type": "expense", "category": "OpEx", "description": "Legal expense — Niro Law Group, Whiteford Law, and CT Corporation", "impact": 4614.96, "dept": "opex", "action": "Multiple legal engagements in January"},
+    {"type": "expense", "category": "OpEx", "description": "MSP360 recategorized from Operational to Consulting expense", "impact": 2770, "dept": "opex", "action": "Category reclassification"},
+    {"type": "expense", "category": "Growth", "description": "Expedia and Delta airline — travel increase in January", "impact": 7747.69, "dept": "growth", "action": "Dan and Kristin LA trip for LACC client launch"},
+    {"type": "expense", "category": "OpEx", "description": "$4K Hudu yearly charge", "impact": 4244.41, "dept": "opex", "action": "Annual subscription renewal"},
+    {"type": "adjustment", "category": "OpEx", "description": "Bonus — $3,000 one-time for Justin", "impact": 3000, "dept": "opex", "action": "Confirmed one-time"},
     {"type": "adjustment", "category": "Margin", "description": "Div 3 Cloud GP% — 19.9% (target 60%)", "impact": 0, "dept": "d3", "action": "Evaluate bundling into platform pricing"},
-    {"type": "expense", "category": "COGS", "description": "Labor overhead $0 / R&D COGS $25.9K", "impact": 0, "dept": "unalloc", "action": "Confirm with Bharat"},
-    {"type": "adjustment", "category": "Revenue", "description": "Div 8 Resold services COGS $7,343", "impact": 0, "dept": "d8", "action": "Verify with Bharat"}
+    {"type": "adjustment", "category": "Revenue", "description": "Div 8 Resold services COGS $7,343", "impact": 7342.75, "dept": "d8", "action": "New resold services cost line"}
+  ],
+  "Feb 26": [
+    {"type": "anomaly", "category": "Margin", "description": "Div 2 Project Labor GP% at -194% — allocatable labor $6,728 exceeds revenue $2,558", "impact": -4972.83, "dept": "d2", "action": "Review project staffing vs billing"},
+    {"type": "anomaly", "category": "Margin", "description": "Div 5 Materials GP% at -46% — costs ($9,565) exceed revenue ($6,532)", "impact": -3032.55, "dept": "d5", "action": "Review material procurement margins"},
+    {"type": "anomaly", "category": "Margin", "description": "Div 3 Cloud VAR GP% at 20.7% — consistently below 25% target", "impact": 0, "dept": "d3", "action": "Ongoing structural margin issue"},
+    {"type": "expense", "category": "OpEx", "description": "Insurance spiked to $2,781 — up from ~$1,157 avg", "impact": 2780.99, "dept": "opex", "action": "Verify if annual renewal or rate increase"},
+    {"type": "expense", "category": "OpEx", "description": "Office admin jumped to $1,736 — up from near-zero recent months", "impact": 1735.97, "dept": "opex", "action": "Identify what drove the increase"},
+    {"type": "expense", "category": "Growth", "description": "Travel & business at $6,251 — 4x January's $1,554", "impact": 6250.95, "dept": "growth", "action": "Review travel expenses"},
+    {"type": "expense", "category": "OpEx", "description": "Ask My Accountant — $4,782 in other expenses", "impact": 4781.65, "dept": "other", "action": "Reclassify to proper expense categories"},
+    {"type": "adjustment", "category": "COGS", "description": "Labor overhead returned to $21,213 after $0 in January", "impact": 21213.18, "dept": "unalloc", "action": "January had R&D reclassification; February normalized"}
   ]
 };
 
 // Flagged Items — color-coded action/monitor cards per month
 var FLAGS = {
+  "Feb 26": [
+    {"status":"action","title":"Div 2 Project Labor GP% at -194%","desc":"Revenue only $2,558 but allocatable labor at $6,728. Worst Div 2 margin ever recorded.","next":"Review why labor is being allocated to low/no-revenue projects","dept":"Margin / D2"},
+    {"status":"action","title":"Div 5 Materials GP% at -46%","desc":"Both non-project and project materials running negative. Combined loss of $3,033.","next":"Review material procurement pricing and client pass-through","dept":"Margin / D5"},
+    {"status":"action","title":"Ask My Accountant — $4,782","desc":"Large amount sitting in unclassified 'Ask My Accountant' category.","next":"Work with Bharat to reclassify to proper expense categories","dept":"Other Expenses"},
+    {"status":"monitor","title":"Insurance at $2,781 (+140% vs avg)","desc":"Jumped from ~$1,157 average. Could be annual renewal or rate increase.","next":"Verify with accounting","dept":"OPEX"},
+    {"status":"monitor","title":"Travel & business at $6,251 (+302% MoM)","desc":"4x increase from January's $1,554. Second highest travel month.","next":"Review if tied to client activity","dept":"Growth / OPEX"},
+    {"status":"monitor","title":"Revenue down to $231K (-10% MoM)","desc":"Dropped from $256K in January. Div 1 down $5K, Div 2 down $3K.","next":"Monitor for trend vs seasonal dip","dept":"Revenue"}
+  ],
   "Jan 26": [
     {"status":"resolved","title":"R&D in COGS — $25,856","desc":"Normal tech overhead is ~$17K/mo. January was $25,856 — the increase of ~$8.9K is the delta above normal. Was previously booked under Growth Expenses at ~$868/mo in 2025.","next":"Resolved — delta is $8.9K above $17K baseline","dept":"COGS / UNALLOC"},
     {"status":"resolved","title":"Travel & business — $7,748 (+144% vs avg)","desc":"Dan and Kristin traveled to LA for extended stay + launch of LA Country Club (LACC), a large new client.","next":"Resolved — justified by LACC client launch","dept":"Growth / OPEX"},
@@ -1414,6 +1511,7 @@ var FLAGS = {
 };
 
 var FLAG_SUMMARY = {
+  "Feb 26": "Revenue at $231K, down 10% from Jan. GP margin at 36.4%. EBITDA margin improved to 9.4%. Net margin at 7.4%. Div 2 and Div 5 both running negative margins. Div 8 Security Platform at $124K remains 54% of total revenue. $4,782 in unclassified 'Ask My Accountant' needs reclassification. Travel & business spiked 4x from January.",
   "Jan 26": "Revenue at $256K grew 24% YoY. GP margin at 40.2%. Net margin at 7.7% compressed by expense anomalies. A+ Animal/Diamond at $125K represents 49% of revenue. Normalize for the R&D COGS reclassification and GP would be 50.3%.",
   "Dec 25": "Revenue at $278K — record month. GP margin 40.1%. D8 Security Platform at $125K is 45% of revenue. D5 Materials had massive $65K spike. D2 continued negative margins.",
   "Nov 25": "Revenue at $211K. GP margin improved to 46.1% (best of 2025). D2 Project Labor posted worst-ever -63.2% margin. D5 Materials nearly zeroed out at $1.5K.",
