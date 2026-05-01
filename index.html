@@ -1016,9 +1016,21 @@
               <canvas id="marginChart"></canvas>
             </div>
           </div>
-          <div>
-            <div class="chart-title" style="padding: 0 0 16px 0;">Division Performance</div>
-            <div class="dept-grid" id="deptGrid"></div>
+          <div class="chart-row">
+            <div class="chart-card">
+              <div class="chart-title">Div 1 — IT Support  Revenue & Margin Trend</div>
+              <canvas id="d1TrendChart"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Div 8 — Security Platform  Revenue & Margin Trend</div>
+              <canvas id="d8TrendChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-card" style="max-width: 100%;">
+              <div class="chart-title">Div 1 + Div 8 Combined  Revenue & Margin Trend</div>
+              <canvas id="d1d8CombinedChart"></canvas>
+            </div>
           </div>
         </div>
 
@@ -1196,7 +1208,7 @@
 
       renderInsights();
       renderCharts();
-      renderDepartmentCards();
+      renderDivisionTrendCharts();
       renderFlags(data.month);
     }
 
@@ -1310,53 +1322,89 @@
       });
     }
 
-    function renderDepartmentCards() {
-      const data = getCurrentData();
-      const grid = document.getElementById('deptGrid');
+    function renderDivisionTrendCharts() {
+      const labels = DATA.map(d => d.month);
+      const d1Rev = DATA.map(d => d.d.d1.rev);
+      const d1Margin = DATA.map(d => d.d.d1.gpM);
+      const d8Rev = DATA.map(d => d.d.d8.rev);
+      const d8Margin = DATA.map(d => d.d.d8.gpM);
+      const combRev = DATA.map(d => d.d.d1.rev + d.d.d8.rev);
+      const combGP = DATA.map(d => d.d.d1.gp + d.d.d8.gp);
+      const combMargin = DATA.map((d, i) => combRev[i] > 0 ? (combGP[i] / combRev[i] * 100) : 0);
 
-      grid.innerHTML = DEPTS.map(dept => {
-        const deptData = data.d[dept.id];
-        const bm = BM[dept.id];
-        const marginPct = (deptData.gpM / 100);
-        const targetPct = (bm.tgt / 100);
+      function makeDualAxisChart(canvasId, revData, marginData, revColor, revBg, marginColor, chartRef) {
+        if (charts[chartRef]) charts[chartRef].destroy();
+        charts[chartRef] = new Chart(document.getElementById(canvasId), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Revenue',
+                data: revData,
+                borderColor: revColor,
+                backgroundColor: revBg,
+                fill: true,
+                tension: 0.35,
+                yAxisID: 'y',
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                borderWidth: 2.5
+              },
+              {
+                label: 'Margin %',
+                data: marginData,
+                borderColor: marginColor,
+                borderDash: [6, 3],
+                fill: false,
+                tension: 0.35,
+                yAxisID: 'y1',
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    if (ctx.dataset.yAxisID === 'y1') return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%';
+                    return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                type: 'linear',
+                position: 'left',
+                beginAtZero: true,
+                title: { display: true, text: 'Revenue ($)', font: { size: 11 } },
+                ticks: {
+                  callback: function(v) { return '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v); }
+                }
+              },
+              y1: {
+                type: 'linear',
+                position: 'right',
+                title: { display: true, text: 'Margin %', font: { size: 11 } },
+                grid: { drawOnChartArea: false },
+                ticks: { callback: function(v) { return v.toFixed(0) + '%'; } }
+              }
+            }
+          }
+        });
+      }
 
-        return `
-          <div class="dept-card" onclick="openDeptDrilldown('${dept.id}')">
-            <div class="dept-card-bar" style="background: ${dept.color};"></div>
-            <div class="dept-header">
-              <div class="dept-icon" style="background: ${dept.color}20;">${dept.emoji}</div>
-              <div>
-                <div class="dept-name">${dept.name}</div>
-                <div class="dept-hc">${dept.desc}</div>
-              </div>
-            </div>
-            <div class="dept-metrics">
-              <div>
-                <div class="dept-metric-label">Revenue</div>
-                <div class="dept-metric-value">$${formatNum(deptData.rev)}</div>
-              </div>
-              <div>
-                <div class="dept-metric-label">Margin %</div>
-                <div class="dept-metric-value">${deptData.gpM.toFixed(1)}%</div>
-              </div>
-            </div>
-            <div class="margin-bar">
-              <div class="margin-header">
-                <div class="margin-label">Gross Profit Margin</div>
-                <div class="margin-value">${deptData.gpM.toFixed(1)}% / ${bm.tgt}%</div>
-              </div>
-              <div class="margin-track">
-                <div class="margin-fill" style="width: ${marginPct * 100}%; background: ${dept.color};"></div>
-                <div class="margin-target" style="left: ${targetPct * 100}%;"></div>
-              </div>
-              <div class="margin-range">
-                <span>0%</span>
-                <span>${Math.max(100, bm.top)}%</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      makeDualAxisChart('d1TrendChart', d1Rev, d1Margin, '#3b82f6', 'rgba(59,130,246,0.10)', '#1e40af', 'd1Trend');
+      makeDualAxisChart('d8TrendChart', d8Rev, d8Margin, '#ef4444', 'rgba(239,68,68,0.10)', '#991b1b', 'd8Trend');
+      makeDualAxisChart('d1d8CombinedChart', combRev, combMargin, '#8b5cf6', 'rgba(139,92,246,0.10)', '#5b21b6', 'd1d8Combined');
     }
 
     function renderDepartmentsView() {
