@@ -736,3 +736,38 @@ var FLAG_SUMMARY = {
   "Feb 25": "Revenue at $195K. GP margin 36.3%. D3 Cloud VAR margin crashed 21 pts to 19.5%. D2 posted unusually high 72.1% margin.",
   "Jan 25": "Revenue at $206K. GP margin 36.1%. Baseline month. D5 Materials at 9.1% margin — lowest performer. Labor overhead at $21.8K — highest of all months."
 };
+
+// A+ Animal Suite — Seat Count Tracking (Div 8)
+// Each entry: month label, YYYYMM code, products with seats(s), diff(d), clients(c), MRR(mrr)
+var SEAT_DATA = [
+  {"month":"Jul 24","code":"202407","products":{"A+ Animal":{"s":480,"d":-19,"c":27,"mrr":72963.9}}},
+  {"month":"Aug 24","code":"202408","products":{"A+ Animal":{"s":481,"d":-2,"c":27,"mrr":73142.2}}},
+  {"month":"Sep 24","code":"202409","products":{"A+ Animal":{"s":479,"d":-1,"c":27,"mrr":72981.0}}},
+  {"month":"Oct 24","code":"202410","products":{"A+ Animal":{"s":494,"d":15,"c":27,"mrr":75227.5}}},
+  {"month":"Nov 24","code":"202411","products":{"A+ Animal":{"s":494,"d":0,"c":27,"mrr":75188.6}}},
+  {"month":"Dec 24","code":"202412","products":{"A+ Animal":{"s":497,"d":2,"c":27,"mrr":75609.7}}},
+  {"month":"Jan 25","code":"202501","products":{"A+ Animal":{"s":501,"d":4,"c":27,"mrr":77309.2}}},
+  {"month":"Feb 25","code":"202502","products":{"A+ Animal":{"s":503,"d":3,"c":27,"mrr":77595.6},"Diamond Legacy":{"s":0,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":0,"d":0,"c":1,"mrr":0},"TS4":{"s":0,"d":0,"c":1,"mrr":0},"Diamond IT Essentials":{"s":0,"d":0,"c":1,"mrr":0}}},
+  {"month":"Mar 25","code":"202503","products":{"A+ Animal":{"s":493,"d":-10,"c":27,"mrr":76019.6},"Diamond Legacy":{"s":37,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":12,"d":0,"c":1,"mrr":0},"TS4":{"s":0,"d":0,"c":1,"mrr":0},"Diamond IT Essentials":{"s":0,"d":0,"c":1,"mrr":0}}},
+  {"month":"Apr 25","code":"202504","products":{"A+ Animal":{"s":502,"d":9,"c":27,"mrr":77407.8},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":12,"d":0,"c":1,"mrr":0},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"May 25","code":"202505","products":{"A+ Animal":{"s":514,"d":12,"c":27,"mrr":79283.2},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":12,"d":0,"c":1,"mrr":0},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"Jun 25","code":"202506","products":{"A+ Animal":{"s":511,"d":-3,"c":27,"mrr":78924.6},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":11,"d":-1,"c":1,"mrr":-120},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"Jul 25","code":"202507","products":{"A+ Animal":{"s":546,"d":5,"c":28,"mrr":85249.6},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":11,"d":0,"c":1,"mrr":0},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"Aug 25","code":"202508","products":{"A+ Animal":{"s":549,"d":3,"c":29,"mrr":86184.6},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":11,"d":0,"c":1,"mrr":0},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"Sep 25","code":"202509","products":{"A+ Animal":{"s":541,"d":-8,"c":29,"mrr":85024.6},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":11,"d":0,"c":1,"mrr":0},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"Oct 25","code":"202510","products":{"A+ Animal":{"s":714,"d":-2,"c":30,"mrr":105293.2},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Pro":{"s":12,"d":1,"c":3,"mrr":120},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":0}}},
+  {"month":"Nov 25","code":"202511","products":{"A+ Animal":{"s":693,"d":128,"c":30,"mrr":102589.2},"Diamond IT Pro":{"s":78,"d":66,"c":3,"mrr":7405},"TS4":{"s":9,"d":0,"c":2,"mrr":0},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":1746}}},
+  {"month":"Dec 25","code":"202512","products":{"A+ Animal":{"s":684,"d":-9,"c":30,"mrr":101143.6},"Diamond IT Pro":{"s":78,"d":0,"c":3,"mrr":7285},"TS4":{"s":7,"d":-2,"c":2,"mrr":0},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":1746}}},
+  {"month":"Jan 26","code":"202601","products":{"A+ Animal":{"s":724,"d":40,"c":32,"mrr":107834.2},"Diamond IT Pro":{"s":101,"d":23,"c":4,"mrr":10091},"TS4":{"s":13,"d":6,"c":3,"mrr":0},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":1746}}},
+  {"month":"Feb 26","code":"202602","products":{"A+ Animal":{"s":716,"d":-6,"c":31,"mrr":106823.6},"Diamond IT Pro":{"s":101,"d":0,"c":4,"mrr":10091},"TS4":{"s":13,"d":0,"c":3,"mrr":0},"Diamond Legacy":{"s":57,"d":0,"c":3,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":1746}}},
+  {"month":"Mar 26","code":"202603","products":{"A+ Animal":{"s":699,"d":-21,"c":31,"mrr":103543.4},"Diamond IT Pro":{"s":98,"d":-3,"c":4,"mrr":9725},"TS4":{"s":13,"d":0,"c":3,"mrr":0},"Diamond Legacy":{"s":58,"d":1,"c":3,"mrr":65},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":1746}}},
+  {"month":"Apr 26","code":"202604","products":{"A+ Animal":{"s":730,"d":13,"c":31,"mrr":108268.9},"Diamond IT Pro":{"s":102,"d":0,"c":4,"mrr":10210},"TS4":{"s":8,"d":-5,"c":3,"mrr":0},"Diamond Legacy":{"s":58,"d":0,"c":3,"mrr":0},"Diamond IT Essentials":{"s":18,"d":0,"c":1,"mrr":1746}}}
+];
+
+var SEAT_PRODUCTS = [
+  {id: "A+ Animal", color: "#ef4444", desc: "Core managed security platform"},
+  {id: "Diamond IT Pro", color: "#3b82f6", desc: "IT professional suite"},
+  {id: "Diamond IT Essentials", color: "#10b981", desc: "IT essentials package"},
+  {id: "Diamond Legacy", color: "#f59e0b", desc: "Legacy Diamond platform"},
+  {id: "TS4", color: "#8b5cf6", desc: "TS4 security module"}
+];
