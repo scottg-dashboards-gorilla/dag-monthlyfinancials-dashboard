@@ -1198,6 +1198,22 @@
         <!-- Benchmarking View -->
         <div class="view" id="benchmarks">
           <div class="bench-grid" id="benchGrid"></div>
+          <div class="chart-row">
+            <div class="chart-card">
+              <div class="chart-title">Client Concentration Trend (% of D8 MRR)</div>
+              <canvas id="concTrendChart"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Top Client MRR Trend</div>
+              <canvas id="topClientChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <div class="chart-title" style="padding: 0 0 16px 0;">Top 15 Clients by MRR — Latest Month</div>
+            <div class="pnl-wrap">
+              <table class="pnl-table" id="clientTable"></table>
+            </div>
+          </div>
         </div>
 
         <!-- Seat Tracking View -->
@@ -2233,10 +2249,24 @@
         }))
       };
 
-      // 7. Client Concentration (estimate: top client % of recurring)
-      // We don't have per-client data in DATA, use SEAT_DATA if available
-      // For now use a static estimate — update when per-client data is added
-      vals.clientConc = { current: 8.2, avg3: 8.5 };
+      // 7. Client Concentration (from CLIENT_DATA — real per-client MRR)
+      if (typeof CLIENT_DATA !== 'undefined' && CLIENT_DATA.length > 0) {
+        const latest = CLIENT_DATA[CLIENT_DATA.length - 1];
+        const last3c = CLIENT_DATA.slice(-3);
+        vals.clientConc = {
+          current: latest.top1Pct,
+          avg3: last3c.reduce((s, m) => s + m.top1Pct, 0) / last3c.length
+        };
+        vals.clientConcDetail = {
+          top5: latest.top5Pct,
+          top10: latest.top10Pct,
+          totalClients: latest.totalClients,
+          top1Name: latest.top1Name
+        };
+      } else {
+        vals.clientConc = { current: 8.2, avg3: 8.5 };
+        vals.clientConcDetail = { top5: 0, top10: 0, totalClients: 0, top1Name: '' };
+      }
 
       return vals;
     }
@@ -2334,6 +2364,94 @@
           </div>
         `;
       }).join('');
+
+      // Concentration trend chart
+      if (typeof CLIENT_DATA !== 'undefined' && CLIENT_DATA.length > 0) {
+        const cLabels = CLIENT_DATA.map(d => d.month);
+        if (charts.concTrend) charts.concTrend.destroy();
+        charts.concTrend = new Chart(document.getElementById('concTrendChart'), {
+          type: 'line',
+          data: {
+            labels: cLabels,
+            datasets: [
+              { label: 'Top 1 Client %', data: CLIENT_DATA.map(d => d.top1Pct), borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', fill: true, tension: 0.35, pointRadius: 3, borderWidth: 2.5 },
+              { label: 'Top 5 Clients %', data: CLIENT_DATA.map(d => d.top5Pct), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', fill: true, tension: 0.35, pointRadius: 3, borderWidth: 2 },
+              { label: 'Top 10 Clients %', data: CLIENT_DATA.map(d => d.top10Pct), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.35, pointRadius: 3, borderWidth: 2 }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } },
+              tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%' } }
+            },
+            scales: {
+              y: { min: 0, max: 100, title: { display: true, text: '% of Total MRR', font: { size: 11 } }, ticks: { callback: v => v + '%' } }
+            }
+          }
+        });
+
+        // Top client MRR trend — track top 5 persistent clients
+        const latestClients = CLIENT_DATA[CLIENT_DATA.length - 1].clients.slice(0, 5).map(c => c.n);
+        if (charts.topClient) charts.topClient.destroy();
+        const tcColors = ['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6'];
+        charts.topClient = new Chart(document.getElementById('topClientChart'), {
+          type: 'line',
+          data: {
+            labels: cLabels,
+            datasets: latestClients.map((cn, i) => ({
+              label: cn,
+              data: CLIENT_DATA.map(m => {
+                const found = m.clients.find(c => c.n === cn);
+                return found ? found.mrr : 0;
+              }),
+              borderColor: tcColors[i], fill: false, tension: 0.35, pointRadius: 2, borderWidth: 2
+            }))
+          },
+          options: {
+            responsive: true, maintainAspectRatio: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { size: 10 } } },
+              tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}) } }
+            },
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'MRR ($)', font: { size: 11 } }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } } }
+          }
+        });
+
+        // Client detail table
+        const latestM = CLIENT_DATA[CLIENT_DATA.length - 1];
+        const prevM = CLIENT_DATA.length > 1 ? CLIENT_DATA[CLIENT_DATA.length - 2] : null;
+        const table = document.getElementById('clientTable');
+        let html = '<thead><tr class="pnl-row-hl"><th class="pnl-label">Rank</th><th class="pnl-label">Client</th><th class="pnl-val">Seats</th><th class="pnl-val">MoM</th><th class="pnl-val">MRR</th><th class="pnl-val">% of Total</th><th class="pnl-val">Cumul %</th><th class="pnl-val">MRR Change</th></tr></thead><tbody>';
+        let cumPct = 0;
+        latestM.clients.forEach((c, i) => {
+          const pct = latestM.totalMrr > 0 ? (c.mrr / latestM.totalMrr * 100) : 0;
+          cumPct += pct;
+          const prevClient = prevM ? prevM.clients.find(pc => pc.n === c.n) : null;
+          const mrrDiff = prevClient ? c.mrr - prevClient.mrr : 0;
+          const diffCls = mrrDiff > 0 ? 'pnl-val-pos' : (mrrDiff < 0 ? 'pnl-val-neg' : '');
+          const diffStr = mrrDiff > 0 ? '+$' + mrrDiff.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}) : (mrrDiff < 0 ? '-$' + Math.abs(mrrDiff).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}) : '—');
+          const diffClsD = c.d > 0 ? 'pnl-val-pos' : (c.d < 0 ? 'pnl-val-neg' : '');
+          const isCur = (i < 5);
+          html += `<tr${i < 5 ? ' class="pnl-row-hl"' : ''}>`;
+          html += `<td class="pnl-val" style="font-weight:600;">${i+1}</td>`;
+          html += `<td class="pnl-label" style="font-weight:${i<5?'600':'400'};">${c.n}</td>`;
+          html += `<td class="pnl-val">${c.s.toLocaleString()}</td>`;
+          html += `<td class="pnl-val ${diffClsD}">${c.d > 0 ? '+'+c.d : (c.d < 0 ? c.d : '—')}</td>`;
+          html += `<td class="pnl-val" style="font-weight:500;">$${c.mrr.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</td>`;
+          html += `<td class="pnl-val">${pct.toFixed(1)}%</td>`;
+          html += `<td class="pnl-val">${cumPct.toFixed(1)}%</td>`;
+          html += `<td class="pnl-val ${diffCls}">${diffStr}</td>`;
+          html += '</tr>';
+        });
+        // Totals row
+        html += `<tr class="pnl-row-hl"><td class="pnl-val" style="font-weight:700;"></td><td class="pnl-label" style="font-weight:700;">TOTAL (${latestM.totalClients} paying clients)</td>`;
+        html += `<td class="pnl-val" style="font-weight:700;">${latestM.totalSeats.toLocaleString()}</td><td class="pnl-val"></td>`;
+        html += `<td class="pnl-val" style="font-weight:700;">$${latestM.totalMrr.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</td>`;
+        html += `<td class="pnl-val" style="font-weight:700;">100%</td><td class="pnl-val"></td><td class="pnl-val"></td></tr>`;
+        html += '</tbody>';
+        table.innerHTML = html;
+      }
     }
 
     function renderSeatsView() {
