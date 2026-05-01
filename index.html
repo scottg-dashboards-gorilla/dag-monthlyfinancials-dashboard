@@ -314,12 +314,23 @@
       margin-bottom: 28px;
     }
 
+    .chart-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
     .chart-card {
       background: white;
       border-radius: 8px;
       border: 1px solid var(--border);
       padding: 20px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .chart-card canvas {
+      max-height: 280px;
     }
 
     .chart-title {
