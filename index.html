@@ -791,6 +791,19 @@
     .audit-row-bypass td:first-child { background: #fef3c7; }
     .audit-row-missing td { background: #fef2f2; }
     .audit-row-missing td:first-child { background: #fee2e2; }
+    .audit-row-resolved td { background: #f9fafb !important; color: #9ca3af !important; }
+    .audit-row-resolved td:first-child { background: #f3f4f6 !important; }
+    .audit-row-resolved .badge { opacity: 0.5; }
+    .audit-row-resolved .audit-user-name { text-decoration: line-through; }
+    #auditDetailTable th[data-sort] { cursor: pointer; user-select: none; }
+    #auditDetailTable th[data-sort]:hover { background: #f1f5f9; }
+    .audit-sort-arrow { display: inline-block; width: 10px; color: #2563eb; font-size: 10px; margin-left: 4px; }
+    .audit-resolve-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #059669; }
+    .audit-reset-btn {
+      padding: 6px 10px; background: #fff; color: #6b7280; border: 1px solid #d1d5db;
+      border-radius: 6px; font-size: 12px; cursor: pointer;
+    }
+    .audit-reset-btn:hover { background: #f9fafb; color: #1a1a1a; }
 
     .chat-wrap {
       display: flex;
@@ -1407,7 +1420,18 @@
               <input type="text" id="auditSearch" class="audit-search" placeholder="user name or title..." oninput="renderUserAuditView()" />
             </div>
             <div class="audit-filter-group">
+              <label class="audit-label">Resolved</label>
+              <select id="auditResolvedFilter" class="audit-select" onchange="renderUserAuditView()">
+                <option value="">Show all</option>
+                <option value="unresolved">Hide resolved</option>
+                <option value="resolved">Resolved only</option>
+              </select>
+            </div>
+            <div class="audit-filter-group">
               <button class="audit-btn" onclick="exportUserAudit()">Export CSV</button>
+            </div>
+            <div class="audit-filter-group">
+              <button class="audit-reset-btn" onclick="resetResolvedAudit()" title="Clear all resolved checkboxes">Reset checkmarks</button>
             </div>
           </div>
           <div class="audit-rollup-wrap">
@@ -3260,6 +3284,47 @@
        Pulled 2026-05-01 from setsail.today/api/data/tickets/all */
     const SETSAIL_MATCHED = new Set(["T20260430.0046","T20260429.0046","T20260429.0028","T20260427.0140","T20260422.0042","T20260417.0045","T20260416.0064","T20260415.0118","T20260415.0117","T20260413.0067","T20260413.0066","T20260413.0053","T20260408.0030","T20260403.0039","T20260403.0038","T20260403.0037","T20260401.0070","T20260401.0069","T20260325.0071","T20260325.0070","T20260325.0060","T20260323.0053","T20260323.0033","T20260320.0078","T20260320.0077","T20260318.0047","T20260318.0042","T20260317.0025","T20260316.0052","T20260313.0043","T20260310.0059","T20260306.0011","T20260302.0025","T20260227.0042","T20260227.0021","T20260227.0014","T20260226.0056","T20260226.0016","T20260226.0014","T20260223.0039","T20260223.0033","T20260221.0004","T20260219.0061","T20260219.0060","T20260213.0033","T20260213.0030","T20260209.0036","T20260209.0033","T20260206.0042","T20260206.0040","T20260206.0039","T20260205.0035","T20260205.0026","T20260205.0025","T20260204.0053","T20260203.0044","T20260202.0057","T20260202.0054","T20260130.0039","T20260130.0016","T20260127.0024","T20260123.0081","T20260123.0080","T20260123.0078","T20260123.0077","T20260123.0076","T20260123.0075","T20260123.0074","T20260123.0072","T20260122.0038","T20260113.0060","T20260113.0051","T20260109.0044","T20260102.0033","T20260102.0031"]);
 
+    /* Resolved-tickets persistence — checkboxes the user has marked as
+       reconciled in SetSail. Stored in localStorage under the dashboard origin. */
+    const AUDIT_RESOLVED_KEY = 'dag_audit_resolved_v1';
+    function loadResolvedSet() {
+      try {
+        const raw = localStorage.getItem(AUDIT_RESOLVED_KEY);
+        return new Set(raw ? JSON.parse(raw) : []);
+      } catch (e) { return new Set(); }
+    }
+    function saveResolvedSet(set) {
+      try { localStorage.setItem(AUDIT_RESOLVED_KEY, JSON.stringify(Array.from(set))); }
+      catch (e) {}
+    }
+    let auditResolved = loadResolvedSet();
+    /* Sort state — persisted across re-renders within a session */
+    let auditSort = { col: 'dt', dir: 'desc' };
+
+    function toggleAuditResolved(tk, checked) {
+      if (checked) auditResolved.add(tk);
+      else auditResolved.delete(tk);
+      saveResolvedSet(auditResolved);
+      renderUserAuditView();
+    }
+
+    function resetResolvedAudit() {
+      if (!confirm('Clear all ' + auditResolved.size + ' resolved checkmarks? This cannot be undone.')) return;
+      auditResolved = new Set();
+      saveResolvedSet(auditResolved);
+      renderUserAuditView();
+    }
+
+    function setAuditSort(col) {
+      if (auditSort.col === col) {
+        auditSort.dir = auditSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        auditSort.col = col;
+        auditSort.dir = (col === 'dt' || col === 'm') ? 'desc' : 'asc';
+      }
+      renderUserAuditView();
+    }
+
     function initUserAuditView() {
       const clientFilter = document.getElementById('auditClientFilter');
       if (clientFilter && clientFilter.children.length === 0) {
@@ -3276,9 +3341,10 @@
       const queue = document.getElementById('auditQueueFilter').value;
       const client = document.getElementById('auditClientFilter').value;
       const setsail = document.getElementById('auditSetsailFilter') ? document.getElementById('auditSetsailFilter').value : '';
+      const resolved = document.getElementById('auditResolvedFilter') ? document.getElementById('auditResolvedFilter').value : '';
       const search = (document.getElementById('auditSearch').value || '').toLowerCase().trim();
 
-      return AUDIT_TICKETS.filter(t => {
+      const filtered = AUDIT_TICKETS.filter(t => {
         if (month && t.ck !== month) return false;
         if (action && t.a !== action) return false;
         if (queue === 'bypass' && t.q !== 'Helpdesk' && t.q !== 'Merged') return false;
@@ -3286,18 +3352,47 @@
         if (client && t.co !== client) return false;
         if (setsail === 'matched' && !SETSAIL_MATCHED.has(t.tk)) return false;
         if (setsail === 'missing' && SETSAIL_MATCHED.has(t.tk)) return false;
+        if (resolved === 'unresolved' && auditResolved.has(t.tk)) return false;
+        if (resolved === 'resolved' && !auditResolved.has(t.tk)) return false;
         if (search) {
           const hay = (t.u + ' ' + t.tt + ' ' + t.tk).toLowerCase();
           if (!hay.includes(search)) return false;
         }
         return true;
       });
+
+      // Sort
+      const col = auditSort.col, dir = auditSort.dir === 'asc' ? 1 : -1;
+      const getKey = (t) => {
+        switch (col) {
+          case 'dt': // sort by full ticket number which is YYYYMMDD-based
+            return t.tk;
+          case 'm': return t.ck;
+          case 'co': return t.co;
+          case 'a': return t.a;
+          case 'u': return (t.u || '').toLowerCase();
+          case 'ss': return SETSAIL_MATCHED.has(t.tk) ? 1 : 0;
+          case 'q': return t.q;
+          case 's': return t.s;
+          case 'tk': return t.tk;
+          case 'tt': return (t.tt || '').toLowerCase();
+          case 'rs': return auditResolved.has(t.tk) ? 1 : 0;
+          default: return '';
+        }
+      };
+      filtered.sort((a, b) => {
+        const av = getKey(a), bv = getKey(b);
+        if (av < bv) return -1 * dir;
+        if (av > bv) return 1 * dir;
+        return 0;
+      });
+      return filtered;
     }
 
     function renderUserAuditView() {
       const data = getFilteredAuditTickets();
 
-      // Summary stats
+      // Summary stats — these reflect the CURRENT FILTERED view
       const stats = {
         total: data.length,
         onboard: data.filter(t => t.a === 'Onboard').length,
@@ -3305,6 +3400,13 @@
         matchedSS: data.filter(t => SETSAIL_MATCHED.has(t.tk)).length,
         missingSS: data.filter(t => !SETSAIL_MATCHED.has(t.tk)).length,
       };
+      // Resolved count is computed against ALL missing rows in the unfiltered dataset
+      // so the "X of Y resolved" message stays meaningful as filters change.
+      const allMissing = AUDIT_TICKETS.filter(t => !SETSAIL_MATCHED.has(t.tk));
+      const allResolvedMissing = allMissing.filter(t => auditResolved.has(t.tk)).length;
+      const allMissingTotal = allMissing.length;
+      const remainingMissing = allMissingTotal - allResolvedMissing;
+      const resolvedPct = allMissingTotal > 0 ? Math.round(allResolvedMissing / allMissingTotal * 100) : 0;
       const matchedPct = stats.total > 0 ? Math.round(stats.matchedSS / stats.total * 100) : 0;
       const missingPct = stats.total > 0 ? Math.round(stats.missingSS / stats.total * 100) : 0;
       const summary = document.getElementById('auditSummary');
@@ -3313,7 +3415,8 @@
         '<div class="audit-stat good"><div class="audit-stat-label">Onboards</div><div class="audit-stat-value">' + stats.onboard + '</div></div>' +
         '<div class="audit-stat warn"><div class="audit-stat-label">Offboards</div><div class="audit-stat-value">' + stats.offboard + '</div></div>' +
         '<div class="audit-stat good"><div class="audit-stat-label">Matched in SetSail</div><div class="audit-stat-value">' + stats.matchedSS + '</div><div class="audit-stat-sub">' + matchedPct + '% of total</div></div>' +
-        '<div class="audit-stat alert"><div class="audit-stat-label">Missing from SetSail</div><div class="audit-stat-value">' + stats.missingSS + '</div><div class="audit-stat-sub">' + missingPct + '% &mdash; billing reconciliation gap</div></div>';
+        '<div class="audit-stat alert"><div class="audit-stat-label">Missing from SetSail</div><div class="audit-stat-value">' + stats.missingSS + '</div><div class="audit-stat-sub">' + missingPct + '% &mdash; billing reconciliation gap</div></div>' +
+        '<div class="audit-stat good"><div class="audit-stat-label">Resolved</div><div class="audit-stat-value">' + allResolvedMissing + ' / ' + allMissingTotal + '</div><div class="audit-stat-sub">' + resolvedPct + '% &mdash; ' + remainingMissing + ' to go</div></div>';
 
       // Rollup by client x month
       const months = ['2026-01','2026-02','2026-03','2026-04'];
@@ -3364,20 +3467,47 @@
       rollupHtml += '</tbody>';
       document.getElementById('auditRollupTable').innerHTML = rollupHtml;
 
-      // Detail table
+      // Detail table — columns are sortable; "Resolved" column is a checkbox for missing rows.
       document.getElementById('auditTableCount').textContent = '(' + data.length + ' shown)';
-      let detail = '<thead><tr><th>Date</th><th>Month</th><th>Client</th><th>Action</th><th>User Name</th><th>In SetSail?</th><th>Source</th><th>Status</th><th>Ticket</th><th style="text-align:left;">Title</th></tr></thead><tbody>';
+      const arrow = (col) => auditSort.col === col ? '<span class="audit-sort-arrow">' + (auditSort.dir === 'asc' ? '▲' : '▼') + '</span>' : '<span class="audit-sort-arrow"></span>';
+      const th = (col, label, leftAlign) => '<th data-sort="' + col + '" onclick="setAuditSort(\'' + col + '\')"' + (leftAlign ? ' style="text-align:left;"' : '') + '>' + label + arrow(col) + '</th>';
+      let detail = '<thead><tr>' +
+        th('rs', 'Resolved', true) +
+        th('dt', 'Date', false) +
+        th('m', 'Month', false) +
+        th('co', 'Client', false) +
+        th('a', 'Action', false) +
+        th('u', 'User Name', false) +
+        th('ss', 'In SetSail?', false) +
+        th('q', 'Source', false) +
+        th('s', 'Status', false) +
+        th('tk', 'Ticket', false) +
+        th('tt', 'Title', true) +
+        '</tr></thead><tbody>';
       data.forEach(t => {
         const queueClass = t.q === 'Setsail' ? 'badge-setsail' : t.q === 'Helpdesk' ? 'badge-helpdesk' : t.q === 'Merged' ? 'badge-merged' : 'badge-internal';
         const actClass = t.a === 'Onboard' ? 'badge-onboard' : 'badge-offboard';
         const inSetsail = SETSAIL_MATCHED.has(t.tk);
         const ssClass = inSetsail ? 'badge-matched' : 'badge-missing';
         const ssLabel = inSetsail ? 'In SetSail' : 'MISSING';
-        const rowClass = !inSetsail ? 'audit-row-missing' : ((t.q === 'Helpdesk' || t.q === 'Merged') ? 'audit-row-bypass' : '');
+        const isResolved = auditResolved.has(t.tk);
+        const rowClass = isResolved
+          ? 'audit-row-resolved'
+          : (!inSetsail ? 'audit-row-missing' : ((t.q === 'Helpdesk' || t.q === 'Merged') ? 'audit-row-bypass' : ''));
         const ticketUrl = 'https://ww14.autotask.net/Mvc/ServiceDesk/TicketDetail.mvc?TicketNumber=' + encodeURIComponent(t.tk);
-        const userDisplay = t.u || '<span style="color:#9ca3af;">(see title)</span>';
+        const userDisplay = t.u
+          ? '<span class="audit-user-name">' + t.u + '</span>'
+          : '<span style="color:#9ca3af;">(see title)</span>';
         const escapedTitle = (t.tt || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        // Only missing rows get a checkbox. Matched rows show a "—".
+        const checkboxCell = inSetsail
+          ? '<td style="text-align:center; color:#d1d5db;">—</td>'
+          : '<td style="text-align:center;"><input type="checkbox" class="audit-resolve-checkbox" ' +
+              (isResolved ? 'checked' : '') +
+              ' title="Mark as reconciled in SetSail" ' +
+              'onchange="toggleAuditResolved(\'' + t.tk + '\', this.checked)" /></td>';
         detail += '<tr class="' + rowClass + '">' +
+          checkboxCell +
           '<td style="text-align:left;">' + t.dt + '</td>' +
           '<td style="text-align:left;">' + t.m + '</td>' +
           '<td style="text-align:left;">' + t.co + '</td>' +
@@ -3396,8 +3526,13 @@
 
     function exportUserAudit() {
       const data = getFilteredAuditTickets();
-      const headers = ['Date','Month','Client','Action','User Name','In SetSail','Source/Queue','Status','Ticket','Title'];
-      const rows = [headers].concat(data.map(t => [t.dt, t.m, t.co, t.a, t.u, SETSAIL_MATCHED.has(t.tk) ? 'Yes' : 'NO', t.q, t.s, t.tk, t.tt]));
+      const headers = ['Resolved','Date','Month','Client','Action','User Name','In SetSail','Source/Queue','Status','Ticket','Title'];
+      const rows = [headers].concat(data.map(t => [
+        auditResolved.has(t.tk) ? 'Yes' : '',
+        t.dt, t.m, t.co, t.a, t.u,
+        SETSAIL_MATCHED.has(t.tk) ? 'Yes' : 'NO',
+        t.q, t.s, t.tk, t.tt
+      ]));
       const csv = rows.map(r => r.map(v => '"' + String(v||'').replace(/"/g,'""') + '"').join(',')).join('\n');
       const blob = new Blob([csv], {type: 'text/csv'});
       const url = URL.createObjectURL(blob);
