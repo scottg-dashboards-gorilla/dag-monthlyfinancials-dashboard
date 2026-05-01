@@ -1239,16 +1239,6 @@
               <canvas id="seatMrrChart"></canvas>
             </div>
           </div>
-          <div class="chart-row">
-            <div class="chart-card">
-              <div class="chart-title">Seat Count by Product</div>
-              <canvas id="seatByProductChart"></canvas>
-            </div>
-            <div class="chart-card">
-              <div class="chart-title">Month-over-Month Seat Change by Product</div>
-              <canvas id="seatDiffChart"></canvas>
-            </div>
-          </div>
           <div>
             <div class="chart-title" style="padding: 0 0 16px 0;">Month-over-Month Detail</div>
             <div class="pnl-wrap">
@@ -2536,62 +2526,7 @@
         }
       });
 
-      // 3. Seats by product (stacked area)
-      if (charts.seatByProduct) charts.seatByProduct.destroy();
-      charts.seatByProduct = new Chart(document.getElementById('seatByProductChart'), {
-        type: 'line',
-        data: {
-          labels,
-          datasets: SEAT_PRODUCTS.map(p => ({
-            label: p.id,
-            data: SEAT_DATA.map(d => (d.products[p.id] || {}).s || 0),
-            borderColor: p.color,
-            backgroundColor: p.color + '20',
-            fill: true,
-            tension: 0.35,
-            pointRadius: 2,
-            borderWidth: 2
-          }))
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } } },
-          scales: {
-            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Seats', font: { size: 11 } } },
-            x: { stacked: true }
-          }
-        }
-      });
-
-      // 4. MoM seat diff by product (bar chart)
-      if (charts.seatDiff) charts.seatDiff.destroy();
-      charts.seatDiff = new Chart(document.getElementById('seatDiffChart'), {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: SEAT_PRODUCTS.map(p => ({
-            label: p.id,
-            data: SEAT_DATA.map(d => (d.products[p.id] || {}).d || 0),
-            backgroundColor: p.color + 'cc',
-            borderColor: p.color,
-            borderWidth: 1
-          }))
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } } },
-          scales: {
-            y: { stacked: true, title: { display: true, text: 'Seat Change', font: { size: 11 } } },
-            x: { stacked: true }
-          }
-        }
-      });
-
-      // 5. Detail table
+      // Detail table
       const table = document.getElementById('seatTable');
       let html = '<thead><tr class="pnl-row-hl"><th class="pnl-label">Product / Metric</th>';
       SEAT_DATA.forEach((d, i) => {
