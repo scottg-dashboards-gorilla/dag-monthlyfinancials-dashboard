@@ -163,6 +163,23 @@
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
+    .back-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 13px;
+      color: var(--dim);
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: all 0.15s;
+    }
+    .back-btn:hover {
+      background: #f1f5f9;
+      color: var(--text);
+      border-color: #94a3b8;
+    }
+
     .header-left h1 {
       font-size: 20px;
       font-weight: 700;
@@ -1128,6 +1145,7 @@
       <!-- Header -->
       <div class="header">
         <div class="header-left">
+          <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none;">&#8592; Back</button>
           <h1 id="viewTitle">Dashboard</h1>
           <p id="viewSubtitle">Financial overview for current month</p>
         </div>
@@ -1336,7 +1354,29 @@
       else if (view === 'intelligence') renderIntelligenceView();
     }
 
+    var viewHistory = ['dashboard'];
+
+    function goBack() {
+      if (viewHistory.length <= 1) return;
+      viewHistory.pop(); // remove current
+      const prev = viewHistory[viewHistory.length - 1];
+      // Find and click the right nav item
+      const navItems = document.querySelectorAll('.nav-item');
+      const viewOrder = ['dashboard','departments','grossprofit','pnl','intelligence','benchmarks','seats','import'];
+      const idx = viewOrder.indexOf(prev);
+      if (idx >= 0 && navItems[idx]) {
+        navItems[idx].click();
+        // The click will push to history again, so pop the duplicate
+        viewHistory.pop();
+      }
+    }
+
     function switchView(viewName) {
+      if (viewHistory[viewHistory.length - 1] !== viewName) {
+        viewHistory.push(viewName);
+      }
+      document.getElementById('backBtn').style.display = (viewHistory.length > 1) ? 'inline-block' : 'none';
+
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewName).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
