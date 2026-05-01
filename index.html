@@ -700,6 +700,98 @@
     .pnl-val-neg { color: #dc2626 !important; }
     .pnl-section-header td { background: #f8fafc !important; font-weight: 700; font-size: 13px; padding-top: 16px !important; border-bottom: 1px solid #d1d5db; }
 
+    /* User Count Audit view */
+    .audit-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .audit-stat {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .audit-stat-label {
+      color: #6b7280;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 6px;
+    }
+    .audit-stat-value { font-size: 24px; font-weight: 700; color: #1a1a1a; }
+    .audit-stat-sub { color: #6b7280; font-size: 12px; margin-top: 2px; }
+    .audit-stat.alert .audit-stat-value { color: #dc2626; }
+    .audit-stat.warn .audit-stat-value { color: #d97706; }
+    .audit-stat.good .audit-stat-value { color: #059669; }
+
+    .audit-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .audit-filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .audit-label { color: #6b7280; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; }
+    .audit-select, .audit-search {
+      padding: 7px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+      color: #1a1a1a;
+      min-width: 160px;
+    }
+    .audit-search { min-width: 200px; }
+    .audit-btn {
+      padding: 8px 14px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .audit-btn:hover { background: #1d4ed8; }
+
+    .audit-rollup-wrap { margin-bottom: 24px; }
+    .audit-rollup-title, .audit-table-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge-setsail { background: #dcfce7; color: #166534; }
+    .badge-helpdesk { background: #fee2e2; color: #991b1b; }
+    .badge-merged   { background: #fef3c7; color: #92400e; }
+    .badge-internal { background: #e0e7ff; color: #3730a3; }
+    .badge-onboard  { background: #dbeafe; color: #1e40af; }
+    .badge-offboard { background: #fce7f3; color: #9f1239; }
+    .badge-matched  { background: #dcfce7; color: #166534; }
+    .badge-missing  { background: #fee2e2; color: #991b1b; }
+    .audit-row-bypass td { background: #fffbeb; }
+    .audit-row-bypass td:first-child { background: #fef3c7; }
+    .audit-row-missing td { background: #fef2f2; }
+    .audit-row-missing td:first-child { background: #fee2e2; }
+
     .chat-wrap {
       display: flex;
       flex-direction: column;
@@ -1134,6 +1226,7 @@
       <div class="nav-item" onclick="switchView('intelligence')">Intelligence</div>
       <div class="nav-item" onclick="switchView('benchmarks')">Benchmarking</div>
       <div class="nav-item" onclick="switchView('seats')">Seat Tracking</div>
+      <div class="nav-item" onclick="switchView('useraudit')">User Count Audit</div>
       <div class="nav-item" onclick="switchView('import')">Import Data</div>
       <div style="padding: 24px 20px; border-top: 1px solid #374151; margin-top: 24px;">
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -1265,6 +1358,70 @@
           </div>
         </div>
 
+        <!-- User Count Audit View -->
+        <div class="view" id="useraudit">
+          <div class="audit-summary" id="auditSummary"></div>
+          <div class="audit-controls">
+            <div class="audit-filter-group">
+              <label class="audit-label">Month</label>
+              <select id="auditMonthFilter" class="audit-select" onchange="renderUserAuditView()">
+                <option value="">All Months (Jan-Apr 2026)</option>
+                <option value="2026-01">Jan 2026</option>
+                <option value="2026-02">Feb 2026</option>
+                <option value="2026-03">Mar 2026</option>
+                <option value="2026-04">Apr 2026</option>
+              </select>
+            </div>
+            <div class="audit-filter-group">
+              <label class="audit-label">Action</label>
+              <select id="auditActionFilter" class="audit-select" onchange="renderUserAuditView()">
+                <option value="">All</option>
+                <option value="Onboard">Onboard only</option>
+                <option value="Offboard">Offboard only</option>
+              </select>
+            </div>
+            <div class="audit-filter-group">
+              <label class="audit-label">Source / Queue</label>
+              <select id="auditQueueFilter" class="audit-select" onchange="renderUserAuditView()">
+                <option value="">All</option>
+                <option value="bypass">Bypassed Setsail (Helpdesk + Merged)</option>
+                <option value="Setsail">Setsail only</option>
+                <option value="Helpdesk">Helpdesk only</option>
+                <option value="Merged">Merged only</option>
+              </select>
+            </div>
+            <div class="audit-filter-group">
+              <label class="audit-label">SetSail Match</label>
+              <select id="auditSetsailFilter" class="audit-select" onchange="renderUserAuditView()">
+                <option value="">All</option>
+                <option value="missing">Missing from SetSail (billing risk)</option>
+                <option value="matched">Matched in SetSail</option>
+              </select>
+            </div>
+            <div class="audit-filter-group">
+              <label class="audit-label">Client</label>
+              <select id="auditClientFilter" class="audit-select" onchange="renderUserAuditView()"></select>
+            </div>
+            <div class="audit-filter-group">
+              <label class="audit-label">Search</label>
+              <input type="text" id="auditSearch" class="audit-search" placeholder="user name or title..." oninput="renderUserAuditView()" />
+            </div>
+            <div class="audit-filter-group">
+              <button class="audit-btn" onclick="exportUserAudit()">Export CSV</button>
+            </div>
+          </div>
+          <div class="audit-rollup-wrap">
+            <div class="audit-rollup-title">Net Headcount Change by Client &amp; Month</div>
+            <div class="pnl-wrap">
+              <table class="pnl-table" id="auditRollupTable"></table>
+            </div>
+          </div>
+          <div class="audit-table-title">All Onboarding / Offboarding Tickets <span id="auditTableCount" style="color:var(--muted); font-weight:normal; font-size:13px;"></span></div>
+          <div class="pnl-wrap">
+            <table class="pnl-table" id="auditDetailTable"></table>
+          </div>
+        </div>
+
         <!-- Import Data View -->
         <div class="view" id="import">
           <div class="chart-card">
@@ -1362,7 +1519,7 @@
       const prev = viewHistory[viewHistory.length - 1];
       // Find and click the right nav item
       const navItems = document.querySelectorAll('.nav-item');
-      const viewOrder = ['dashboard','departments','grossprofit','pnl','intelligence','benchmarks','seats','import'];
+      const viewOrder = ['dashboard','departments','grossprofit','pnl','intelligence','benchmarks','seats','useraudit','import'];
       const idx = viewOrder.indexOf(prev);
       if (idx >= 0 && navItems[idx]) {
         navItems[idx].click();
@@ -1390,6 +1547,7 @@
         intelligence: 'Intelligence Hub',
         benchmarks: 'MSP Benchmarking — Top 7 Metrics',
         seats: 'A+ Animal Seat Tracking',
+        useraudit: 'User Count Audit',
         import: 'Import Data'
       };
       document.getElementById('viewTitle').textContent = titles[viewName];
@@ -1401,6 +1559,7 @@
         intelligence: 'Anomalies, insights, and advisor chat',
         benchmarks: 'Sub-$50M MSP benchmarks from Service Leadership Index, TruMethods, ScalePad 2025, and MSP M&A advisors',
         seats: 'Month-over-month seat counts and MRR for Div 8 products',
+        useraudit: 'Autotask onboarding/offboarding tickets — reconcile against Setsail before billing',
         import: 'Update financial data from external sources'
       }[viewName];
 
@@ -1411,6 +1570,7 @@
       else if (viewName === 'intelligence') renderIntelligenceView();
       else if (viewName === 'benchmarks') renderBenchmarkView();
       else if (viewName === 'seats') renderSeatsView();
+      else if (viewName === 'useraudit') initUserAuditView();
     }
 
     function getCurrentData() {
@@ -3083,6 +3243,168 @@
       });
       html += '</div></div>';
       container.innerHTML = html;
+    }
+
+    /* ============================================================
+       USER COUNT AUDIT
+       Data pulled from Autotask Title-search for keywords:
+       onboard, offboard, terminat, new hire, new user, separation
+       Date range: Created 1/1/2026 - 4/30/2026
+       Filtered: removed test/QA tickets, internal DAGTECH01.
+       SetSail match data pulled from setsail.today/api/data/tickets/all
+       Pulled: 2026-05-01
+       ============================================================ */
+    const AUDIT_TICKETS = [{"tk":"T20260430.0046","dt":"04/30/26","ck":"2026-04","m":"Apr 26","co":"SYNGNE01","q":"Setsail","a":"Offboard","u":"Jay Whitt","s":"C. Pending Close","tt":"[Offboarding] Offboard Jay Whitt"},{"tk":"T20260429.0046","dt":"04/29/26","ck":"2026-04","m":"Apr 26","co":"AGUDCA01","q":"Setsail","a":"Onboard","u":"Jeff Prior","s":"Complete","tt":"[Onboarding] Onboard Jeff Prior"},{"tk":"T20260429.0028","dt":"04/29/26","ck":"2026-04","m":"Apr 26","co":"BHSTRT01","q":"Setsail","a":"Onboard","u":"Jenna Mayes","s":"C. Pending Close","tt":"[Onboarding] Onboard Jenna Mayes"},{"tk":"T20260429.0025","dt":"04/29/26","ck":"2026-04","m":"Apr 26","co":"SWTLNE01","q":"Setsail","a":"Onboard","u":"ALIX GARNDER","s":"C. Pending Close","tt":"ONBOARDING - ALIX GARNDER"},{"tk":"T20260428.0052","dt":"04/28/26","ck":"2026-04","m":"Apr 26","co":"URBLEG01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"LAUL _ New hire add a new consultant_ Char Bland"},{"tk":"T20260427.0140","dt":"04/27/26","ck":"2026-04","m":"Apr 26","co":"BHSTRT01","q":"Setsail","a":"Offboard","u":"Esme Laster","s":"Complete","tt":"[Offboarding] Offboard Esme Laster"},{"tk":"T20260427.0044","dt":"04/27/26","ck":"2026-04","m":"Apr 26","co":"BHSTRT01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Requesting New User Onboarding Jenna Mayes"},{"tk":"T20260427.0017","dt":"04/27/26","ck":"2026-04","m":"Apr 26","co":"SCILUC01","q":"Helpdesk","a":"Offboard","u":"","s":"Dispatched - Remote","tt":"Judy Nicoud invited you to their board Cousoulis, Aimee - Separation"},{"tk":"T20260422.0042","dt":"04/22/26","ck":"2026-04","m":"Apr 26","co":"KATCOM01","q":"Setsail","a":"Offboard","u":"Andrea Gonzalez Garnier","s":"Complete","tt":"[Offboarding] Offboard Andrea Gonzalez Garnier"},{"tk":"T20260421.0087","dt":"04/21/26","ck":"2026-04","m":"Apr 26","co":"VILOCA01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"He is onboarding and finished all of the tests, but cant see any of the information."},{"tk":"T20260421.0037","dt":"04/21/26","ck":"2026-04","m":"Apr 26","co":"PACGCG01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Requesting to Offboard/Delete User Gerald Woels (gwoels@panafricancapital.com)"},{"tk":"T20260421.0006","dt":"04/21/26","ck":"2026-04","m":"Apr 26","co":"AGUDCA01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"REQUEST -- Please add new hire to AGU-Directors distro list"},{"tk":"T20260420.0047","dt":"04/20/26","ck":"2026-04","m":"Apr 26","co":"AGUDCA01","q":"Helpdesk","a":"Onboard","u":"Shannon Wulf Tregar","s":"Complete","tt":"Fw: AGU IT Onboarding: Shannon Wulf Tregar"},{"tk":"T20260420.0046","dt":"04/20/26","ck":"2026-04","m":"Apr 26","co":"AGUDCA01","q":"Merged","a":"Onboard","u":"Shannon Wulf Tregar","s":"Complete","tt":"Fw: AGU IT Onboarding: Shannon Wulf Tregar"},{"tk":"T20260417.0046","dt":"04/17/26","ck":"2026-04","m":"Apr 26","co":"BHSTRT01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Esme Laster offboarding"},{"tk":"T20260417.0045","dt":"04/17/26","ck":"2026-04","m":"Apr 26","co":"VILOCA01","q":"Setsail","a":"Offboard","u":"Linda Nguyen","s":"Complete","tt":"[Offboarding] Offboard Linda Nguyen"},{"tk":"T20260416.0064","dt":"04/16/26","ck":"2026-04","m":"Apr 26","co":"SHIRAZ01","q":"Setsail","a":"Onboard","u":"Esther Greene","s":"Complete","tt":"[Onboarding] Onboard Esther Greene"},{"tk":"T20260415.0118","dt":"04/15/26","ck":"2026-04","m":"Apr 26","co":"RDKSTG01","q":"Setsail","a":"Onboard","u":"Josh Thiel","s":"Complete","tt":"[Onboarding] Onboard Josh Thiel"},{"tk":"T20260415.0117","dt":"04/15/26","ck":"2026-04","m":"Apr 26","co":"RDKSTG01","q":"Setsail","a":"Onboard","u":"Chris Morris","s":"Complete","tt":"[Onboarding] Onboard Chris Morris"},{"tk":"T20260415.0110","dt":"04/15/26","ck":"2026-04","m":"Apr 26","co":"WHIDCA01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Requesting User Onboarding and Installing Applications for ECW, Adobe Acrobat, and 8x8"},{"tk":"T20260413.0078","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"SWTLNE01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Rishi Kaul - Offboarding"},{"tk":"T20260413.0068","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"RDKSTG01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"New Users - Anne Gore and Dave Saunders"},{"tk":"T20260413.0067","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"RDKSTG01","q":"Setsail","a":"Onboard","u":"Dave Saunders","s":"Complete","tt":"[Onboarding] Onboard Dave Saunders"},{"tk":"T20260413.0066","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"RDKSTG01","q":"Setsail","a":"Onboard","u":"Anne Gore","s":"Complete","tt":"[Onboarding] Onboard Anne Gore"},{"tk":"T20260413.0060","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"AMPWSH01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"RE: SetSail: Onboard new user - Leila Adnani"},{"tk":"T20260413.0059","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"AMPWSH01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"SetSail: Onboard new user - Leila Adnani"},{"tk":"T20260413.0053","dt":"04/13/26","ck":"2026-04","m":"Apr 26","co":"WHIDCA01","q":"Setsail","a":"Onboard","u":"Gloria Macrae","s":"Complete","tt":"[Onboarding] Onboard Gloria Macrae"},{"tk":"T20260412.0015","dt":"04/12/26","ck":"2026-04","m":"Apr 26","co":"DRDSHI01","q":"Internal Tasks","a":"Onboard","u":"A+ Animal Service Delivery (DRDSHI01)","s":"Complete","tt":"Project - P20250826.0002 - Onboarding - A+ Animal Service Delivery (DRDSHI01)"},{"tk":"T20260408.0030","dt":"04/08/26","ck":"2026-04","m":"Apr 26","co":"AGUDCA01","q":"Merged","a":"Onboard","u":"Shannon Tregar","s":"Complete","tt":"[Onboarding] Onboard Shannon Tregar"},{"tk":"T20260406.0051","dt":"04/06/26","ck":"2026-04","m":"Apr 26","co":"SHASQI01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New User + New Group"},{"tk":"T20260403.0039","dt":"04/03/26","ck":"2026-04","m":"Apr 26","co":"VILOCA01","q":"Setsail","a":"Onboard","u":"Jocelyn Juarez","s":"Complete","tt":"[Onboarding] Onboard Jocelyn Juarez"},{"tk":"T20260403.0038","dt":"04/03/26","ck":"2026-04","m":"Apr 26","co":"VILOCA01","q":"Setsail","a":"Onboard","u":"Goasheng Lee","s":"Complete","tt":"[Onboarding] Onboard Goasheng Lee"},{"tk":"T20260403.0037","dt":"04/03/26","ck":"2026-04","m":"Apr 26","co":"VILOCA01","q":"Merged","a":"Onboard","u":"Yuan Zhang","s":"Complete","tt":"[Onboarding] Onboard Yuan Zhang"},{"tk":"T20260403.0031","dt":"04/03/26","ck":"2026-04","m":"Apr 26","co":"EMPCON01","q":"Helpdesk","a":"Offboard","u":"Brian Greer","s":"Complete","tt":"Offboard Brian Greer"},{"tk":"T20260401.0070","dt":"04/01/26","ck":"2026-04","m":"Apr 26","co":"KATCOM01","q":"Setsail","a":"Onboard","u":"Teresa Abrash","s":"Complete","tt":"[Onboarding] Onboard Teresa Abrash"},{"tk":"T20260401.0069","dt":"04/01/26","ck":"2026-04","m":"Apr 26","co":"KATCOM01","q":"Setsail","a":"Offboard","u":"Kyle Kennedy","s":"Complete","tt":"[Offboarding] Offboard Kyle Kennedy"},{"tk":"T20260330.0072","dt":"03/30/26","ck":"2026-03","m":"Mar 26","co":"NCJWOM01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New User Creation: Robin Roger"},{"tk":"T20260330.0033","dt":"03/30/26","ck":"2026-03","m":"Mar 26","co":"MLWGRP01","q":"Helpdesk","a":"Onboard","u":"ed - new attorney Mark Sidman","s":"Complete","tt":"Onboarded - new attorney Mark Sidman"},{"tk":"T20260325.0071","dt":"03/25/26","ck":"2026-03","m":"Mar 26","co":"VILOCA01","q":"Setsail","a":"Onboard","u":"David Jimenez","s":"Complete","tt":"[Onboarding] Onboard David Jimenez"},{"tk":"T20260325.0070","dt":"03/25/26","ck":"2026-03","m":"Mar 26","co":"VILOCA01","q":"Setsail","a":"Onboard","u":"Betzy Avila-Martinez","s":"Complete","tt":"[Onboarding] Onboard Betzy Avila-Martinez"},{"tk":"T20260325.0060","dt":"03/25/26","ck":"2026-03","m":"Mar 26","co":"AGUDCA01","q":"Setsail","a":"Offboard","u":"Jim Colleton","s":"Complete","tt":"[Offboarding] Offboard Jim Colleton"},{"tk":"T20260323.0053","dt":"03/23/26","ck":"2026-03","m":"Mar 26","co":"WHIDCA01","q":"Setsail","a":"Offboard","u":"Darmani Paramore","s":"Complete","tt":"[Offboarding] Offboard Darmani Paramore"},{"tk":"T20260323.0033","dt":"03/23/26","ck":"2026-03","m":"Mar 26","co":"HOLAPA01","q":"Setsail","a":"Onboard","u":"Kassandra Perez-Desir","s":"Complete","tt":"[Onboarding] Onboard Kassandra Perez-Desir"},{"tk":"T20260323.0023","dt":"03/23/26","ck":"2026-03","m":"Mar 26","co":"BAKEML01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"The caller states new hire, Chloe needs assistance syncing Outlook to her iphone. and accessing MS Word."},{"tk":"T20260320.0078","dt":"03/20/26","ck":"2026-03","m":"Mar 26","co":"VILOCA01","q":"Setsail","a":"Offboard","u":"Adilene Ruiz","s":"Complete","tt":"[Offboarding] Offboard Adilene Ruiz"},{"tk":"T20260320.0077","dt":"03/20/26","ck":"2026-03","m":"Mar 26","co":"VILOCA01","q":"Setsail","a":"Offboard","u":"Kimberly Martinez","s":"Complete","tt":"[Offboarding] Offboard Kimberly Martinez"},{"tk":"T20260318.0047","dt":"03/18/26","ck":"2026-03","m":"Mar 26","co":"MLWGRP01","q":"Setsail","a":"Onboard","u":"Mark Sidman","s":"Complete","tt":"[Onboarding] Onboard Mark Sidman"},{"tk":"T20260318.0042","dt":"03/18/26","ck":"2026-03","m":"Mar 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Elizabeth Bird","s":"Complete","tt":"[Offboarding] Offboard Elizabeth Bird"},{"tk":"T20260317.0055","dt":"03/17/26","ck":"2026-03","m":"Mar 26","co":"KATCOM01","q":"Merged","a":"Offboard","u":"","s":"Complete","tt":"Caller wants to speak with Greg. If they are not available, then with Jordan or Guillermo. Cal is about access termination for an employee."},{"tk":"T20260317.0027","dt":"03/17/26","ck":"2026-03","m":"Mar 26","co":"SWTLNE01","q":"Helpdesk","a":"Offboard","u":"Tucker Malsch","s":"Complete","tt":"Offboard - Tucker Malsch"},{"tk":"T20260317.0025","dt":"03/17/26","ck":"2026-03","m":"Mar 26","co":"SCILUC01","q":"Merged","a":"Onboard","u":"Matthew Latey","s":"Complete","tt":"[Onboarding] Onboard Matthew Latey"},{"tk":"T20260316.0060","dt":"03/16/26","ck":"2026-03","m":"Mar 26","co":"SWTLNE01","q":"Helpdesk","a":"Offboard","u":"SFP","s":"Complete","tt":"OFFBOARD - SFP"},{"tk":"T20260316.0052","dt":"03/16/26","ck":"2026-03","m":"Mar 26","co":"VILOCA01","q":"Setsail","a":"Offboard","u":"Raphaiella Sous","s":"Complete","tt":"(03/17)[Offboarding] Offboard Raphaiella Sous"},{"tk":"T20260316.0042","dt":"03/16/26","ck":"2026-03","m":"Mar 26","co":"BAKEML01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"URGENT : New User Machine Setup"},{"tk":"T20260314.0006","dt":"03/14/26","ck":"2026-03","m":"Mar 26","co":"SCILUC01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Judy Nicoud Invited You to their Board Latey, Matthew - Onboarding"},{"tk":"T20260313.0043","dt":"03/13/26","ck":"2026-03","m":"Mar 26","co":"AGUDCA01","q":"Setsail","a":"Onboard","u":"McKay Porter","s":"Complete","tt":"(03-23 Start Date)[Onboarding] Onboard McKay Porter"},{"tk":"T20260312.0043","dt":"03/12/26","ck":"2026-03","m":"Mar 26","co":"SWTLNE01","q":"Helpdesk","a":"Onboard","u":"Tucker Malsch","s":"Complete","tt":"New Employee Onboarding - Tucker Malsch"},{"tk":"T20260310.0059","dt":"03/10/26","ck":"2026-03","m":"Mar 26","co":"KATCOM01","q":"Setsail","a":"Onboard","u":"Kyle Kennedy","s":"Complete","tt":"[Onboarding] Onboard Kyle Kennedy"},{"tk":"T20260309.0019","dt":"03/09/26","ck":"2026-03","m":"Mar 26","co":"SYNGNE01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New User Email Account Creation"},{"tk":"T20260306.0019","dt":"03/06/26","ck":"2026-03","m":"Mar 26","co":"SCILUC01","q":"Helpdesk","a":"Offboard","u":"of Alissa Threat","s":"Complete","tt":"Offboarding of Alissa Threat"},{"tk":"T20260306.0011","dt":"03/06/26","ck":"2026-03","m":"Mar 26","co":"MACLAW01","q":"Setsail","a":"Onboard","u":"Nicholas Daetwyler","s":"Complete","tt":"[Onboarding] Onboard Nicholas Daetwyler"},{"tk":"T20260305.0032","dt":"03/05/26","ck":"2026-03","m":"Mar 26","co":"212TAX01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"212 Tax - Request to Add New User to 8x8 Account"},{"tk":"T20260305.0026","dt":"03/05/26","ck":"2026-03","m":"Mar 26","co":"MACLAW01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New hire"},{"tk":"T20260304.0047","dt":"03/04/26","ck":"2026-03","m":"Mar 26","co":"SHASQI01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Shasqi - Access to SharePoint Group for new user"},{"tk":"T20260302.0040","dt":"03/02/26","ck":"2026-03","m":"Mar 26","co":"AMPWSH01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"SetSail: Offboard existing user - Chris LaSota"},{"tk":"T20260302.0025","dt":"03/02/26","ck":"2026-03","m":"Mar 26","co":"RGCENG01","q":"Setsail","a":"Offboard","u":"Jesus Garcia Jimenez","s":"Complete","tt":"[Offboarding] Offboard Jesus Garcia Jimenez"},{"tk":"T20260302.0013","dt":"03/02/26","ck":"2026-03","m":"Mar 26","co":"AMPWSH01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"SetSail: Onboard new user - Miguel Gonzalez"},{"tk":"T20260227.0042","dt":"02/27/26","ck":"2026-02","m":"Feb 26","co":"SKFGLR01","q":"Setsail","a":"Offboard","u":"Caroline Hoiseth","s":"Complete","tt":"[Offboarding] Offboard Caroline Hoiseth"},{"tk":"T20260227.0040","dt":"02/27/26","ck":"2026-02","m":"Feb 26","co":"VILOCA01","q":"Helpdesk","a":"Offboard","u":"and Offboarding","s":"Complete","tt":"Onboarding and Offboarding"},{"tk":"T20260227.0027","dt":"02/27/26","ck":"2026-02","m":"Feb 26","co":"AMPWSH01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"SetSail: Offboard existing user - Nicholas Garcia"},{"tk":"T20260227.0021","dt":"02/27/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Setsail","a":"Onboard","u":"Leilah Mooney Joseph","s":"Complete","tt":"[Onboarding] Onboard Leilah Mooney Joseph"},{"tk":"T20260227.0014","dt":"02/27/26","ck":"2026-02","m":"Feb 26","co":"WHIDCA01","q":"Setsail","a":"Onboard","u":"Erin Murray","s":"Complete","tt":"[Onboarding] Onboard Erin Murray"},{"tk":"T20260226.0056","dt":"02/26/26","ck":"2026-02","m":"Feb 26","co":"BHSTRT01","q":"Setsail","a":"Offboard","u":"Breanna Walsh","s":"Complete","tt":"[Offboarding] Offboard Breanna Walsh"},{"tk":"T20260226.0016","dt":"02/26/26","ck":"2026-02","m":"Feb 26","co":"RDKSTG01","q":"Setsail","a":"Onboard","u":"Tami Begassee","s":"Complete","tt":"[Onboarding] Onboard Tami Begassee"},{"tk":"T20260226.0014","dt":"02/26/26","ck":"2026-02","m":"Feb 26","co":"RDKSTG01","q":"Setsail","a":"Onboard","u":"Gretchen Wharton","s":"Complete","tt":"[Onboarding] Onboard Gretchen Wharton (Start Date - 03/04)"},{"tk":"T20260224.0034","dt":"02/24/26","ck":"2026-02","m":"Feb 26","co":"SWTLNE01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New Employee Onboarding"},{"tk":"T20260223.0040","dt":"02/23/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Out of Office Re: [Set Sail] New User Onboarded"},{"tk":"T20260223.0039","dt":"02/23/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Setsail","a":"Onboard","u":"Josh San Miguel","s":"Complete","tt":"[Onboarding] Onboard Josh San Miguel"},{"tk":"T20260223.0033","dt":"02/23/26","ck":"2026-02","m":"Feb 26","co":"WHIDCA01","q":"Setsail","a":"Onboard","u":"Roberto Trejo Lopez","s":"Complete","tt":"[Onboarding] Onboard Roberto Trejo Lopez"},{"tk":"T20260223.0018","dt":"02/23/26","ck":"2026-02","m":"Feb 26","co":"EMPCON01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New User setup: Aissatou Sow"},{"tk":"T20260221.0016","dt":"02/21/26","ck":"2026-02","m":"Feb 26","co":"AYAVDO01","q":"Setsail","a":"Offboard","u":"Jonatan Munoz","s":"Complete","tt":"[Offboarding] Offboard Jonatan Munoz"},{"tk":"T20260221.0004","dt":"02/21/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Offboard","u":"Sean Twombly","s":"Complete","tt":"[Offboarding] Offboard Sean Twombly"},{"tk":"T20260220.0023","dt":"02/20/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Helpdesk","a":"Onboard","u":"Status for 2 New Users","s":"Complete","tt":"Onboarding Status for 2 New Users"},{"tk":"T20260219.0061","dt":"02/19/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Offboard","u":"Robert Tole","s":"Complete","tt":"[Offboarding] Offboard Robert Tole"},{"tk":"T20260219.0060","dt":"02/19/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Onboard","u":"Brandon Green","s":"Complete","tt":"[Onboarding] Onboard Brandon Green"},{"tk":"T20260218.0037","dt":"02/18/26","ck":"2026-02","m":"Feb 26","co":"HMCBLD01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Requesting to Activate a Key Card to a New User"},{"tk":"T20260217.0040","dt":"02/17/26","ck":"2026-02","m":"Feb 26","co":"SWTLNE01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New employee onboarding"},{"tk":"T20260215.0012","dt":"02/15/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"Laptop Setups for 2 New Hires"},{"tk":"T20260213.0033","dt":"02/13/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Onboard","u":"Jack Folwell","s":"Complete","tt":"[Onboarding] Onboard Jack Folwell"},{"tk":"T20260213.0030","dt":"02/13/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Onboard","u":"TaKisha Adams","s":"Complete","tt":"[Onboarding] Onboard TaKisha Adams"},{"tk":"T20260213.0001","dt":"02/13/26","ck":"2026-02","m":"Feb 26","co":"FNDIGS01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"UW-2 Group Onboarding for JC"},{"tk":"T20260212.0013","dt":"02/12/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"User Offboarding/Profile Removal Requests"},{"tk":"T20260210.0040","dt":"02/10/26","ck":"2026-02","m":"Feb 26","co":"SHASQI01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"URGENT - Requesting to Create SharePoint User and New User Group"},{"tk":"T20260210.0029","dt":"02/10/26","ck":"2026-02","m":"Feb 26","co":"SHIRAZ01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Confirm Offboarding"},{"tk":"T20260209.0036","dt":"02/09/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Merged","a":"Onboard","u":"Jessica Schaffer","s":"Complete","tt":"[Onboarding] Onboard Jessica Schaffer"},{"tk":"T20260209.0033","dt":"02/09/26","ck":"2026-02","m":"Feb 26","co":"NCJWOM01","q":"Merged","a":"Onboard","u":"Michael Lieberman","s":"Complete","tt":"[Onboarding] Onboard Michael Lieberman"},{"tk":"T20260206.0055","dt":"02/06/26","ck":"2026-02","m":"Feb 26","co":"HMCBLD01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"New Hire Keycard Access - Jo Smith"},{"tk":"T20260206.0042","dt":"02/06/26","ck":"2026-02","m":"Feb 26","co":"WHIDCA01","q":"Setsail","a":"Offboard","u":"Nancy Markoe","s":"Complete","tt":"[Offboarding] Offboard Nancy Markoe"},{"tk":"T20260206.0040","dt":"02/06/26","ck":"2026-02","m":"Feb 26","co":"WHIDCA01","q":"Setsail","a":"Offboard","u":"Bilen Mamo","s":"Complete","tt":"[Offboarding] Offboard Bilen Mamo"},{"tk":"T20260206.0039","dt":"02/06/26","ck":"2026-02","m":"Feb 26","co":"SKFGLR01","q":"Setsail","a":"Onboard","u":"Allyson Stewart","s":"Complete","tt":"[Onboarding] Onboard Allyson Stewart"},{"tk":"T20260205.0035","dt":"02/05/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Onboard","u":"Suleyca Rivera","s":"Complete","tt":"[Onboarding] Onboard Suleyca Rivera"},{"tk":"T20260205.0026","dt":"02/05/26","ck":"2026-02","m":"Feb 26","co":"SKFGLR01","q":"Setsail","a":"Offboard","u":"Maryanne Forsythe","s":"Complete","tt":"[Offboarding] Offboard Maryanne Forsythe"},{"tk":"T20260205.0025","dt":"02/05/26","ck":"2026-02","m":"Feb 26","co":"SKFGLR01","q":"Setsail","a":"Offboard","u":"Erin Cecil","s":"Complete","tt":"[Offboarding] Offboard Erin Cecil"},{"tk":"T20260204.0053","dt":"02/04/26","ck":"2026-02","m":"Feb 26","co":"SHIRAZ01","q":"Setsail","a":"Onboard","u":"Lindsey Brown","s":"Complete","tt":"[Onboarding] Onboard Lindsey Brown"},{"tk":"T20260203.0057","dt":"02/03/26","ck":"2026-02","m":"Feb 26","co":"AMPWSH01","q":"Setsail","a":"Offboard","u":"","s":"Complete","tt":"Employee Termination"},{"tk":"T20260203.0044","dt":"02/03/26","ck":"2026-02","m":"Feb 26","co":"KATCOM01","q":"Setsail","a":"Offboard","u":"Bradley Tenenbaum","s":"Complete","tt":"[Offboarding] Offboard Bradley Tenenbaum"},{"tk":"T20260202.0057","dt":"02/02/26","ck":"2026-02","m":"Feb 26","co":"AGUDCA01","q":"Setsail","a":"Offboard","u":"Sara Haywood","s":"Complete","tt":"[Offboarding] Offboard Sara Haywood"},{"tk":"T20260202.0054","dt":"02/02/26","ck":"2026-02","m":"Feb 26","co":"AMPWSH01","q":"Setsail","a":"Onboard","u":"Ryan Cooper","s":"Complete","tt":"[Onboarding] Onboard Ryan Cooper"},{"tk":"T20260130.0039","dt":"01/30/26","ck":"2026-01","m":"Jan 26","co":"WHIDCA01","q":"Setsail","a":"Onboard","u":"Garrett Adams","s":"Complete","tt":"[Onboarding] Onboard Garrett Adams"},{"tk":"T20260130.0016","dt":"01/30/26","ck":"2026-01","m":"Jan 26","co":"RGCENG01","q":"Merged","a":"Onboard","u":"Bharath Singh Belur Dinesh","s":"Complete","tt":"[Onboarding] Onboard Bharath Singh Belur Dinesh"},{"tk":"T20260128.0031","dt":"01/28/26","ck":"2026-01","m":"Jan 26","co":"SWTLNE01","q":"Helpdesk","a":"Offboard","u":"Jon Hoy","s":"Complete","tt":"Offboard Jon Hoy"},{"tk":"T20260127.0024","dt":"01/27/26","ck":"2026-01","m":"Jan 26","co":"AGUDCA01","q":"Setsail","a":"Offboard","u":"Hope Sreeram","s":"Complete","tt":"[Offboarding] Offboard Hope Sreeram"},{"tk":"T20260126.0088","dt":"01/26/26","ck":"2026-01","m":"Jan 26","co":"SHASQI01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Shasqi - New User - Access to SharePoint needed"},{"tk":"T20260123.0081","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Mina Sanders","s":"Complete","tt":"[Offboarding] Offboard Mina Sanders"},{"tk":"T20260123.0080","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Autumn Swinbank","s":"Complete","tt":"[Offboarding] Offboard Autumn Swinbank"},{"tk":"T20260123.0078","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Allie Pallotta","s":"Complete","tt":"[Offboarding] Offboard Allie Pallotta"},{"tk":"T20260123.0077","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Roshni Patel","s":"Complete","tt":"[Offboarding] Offboard Roshni Patel"},{"tk":"T20260123.0076","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Sherri Krol","s":"Complete","tt":"[Offboarding] Offboard Sherri Krol"},{"tk":"T20260123.0075","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Jeanette Mancilla","s":"Complete","tt":"[Offboarding] Offboard Jeanette Mancilla"},{"tk":"T20260123.0074","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Izzy Nazaire","s":"Complete","tt":"[Offboarding] Offboard Izzy Nazaire"},{"tk":"T20260123.0072","dt":"01/23/26","ck":"2026-01","m":"Jan 26","co":"KRAOCS01","q":"Setsail","a":"Offboard","u":"Elizabeth Bird","s":"Complete","tt":"[Offboarding] Offboard Elizabeth Bird"},{"tk":"T20260122.0039","dt":"01/22/26","ck":"2026-01","m":"Jan 26","co":"RDKSTG01","q":"Setsail","a":"Offboard","u":"for Keith Toy","s":"Complete","tt":"Offboarding for Keith Toy"},{"tk":"T20260122.0038","dt":"01/22/26","ck":"2026-01","m":"Jan 26","co":"WHIDCA01","q":"Setsail","a":"Offboard","u":"Jasmine Thompson","s":"Complete","tt":"[Offboarding] Offboard Jasmine Thompson"},{"tk":"T20260120.0064","dt":"01/20/26","ck":"2026-01","m":"Jan 26","co":"SWTLNE01","q":"Helpdesk","a":"Offboard","u":"users","s":"Complete","tt":"Offboarding users"},{"tk":"T20260116.0043","dt":"01/16/26","ck":"2026-01","m":"Jan 26","co":"MAVENE01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"Fwd: Fwd: Supervisors needed to be added to Monday.com new hire list"},{"tk":"T20260114.0074","dt":"01/14/26","ck":"2026-01","m":"Jan 26","co":"GRTPAC01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Notice of Termination of IT Services"},{"tk":"T20260114.0018","dt":"01/14/26","ck":"2026-01","m":"Jan 26","co":"GRTPAC01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"RE: Notice of Termination of IT Services"},{"tk":"T20260114.0016","dt":"01/14/26","ck":"2026-01","m":"Jan 26","co":"SCILUC01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Judy Nicoud invited you to their board Osborne, Ellen - Offboarding Checklist"},{"tk":"T20260113.0078","dt":"01/13/26","ck":"2026-01","m":"Jan 26","co":"MAVENE01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Supervisors needed to be added to Monday.com new hire list"},{"tk":"T20260113.0060","dt":"01/13/26","ck":"2026-01","m":"Jan 26","co":"SHIRAZ01","q":"Setsail","a":"Offboard","u":"John O'Malley","s":"Complete","tt":"[Offboarding] Offboard John O'Malley"},{"tk":"T20260113.0051","dt":"01/13/26","ck":"2026-01","m":"Jan 26","co":"RGCENG01","q":"Setsail","a":"Onboard","u":"Jesus Garcia Jimenez","s":"Complete","tt":"[Onboarding] Onboard Jesus Garcia Jimenez"},{"tk":"T20260112.0049","dt":"01/12/26","ck":"2026-01","m":"Jan 26","co":"URBLEG01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"Follow up on the onboarding ticket 20260110.0009"},{"tk":"T20260111.0007","dt":"01/11/26","ck":"2026-01","m":"Jan 26","co":"KOLAMD01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Terminated employee"},{"tk":"T20260110.0009","dt":"01/10/26","ck":"2026-01","m":"Jan 26","co":"URBLEG01","q":"Helpdesk","a":"Onboard","u":"new consultant_ Schoen Smith","s":"Complete","tt":"Onboarding new consultant_ Schoen Smith"},{"tk":"T20260109.0044","dt":"01/09/26","ck":"2026-01","m":"Jan 26","co":"BHSTRT01","q":"Setsail","a":"Offboard","u":"Ryan McKenna","s":"Complete","tt":"[Offboarding] Offboard Ryan McKenna"},{"tk":"T20260109.0025","dt":"01/09/26","ck":"2026-01","m":"Jan 26","co":"SCILUC01","q":"Helpdesk","a":"Offboard","u":"","s":"Complete","tt":"Nathanael Stocke - Separation Trello Checklist"},{"tk":"T20260107.0070","dt":"01/07/26","ck":"2026-01","m":"Jan 26","co":"VILOCA01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"Laptop Set up - New Hire Staff"},{"tk":"T20260106.0037","dt":"01/06/26","ck":"2026-01","m":"Jan 26","co":"WHIDCA01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"eCW Training Curriculum for new hires"},{"tk":"T20260104.0018","dt":"01/04/26","ck":"2026-01","m":"Jan 26","co":"URBLEG01","q":"Helpdesk","a":"Onboard","u":"","s":"Complete","tt":"LAUL : New Employee onboarding"},{"tk":"T20260102.0034","dt":"01/02/26","ck":"2026-01","m":"Jan 26","co":"SKFGLR01","q":"Merged","a":"Onboard","u":"","s":"Complete","tt":"FW: [Set Sail] New User Onboarded"},{"tk":"T20260102.0033","dt":"01/02/26","ck":"2026-01","m":"Jan 26","co":"SKFGLR01","q":"Setsail","a":"Onboard","u":"Ian Simon-Curry","s":"Complete","tt":"[Onboarding] Onboard Ian Simon-Curry"},{"tk":"T20260102.0031","dt":"01/02/26","ck":"2026-01","m":"Jan 26","co":"SKFGLR01","q":"Setsail","a":"Offboard","u":"Margi Conrads","s":"Complete","tt":"[Offboarding] Offboard Margi Conrads"}];
+
+    /* SetSail reconciliation — ticket numbers found in SetSail (Jan-Apr 2026)
+       Pulled 2026-05-01 from setsail.today/api/data/tickets/all */
+    const SETSAIL_MATCHED = new Set(["T20260430.0046","T20260429.0046","T20260429.0028","T20260427.0140","T20260422.0042","T20260417.0045","T20260416.0064","T20260415.0118","T20260415.0117","T20260413.0067","T20260413.0066","T20260413.0053","T20260408.0030","T20260403.0039","T20260403.0038","T20260403.0037","T20260401.0070","T20260401.0069","T20260325.0071","T20260325.0070","T20260325.0060","T20260323.0053","T20260323.0033","T20260320.0078","T20260320.0077","T20260318.0047","T20260318.0042","T20260317.0025","T20260316.0052","T20260313.0043","T20260310.0059","T20260306.0011","T20260302.0025","T20260227.0042","T20260227.0021","T20260227.0014","T20260226.0056","T20260226.0016","T20260226.0014","T20260223.0039","T20260223.0033","T20260221.0004","T20260219.0061","T20260219.0060","T20260213.0033","T20260213.0030","T20260209.0036","T20260209.0033","T20260206.0042","T20260206.0040","T20260206.0039","T20260205.0035","T20260205.0026","T20260205.0025","T20260204.0053","T20260203.0044","T20260202.0057","T20260202.0054","T20260130.0039","T20260130.0016","T20260127.0024","T20260123.0081","T20260123.0080","T20260123.0078","T20260123.0077","T20260123.0076","T20260123.0075","T20260123.0074","T20260123.0072","T20260122.0038","T20260113.0060","T20260113.0051","T20260109.0044","T20260102.0033","T20260102.0031"]);
+
+    function initUserAuditView() {
+      const clientFilter = document.getElementById('auditClientFilter');
+      if (clientFilter && clientFilter.children.length === 0) {
+        const clients = Array.from(new Set(AUDIT_TICKETS.map(t => t.co))).sort();
+        clientFilter.innerHTML = '<option value="">All Clients</option>' +
+          clients.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+      }
+      renderUserAuditView();
+    }
+
+    function getFilteredAuditTickets() {
+      const month = document.getElementById('auditMonthFilter').value;
+      const action = document.getElementById('auditActionFilter').value;
+      const queue = document.getElementById('auditQueueFilter').value;
+      const client = document.getElementById('auditClientFilter').value;
+      const setsail = document.getElementById('auditSetsailFilter') ? document.getElementById('auditSetsailFilter').value : '';
+      const search = (document.getElementById('auditSearch').value || '').toLowerCase().trim();
+
+      return AUDIT_TICKETS.filter(t => {
+        if (month && t.ck !== month) return false;
+        if (action && t.a !== action) return false;
+        if (queue === 'bypass' && t.q !== 'Helpdesk' && t.q !== 'Merged') return false;
+        else if (queue && queue !== 'bypass' && t.q !== queue) return false;
+        if (client && t.co !== client) return false;
+        if (setsail === 'matched' && !SETSAIL_MATCHED.has(t.tk)) return false;
+        if (setsail === 'missing' && SETSAIL_MATCHED.has(t.tk)) return false;
+        if (search) {
+          const hay = (t.u + ' ' + t.tt + ' ' + t.tk).toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderUserAuditView() {
+      const data = getFilteredAuditTickets();
+
+      // Summary stats
+      const stats = {
+        total: data.length,
+        onboard: data.filter(t => t.a === 'Onboard').length,
+        offboard: data.filter(t => t.a === 'Offboard').length,
+        matchedSS: data.filter(t => SETSAIL_MATCHED.has(t.tk)).length,
+        missingSS: data.filter(t => !SETSAIL_MATCHED.has(t.tk)).length,
+      };
+      const matchedPct = stats.total > 0 ? Math.round(stats.matchedSS / stats.total * 100) : 0;
+      const missingPct = stats.total > 0 ? Math.round(stats.missingSS / stats.total * 100) : 0;
+      const summary = document.getElementById('auditSummary');
+      summary.innerHTML =
+        '<div class="audit-stat"><div class="audit-stat-label">Total Tickets</div><div class="audit-stat-value">' + stats.total + '</div></div>' +
+        '<div class="audit-stat good"><div class="audit-stat-label">Onboards</div><div class="audit-stat-value">' + stats.onboard + '</div></div>' +
+        '<div class="audit-stat warn"><div class="audit-stat-label">Offboards</div><div class="audit-stat-value">' + stats.offboard + '</div></div>' +
+        '<div class="audit-stat good"><div class="audit-stat-label">Matched in SetSail</div><div class="audit-stat-value">' + stats.matchedSS + '</div><div class="audit-stat-sub">' + matchedPct + '% of total</div></div>' +
+        '<div class="audit-stat alert"><div class="audit-stat-label">Missing from SetSail</div><div class="audit-stat-value">' + stats.missingSS + '</div><div class="audit-stat-sub">' + missingPct + '% &mdash; billing reconciliation gap</div></div>';
+
+      // Rollup by client x month
+      const months = ['2026-01','2026-02','2026-03','2026-04'];
+      const monthLabels = {'2026-01':'Jan 26','2026-02':'Feb 26','2026-03':'Mar 26','2026-04':'Apr 26'};
+      const clientMonth = {};
+      data.forEach(t => {
+        if (!clientMonth[t.co]) clientMonth[t.co] = {};
+        if (!clientMonth[t.co][t.ck]) clientMonth[t.co][t.ck] = {on:0, off:0};
+        if (t.a === 'Onboard') clientMonth[t.co][t.ck].on += 1;
+        else if (t.a === 'Offboard') clientMonth[t.co][t.ck].off += 1;
+      });
+      const sortedClients = Object.keys(clientMonth).sort();
+      let rollupHtml = '<thead><tr><th>Client</th>';
+      months.forEach(m => { rollupHtml += '<th>' + monthLabels[m] + '<br><span style="font-weight:400; color:#9ca3af; font-size:10px;">on / off / net</span></th>'; });
+      rollupHtml += '<th>Total Net</th></tr></thead><tbody>';
+      sortedClients.forEach(co => {
+        let total = 0;
+        rollupHtml += '<tr><td><strong>' + co + '</strong></td>';
+        months.forEach(m => {
+          const v = clientMonth[co][m] || {on:0, off:0};
+          const net = v.on - v.off;
+          total += net;
+          if (v.on === 0 && v.off === 0) {
+            rollupHtml += '<td style="color:#d1d5db;">&mdash;</td>';
+          } else {
+            const netCls = net > 0 ? 'pnl-val-pos' : (net < 0 ? 'pnl-val-neg' : '');
+            rollupHtml += '<td>' + v.on + ' / ' + v.off + ' / <span class="' + netCls + '" style="font-weight:700">' + (net > 0 ? '+' : '') + net + '</span></td>';
+          }
+        });
+        const totCls = total > 0 ? 'pnl-val-pos' : (total < 0 ? 'pnl-val-neg' : '');
+        rollupHtml += '<td class="' + totCls + '" style="font-weight:700">' + (total > 0 ? '+' : '') + total + '</td></tr>';
+      });
+      rollupHtml += '<tr style="border-top:2px solid #d1d5db; font-weight:700;"><td>TOTAL</td>';
+      let grandTotal = 0;
+      months.forEach(m => {
+        let on = 0, off = 0;
+        sortedClients.forEach(co => {
+          const v = clientMonth[co][m] || {on:0, off:0};
+          on += v.on; off += v.off;
+        });
+        const net = on - off;
+        grandTotal += net;
+        const cls = net > 0 ? 'pnl-val-pos' : (net < 0 ? 'pnl-val-neg' : '');
+        rollupHtml += '<td>' + on + ' / ' + off + ' / <span class="' + cls + '">' + (net > 0 ? '+' : '') + net + '</span></td>';
+      });
+      const gtCls = grandTotal > 0 ? 'pnl-val-pos' : (grandTotal < 0 ? 'pnl-val-neg' : '');
+      rollupHtml += '<td class="' + gtCls + '">' + (grandTotal > 0 ? '+' : '') + grandTotal + '</td></tr>';
+      rollupHtml += '</tbody>';
+      document.getElementById('auditRollupTable').innerHTML = rollupHtml;
+
+      // Detail table
+      document.getElementById('auditTableCount').textContent = '(' + data.length + ' shown)';
+      let detail = '<thead><tr><th>Date</th><th>Month</th><th>Client</th><th>Action</th><th>User Name</th><th>In SetSail?</th><th>Source</th><th>Status</th><th>Ticket</th><th style="text-align:left;">Title</th></tr></thead><tbody>';
+      data.forEach(t => {
+        const queueClass = t.q === 'Setsail' ? 'badge-setsail' : t.q === 'Helpdesk' ? 'badge-helpdesk' : t.q === 'Merged' ? 'badge-merged' : 'badge-internal';
+        const actClass = t.a === 'Onboard' ? 'badge-onboard' : 'badge-offboard';
+        const inSetsail = SETSAIL_MATCHED.has(t.tk);
+        const ssClass = inSetsail ? 'badge-matched' : 'badge-missing';
+        const ssLabel = inSetsail ? 'In SetSail' : 'MISSING';
+        const rowClass = !inSetsail ? 'audit-row-missing' : ((t.q === 'Helpdesk' || t.q === 'Merged') ? 'audit-row-bypass' : '');
+        const ticketUrl = 'https://ww14.autotask.net/Mvc/ServiceDesk/TicketDetail.mvc?TicketNumber=' + encodeURIComponent(t.tk);
+        const userDisplay = t.u || '<span style="color:#9ca3af;">(see title)</span>';
+        const escapedTitle = (t.tt || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        detail += '<tr class="' + rowClass + '">' +
+          '<td style="text-align:left;">' + t.dt + '</td>' +
+          '<td style="text-align:left;">' + t.m + '</td>' +
+          '<td style="text-align:left;">' + t.co + '</td>' +
+          '<td style="text-align:left;"><span class="badge ' + actClass + '">' + t.a + '</span></td>' +
+          '<td style="text-align:left;">' + userDisplay + '</td>' +
+          '<td style="text-align:left;"><span class="badge ' + ssClass + '">' + ssLabel + '</span></td>' +
+          '<td style="text-align:left;"><span class="badge ' + queueClass + '">' + t.q + '</span></td>' +
+          '<td style="text-align:left;">' + t.s + '</td>' +
+          '<td style="text-align:left;"><a href="' + ticketUrl + '" target="_blank" style="color:#2563eb; text-decoration:none;">' + t.tk + '</a></td>' +
+          '<td style="text-align:left; max-width:380px; white-space:normal; font-size:12px; color:#374151;">' + escapedTitle + '</td>' +
+          '</tr>';
+      });
+      detail += '</tbody>';
+      document.getElementById('auditDetailTable').innerHTML = detail;
+    }
+
+    function exportUserAudit() {
+      const data = getFilteredAuditTickets();
+      const headers = ['Date','Month','Client','Action','User Name','In SetSail','Source/Queue','Status','Ticket','Title'];
+      const rows = [headers].concat(data.map(t => [t.dt, t.m, t.co, t.a, t.u, SETSAIL_MATCHED.has(t.tk) ? 'Yes' : 'NO', t.q, t.s, t.tk, t.tt]));
+      const csv = rows.map(r => r.map(v => '"' + String(v||'').replace(/"/g,'""') + '"').join(',')).join('\n');
+      const blob = new Blob([csv], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'user-count-audit.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     document.addEventListener('keypress', function(e) {
