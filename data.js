@@ -106,1099 +106,413 @@ var DATA = [
   {
     "month": "Jan 25",
     "d": {
-      "d1": {
-        "rev": 43054.81,
-        "cogs": 26247.98,
-        "gp": 16806.83,
-        "gpM": 39.04
-      },
-      "d2": {
-        "rev": 10722.6,
-        "cogs": 5172.26,
-        "gp": 5550.34,
-        "gpM": 51.76
-      },
-      "d3": {
-        "rev": 51127.73,
-        "cogs": 30134.37,
-        "gp": 20993.36,
-        "gpM": 41.06
-      },
-      "d4": {
-        "rev": 1372.36,
-        "cogs": 0,
-        "gp": 1372.36,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 11517.19,
-        "cogs": 10467.79,
-        "gp": 1049.4,
-        "gpM": 9.11
-      },
-      "d6": {
-        "rev": 3156.25,
-        "cogs": 995.57,
-        "gp": 2160.68,
-        "gpM": 68.46
-      },
-      "d8": {
-        "rev": 85118.8,
-        "cogs": 36809.51,
-        "gp": 48309.29,
-        "gpM": 56.76
-      }
+      "d1": {"rev": 43054.81, "cogs": 27909.78, "gp": 15145.03, "gpM": 35.18},
+      "d2": {"rev": 10722.6, "cogs": 5172.26, "gp": 5550.34, "gpM": 51.76},
+      "d3": {"rev": 51127.73, "cogs": 30134.37, "gp": 20993.36, "gpM": 41.06},
+      "d4": {"rev": 1372.36, "cogs": 0.0, "gp": 1372.36, "gpM": 100.0},
+      "d5": {"rev": 11517.19, "cogs": 1960.23, "gp": 9556.96, "gpM": 82.98},
+      "d6": {"rev": 3156.25, "cogs": 995.57, "gp": 2160.68, "gpM": 68.46},
+      "d8": {"rev": 85118.8, "cogs": 36809.51, "gp": 48309.29, "gpM": 56.76}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 4355.68,
-        "cogsNonAllocatable": 816.58
-      },
+      "d2": {"cogsAllocatable": 4355.68, "cogsNonAllocatable": 816.58},
       "d5": {
-        "revNonProject": 3631.99,
-        "revProject": 7885.2,
-        "revShipping": 0,
-        "cogsNonProject": 2883.73,
-        "cogsProject": 7584.06,
-        "cogsShipping": 0
+        "revNonProject": 3631.99, "revProject": 7885.2, "revShipping": 0,
+        "cogsNonProject": -5623.83, "cogsProject": 7584.06, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 13058.91,
-        "cogsLabor": 23750.6,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 13058.91, "cogsLabor": 23750.6, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 21804.45,
-      "rd": 0
-    },
+    "unalloc": {"loh": 21804.45, "rd": 0},
     "totRev": 206069.74,
-    "totCogs": 131631.93,
-    "gp": 74437.81,
-    "gpM": 36.12,
-    "opex": 33134.53,
-    "growth": 28476.34,
-    "ebitda": 12826.94,
-    "ebitdaM": 6.22,
-    "netIncome": 12826.94
+    "totCogs": 124786.17,
+    "gp": 81283.57,
+    "gpM": 39.44,
+    "opex": 36953.76,
+    "growth": 22626.34,
+    "ebitda": 21703.47,
+    "ebitdaM": 10.53,
+    "netIncome": 21157.92
   },
   {
     "month": "Feb 25",
     "d": {
-      "d1": {
-        "rev": 35895.23,
-        "cogs": 19257.61,
-        "gp": 16637.62,
-        "gpM": 46.35
-      },
-      "d2": {
-        "rev": 9301.99,
-        "cogs": 2596.56,
-        "gp": 6705.43,
-        "gpM": 72.09
-      },
-      "d3": {
-        "rev": 43681.11,
-        "cogs": 35160.3,
-        "gp": 8520.81,
-        "gpM": 19.51
-      },
-      "d4": {
-        "rev": 1788.85,
-        "cogs": 0,
-        "gp": 1788.85,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 17543.76,
-        "cogs": 14669.6,
-        "gp": 2874.16,
-        "gpM": 16.38
-      },
-      "d6": {
-        "rev": 3100,
-        "cogs": 875.04,
-        "gp": 2224.96,
-        "gpM": 71.77
-      },
-      "d8": {
-        "rev": 83328.2,
-        "cogs": 30309.91,
-        "gp": 53018.29,
-        "gpM": 63.63
-      }
+      "d1": {"rev": 41276.62, "cogs": 19257.61, "gp": 22019.01, "gpM": 53.34},
+      "d2": {"rev": 9301.99, "cogs": 2596.56, "gp": 6705.43, "gpM": 72.09},
+      "d3": {"rev": 43681.11, "cogs": 35160.3, "gp": 8520.81, "gpM": 19.51},
+      "d4": {"rev": 1788.85, "cogs": 0.0, "gp": 1788.85, "gpM": 100.0},
+      "d5": {"rev": 18121.46, "cogs": 15636.84, "gp": 2484.62, "gpM": 13.71},
+      "d6": {"rev": 3100.0, "cogs": 875.04, "gp": 2224.96, "gpM": 71.77},
+      "d8": {"rev": 83328.2, "cogs": 30309.91, "gp": 53018.29, "gpM": 63.63}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 1794.24,
-        "cogsNonAllocatable": 802.32
-      },
+      "d2": {"cogsAllocatable": 1794.24, "cogsNonAllocatable": 802.32},
       "d5": {
-        "revNonProject": 9675.36,
-        "revProject": 7868.4,
-        "revShipping": 0,
-        "cogsNonProject": 8331.29,
-        "cogsProject": 6338.31,
-        "cogsShipping": 0
+        "revNonProject": 10253.06, "revProject": 7868.4, "revShipping": 0,
+        "cogsNonProject": 9298.53, "cogsProject": 6338.31, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 11364.24,
-        "cogsLabor": 18945.67,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 11364.24, "cogsLabor": 18945.67, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 21076.66,
-      "rd": 0
-    },
-    "totRev": 194639.14,
-    "totCogs": 123945.68,
-    "gp": 70693.46,
-    "gpM": 36.32,
-    "opex": 29971.64,
+    "unalloc": {"loh": 21076.66, "rd": 0},
+    "totRev": 200598.23,
+    "totCogs": 124912.92,
+    "gp": 75685.31,
+    "gpM": 37.73,
+    "opex": 29921.55,
     "growth": 28892.72,
-    "ebitda": 11829.1,
-    "ebitdaM": 6.08,
-    "netIncome": 11829.1
+    "ebitda": 16871.04,
+    "ebitdaM": 8.41,
+    "netIncome": 16909.07
   },
   {
     "month": "Mar 25",
     "d": {
-      "d1": {
-        "rev": 40898.15,
-        "cogs": 18080.3,
-        "gp": 22817.85,
-        "gpM": 55.79
-      },
-      "d2": {
-        "rev": 4824.84,
-        "cogs": 2288.08,
-        "gp": 2536.76,
-        "gpM": 52.58
-      },
-      "d3": {
-        "rev": 41893.06,
-        "cogs": 31881.29,
-        "gp": 10011.77,
-        "gpM": 23.9
-      },
-      "d4": {
-        "rev": 4497.46,
-        "cogs": 0,
-        "gp": 4497.46,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 30473.41,
-        "cogs": 21069.53,
-        "gp": 9403.88,
-        "gpM": 30.86
-      },
-      "d6": {
-        "rev": 3100,
-        "cogs": 747.83,
-        "gp": 2352.17,
-        "gpM": 75.88
-      },
-      "d8": {
-        "rev": 82408.2,
-        "cogs": 29140.79,
-        "gp": 53267.41,
-        "gpM": 64.64
-      }
+      "d1": {"rev": 44747.28, "cogs": 18080.3, "gp": 26666.98, "gpM": 59.59},
+      "d2": {"rev": 4824.84, "cogs": 2288.08, "gp": 2536.76, "gpM": 52.58},
+      "d3": {"rev": 41893.06, "cogs": 31881.29, "gp": 10011.77, "gpM": 23.9},
+      "d4": {"rev": 4497.46, "cogs": 0.0, "gp": 4497.46, "gpM": 100.0},
+      "d5": {"rev": 29374.41, "cogs": 18779.64, "gp": 10594.77, "gpM": 36.07},
+      "d6": {"rev": 3100.0, "cogs": 747.83, "gp": 2352.17, "gpM": 75.88},
+      "d8": {"rev": 82408.2, "cogs": 29140.79, "gp": 53267.41, "gpM": 64.64}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 1540.25,
-        "cogsNonAllocatable": 747.83
-      },
+      "d2": {"cogsAllocatable": 1540.25, "cogsNonAllocatable": 747.83},
       "d5": {
-        "revNonProject": 23318.08,
-        "revProject": 7155.33,
-        "revShipping": 0,
-        "cogsNonProject": 17306.07,
-        "cogsProject": 3763.46,
-        "cogsShipping": 0
+        "revNonProject": 22219.08, "revProject": 7155.33, "revShipping": 0,
+        "cogsNonProject": 15016.18, "cogsProject": 3763.46, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10403.44,
-        "cogsLabor": 18737.35,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10403.44, "cogsLabor": 18737.35, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 17828.99,
-      "rd": 0
-    },
-    "totRev": 208095.12,
-    "totCogs": 121036.81,
-    "gp": 87058.31,
-    "gpM": 41.84,
-    "opex": 36896.58,
+    "unalloc": {"loh": 17828.99, "rd": 0},
+    "totRev": 210845.25,
+    "totCogs": 118746.92,
+    "gp": 92098.33,
+    "gpM": 43.68,
+    "opex": 37046.58,
     "growth": 24120.58,
-    "ebitda": 26041.15,
-    "ebitdaM": 12.51,
-    "netIncome": 26041.15
+    "ebitda": 30931.17,
+    "ebitdaM": 14.67,
+    "netIncome": 30625.55
   },
   {
     "month": "Apr 25",
     "d": {
-      "d1": {
-        "rev": 49359.05,
-        "cogs": 17529.42,
-        "gp": 31829.63,
-        "gpM": 64.49
-      },
-      "d2": {
-        "rev": 6463.88,
-        "cogs": 4829,
-        "gp": 1634.88,
-        "gpM": 25.29
-      },
-      "d3": {
-        "rev": 49957.85,
-        "cogs": 40989.24,
-        "gp": 8968.61,
-        "gpM": 17.95
-      },
-      "d4": {
-        "rev": 1665.58,
-        "cogs": 0,
-        "gp": 1665.58,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 3603.08,
-        "cogs": 3704.93,
-        "gp": -101.85,
-        "gpM": -2.83
-      },
-      "d6": {
-        "rev": 5366.25,
-        "cogs": 2037.83,
-        "gp": 3328.42,
-        "gpM": 62.03
-      },
-      "d8": {
-        "rev": 83624.86,
-        "cogs": 30594.81,
-        "gp": 53030.05,
-        "gpM": 63.41
-      }
+      "d1": {"rev": 41805.53, "cogs": 14529.42, "gp": 27276.11, "gpM": 65.25},
+      "d2": {"rev": 6463.88, "cogs": 4829.0, "gp": 1634.88, "gpM": 25.29},
+      "d3": {"rev": 49957.85, "cogs": 40989.24, "gp": 8968.61, "gpM": 17.95},
+      "d4": {"rev": 1665.58, "cogs": 0.0, "gp": 1665.58, "gpM": 100.0},
+      "d5": {"rev": 3603.08, "cogs": 3704.93, "gp": -101.85, "gpM": -2.83},
+      "d6": {"rev": 5366.25, "cogs": 2037.83, "gp": 3328.42, "gpM": 62.03},
+      "d8": {"rev": 83624.86, "cogs": 30594.81, "gp": 53030.05, "gpM": 63.41}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 4083.73,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 4083.73, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 3568.55,
-        "revProject": 34.53,
-        "revShipping": 0,
-        "cogsNonProject": 3754.83,
-        "cogsProject": -49.9,
-        "cogsShipping": 0
+        "revNonProject": 3568.55, "revProject": 34.53, "revShipping": 0,
+        "cogsNonProject": 3754.83, "cogsProject": -49.9, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10462.76,
-        "cogsLabor": 20132.05,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10462.76, "cogsLabor": 20132.05, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 20649.23,
-      "rd": 0
-    },
-    "totRev": 200040.55,
-    "totCogs": 120334.46,
-    "gp": 79706.09,
-    "gpM": 39.84,
+    "unalloc": {"loh": 20649.23, "rd": 0},
+    "totRev": 192487.03,
+    "totCogs": 117334.46,
+    "gp": 75152.57,
+    "gpM": 39.04,
     "opex": 31749.98,
     "growth": 28177.23,
-    "ebitda": 19778.88,
-    "ebitdaM": 9.89,
-    "netIncome": 19778.88
+    "ebitda": 15225.36,
+    "ebitdaM": 7.91,
+    "netIncome": 46017.06
   },
   {
     "month": "May 25",
     "d": {
-      "d1": {
-        "rev": 38961.5,
-        "cogs": 19592.01,
-        "gp": 19369.49,
-        "gpM": 49.71
-      },
-      "d2": {
-        "rev": 2125.03,
-        "cogs": 2667.52,
-        "gp": -542.49,
-        "gpM": -25.53
-      },
-      "d3": {
-        "rev": 41930.04,
-        "cogs": 32735.27,
-        "gp": 9194.77,
-        "gpM": 21.93
-      },
-      "d4": {
-        "rev": 1506.79,
-        "cogs": 0,
-        "gp": 1506.79,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 22078.11,
-        "cogs": 18699.8,
-        "gp": 3378.31,
-        "gpM": 15.3
-      },
-      "d6": {
-        "rev": 3325,
-        "cogs": 1536.55,
-        "gp": 1788.45,
-        "gpM": 53.79
-      },
-      "d8": {
-        "rev": 85612.08,
-        "cogs": 35123.94,
-        "gp": 50488.14,
-        "gpM": 58.97
-      }
+      "d1": {"rev": 40463.0, "cogs": 19592.01, "gp": 20870.99, "gpM": 51.58},
+      "d2": {"rev": 2125.03, "cogs": 2667.52, "gp": -542.49, "gpM": -25.53},
+      "d3": {"rev": 41930.04, "cogs": 32735.27, "gp": 9194.77, "gpM": 21.93},
+      "d4": {"rev": 1506.79, "cogs": 0.0, "gp": 1506.79, "gpM": 100.0},
+      "d5": {"rev": 22098.11, "cogs": 18302.96, "gp": 3795.15, "gpM": 17.17},
+      "d6": {"rev": 3325.0, "cogs": 1536.55, "gp": 1788.45, "gpM": 53.79},
+      "d8": {"rev": 85611.8, "cogs": 35123.94, "gp": 50487.86, "gpM": 58.97}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 1549.61,
-        "cogsNonAllocatable": 1117.91
-      },
+      "d2": {"cogsAllocatable": 1549.61, "cogsNonAllocatable": 1117.91},
       "d5": {
-        "revNonProject": 22078.11,
-        "revProject": 0,
-        "revShipping": 0,
-        "cogsNonProject": 18699.8,
-        "cogsProject": 0,
-        "cogsShipping": 0
+        "revNonProject": 22098.11, "revProject": 0.0, "revShipping": 0,
+        "cogsNonProject": 18302.96, "cogsProject": 0.0, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10747.49,
-        "cogsLabor": 24376.45,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10747.49, "cogsLabor": 24376.45, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 17112.65,
-      "rd": 0
-    },
-    "totRev": 195538.55,
-    "totCogs": 127467.74,
-    "gp": 68070.81,
-    "gpM": 34.81,
+    "unalloc": {"loh": 17112.65, "rd": 0},
+    "totRev": 197059.77,
+    "totCogs": 127070.9,
+    "gp": 69988.87,
+    "gpM": 35.52,
     "opex": 26881.84,
     "growth": 31899.16,
-    "ebitda": 9289.81,
-    "ebitdaM": 4.75,
-    "netIncome": 9289.81
+    "ebitda": 11207.87,
+    "ebitdaM": 5.69,
+    "netIncome": 11351.38
   },
   {
     "month": "Jun 25",
     "d": {
-      "d1": {
-        "rev": 44676.51,
-        "cogs": 17208.91,
-        "gp": 27467.6,
-        "gpM": 61.48
-      },
-      "d2": {
-        "rev": 10077.76,
-        "cogs": 5430.84,
-        "gp": 4646.92,
-        "gpM": 46.11
-      },
-      "d3": {
-        "rev": 57672.48,
-        "cogs": 45227.39,
-        "gp": 12445.09,
-        "gpM": 21.58
-      },
-      "d4": {
-        "rev": 1500.15,
-        "cogs": 0,
-        "gp": 1500.15,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 46924.05,
-        "cogs": 38438.13,
-        "gp": 8485.92,
-        "gpM": 18.08
-      },
-      "d6": {
-        "rev": 5330,
-        "cogs": 1732.54,
-        "gp": 3597.46,
-        "gpM": 67.49
-      },
-      "d8": {
-        "rev": 95776.44,
-        "cogs": 34561.41,
-        "gp": 61215.03,
-        "gpM": 63.91
-      }
+      "d1": {"rev": 44267.01, "cogs": 17208.91, "gp": 27058.1, "gpM": 61.12},
+      "d2": {"rev": 5129.6, "cogs": 5430.84, "gp": -301.24, "gpM": -5.87},
+      "d3": {"rev": 57672.48, "cogs": 45227.39, "gp": 12445.09, "gpM": 21.58},
+      "d4": {"rev": 1500.15, "cogs": 0.0, "gp": 1500.15, "gpM": 100.0},
+      "d5": {"rev": 48095.91, "cogs": 38438.13, "gp": 9657.78, "gpM": 20.08},
+      "d6": {"rev": 5330.0, "cogs": 1732.54, "gp": 3597.46, "gpM": 67.49},
+      "d8": {"rev": 95775.9, "cogs": 34561.41, "gp": 61214.49, "gpM": 63.91}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 4685.57,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 4685.57, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 26643.33,
-        "revProject": 20280.72,
-        "revShipping": 0,
-        "cogsNonProject": 22018.8,
-        "cogsProject": 16419.33,
-        "cogsShipping": 0
+        "revNonProject": 26643.33, "revProject": 21452.58, "revShipping": 0,
+        "cogsNonProject": 22018.8, "cogsProject": 16419.33, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10778.83,
-        "cogsLabor": 23782.58,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10778.83, "cogsLabor": 23782.58, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 15917.25,
-      "rd": 0
-    },
-    "totRev": 261957.39,
+    "unalloc": {"loh": 15917.25, "rd": 0},
+    "totRev": 257771.05,
     "totCogs": 158516.47,
-    "gp": 103440.92,
-    "gpM": 39.49,
+    "gp": 99254.58,
+    "gpM": 38.5,
     "opex": 33105.31,
     "growth": 28071.81,
-    "ebitda": 42263.8,
-    "ebitdaM": 16.13,
-    "netIncome": 42263.8
+    "ebitda": 38077.46,
+    "ebitdaM": 14.77,
+    "netIncome": 38172.0
   },
   {
     "month": "Jul 25",
     "d": {
-      "d1": {
-        "rev": 37894,
-        "cogs": 22265.96,
-        "gp": 15628.04,
-        "gpM": 41.24
-      },
-      "d2": {
-        "rev": 13362.7,
-        "cogs": 12738.32,
-        "gp": 624.38,
-        "gpM": 4.67
-      },
-      "d3": {
-        "rev": 45100.64,
-        "cogs": 36886.77,
-        "gp": 8213.87,
-        "gpM": 18.21
-      },
-      "d4": {
-        "rev": 1757.25,
-        "cogs": 0,
-        "gp": 1757.25,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 27675.86,
-        "cogs": 24541.58,
-        "gp": 3134.28,
-        "gpM": 11.32
-      },
-      "d6": {
-        "rev": 5220,
-        "cogs": 1961.18,
-        "gp": 3258.82,
-        "gpM": 62.43
-      },
-      "d8": {
-        "rev": 92014.9,
-        "cogs": 33514.57,
-        "gp": 58500.33,
-        "gpM": 63.58
-      }
+      "d1": {"rev": 36516.05, "cogs": 22265.96, "gp": 14250.09, "gpM": 39.02},
+      "d2": {"rev": 13860.28, "cogs": 12597.07, "gp": 1263.21, "gpM": 9.11},
+      "d3": {"rev": 45107.74, "cogs": 36886.77, "gp": 8220.97, "gpM": 18.23},
+      "d4": {"rev": 1757.25, "cogs": 0.0, "gp": 1757.25, "gpM": 100.0},
+      "d5": {"rev": 22692.24, "cogs": 24551.15, "gp": -1858.91, "gpM": -8.19},
+      "d6": {"rev": 5220.0, "cogs": 2102.43, "gp": 3117.57, "gpM": 59.72},
+      "d8": {"rev": 92014.9, "cogs": 33514.57, "gp": 58500.33, "gpM": 63.58}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 11993.05,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 11851.8, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 13718,
-        "revProject": 13957.86,
-        "revShipping": 0,
-        "cogsNonProject": 11566.53,
-        "cogsProject": 12975.05,
-        "cogsShipping": 0
+        "revNonProject": 7940.44, "revProject": 14751.8, "revShipping": 0,
+        "cogsNonProject": 12725.1, "cogsProject": 11826.05, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10685.88,
-        "cogsLabor": 22828.69,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10685.88, "cogsLabor": 22828.69, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 12899.06,
-      "rd": 0
-    },
-    "totRev": 223025.35,
-    "totCogs": 144807.44,
-    "gp": 78217.91,
-    "gpM": 35.07,
+    "unalloc": {"loh": 12899.06, "rd": 0},
+    "totRev": 217168.46,
+    "totCogs": 144817.01,
+    "gp": 72351.45,
+    "gpM": 33.32,
     "opex": 32221.72,
     "growth": 29393.67,
-    "ebitda": 16602.52,
-    "ebitdaM": 7.44,
-    "netIncome": 16602.52
+    "ebitda": 10736.06,
+    "ebitdaM": 4.94,
+    "netIncome": 10817.6
   },
   {
     "month": "Aug 25",
     "d": {
-      "d1": {
-        "rev": 38036.25,
-        "cogs": 19880.97,
-        "gp": 18155.28,
-        "gpM": 47.73
-      },
-      "d2": {
-        "rev": 32302.9,
-        "cogs": 19374.84,
-        "gp": 12928.06,
-        "gpM": 40.02
-      },
-      "d3": {
-        "rev": 41078.12,
-        "cogs": 32052.46,
-        "gp": 9025.66,
-        "gpM": 21.97
-      },
-      "d4": {
-        "rev": 1623.4,
-        "cogs": 0,
-        "gp": 1623.4,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 9781.83,
-        "cogs": 8333.72,
-        "gp": 1448.11,
-        "gpM": 14.8
-      },
-      "d6": {
-        "rev": 4780,
-        "cogs": 896.26,
-        "gp": 3883.74,
-        "gpM": 81.25
-      },
-      "d8": {
-        "rev": 92394.6,
-        "cogs": 34921.84,
-        "gp": 57472.76,
-        "gpM": 62.2
-      }
+      "d1": {"rev": 39560.02, "cogs": 21380.97, "gp": 18179.05, "gpM": 45.95},
+      "d2": {"rev": 40793.56, "cogs": 17874.84, "gp": 22918.72, "gpM": 56.18},
+      "d3": {"rev": 40198.12, "cogs": 32052.46, "gp": 8145.66, "gpM": 20.26},
+      "d4": {"rev": 1623.4, "cogs": 0.0, "gp": 1623.4, "gpM": 100.0},
+      "d5": {"rev": 9781.83, "cogs": 6935.72, "gp": 2846.11, "gpM": 29.1},
+      "d6": {"rev": 4780.0, "cogs": 896.26, "gp": 3883.74, "gpM": 81.25},
+      "d8": {"rev": 92394.6, "cogs": 34921.84, "gp": 57472.76, "gpM": 62.2}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 18629.57,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 17129.57, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 8450.43,
-        "revProject": 1331.4,
-        "revShipping": 0,
-        "cogsNonProject": 6624.64,
-        "cogsProject": 1709.08,
-        "cogsShipping": 0
+        "revNonProject": 8450.43, "revProject": 1331.4, "revShipping": 0,
+        "cogsNonProject": 5226.64, "cogsProject": 1709.08, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10693.16,
-        "cogsLabor": 24228.68,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10693.16, "cogsLabor": 24228.68, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 16388.45,
-      "rd": 0
-    },
-    "totRev": 219997.1,
-    "totCogs": 131848.54,
-    "gp": 88148.56,
-    "gpM": 40.07,
+    "unalloc": {"loh": 16388.45, "rd": 0},
+    "totRev": 229131.53,
+    "totCogs": 130450.54,
+    "gp": 98680.99,
+    "gpM": 43.07,
     "opex": 27945.28,
     "growth": 26701.7,
-    "ebitda": 33501.58,
-    "ebitdaM": 15.23,
-    "netIncome": 33501.58
+    "ebitda": 44034.01,
+    "ebitdaM": 19.22,
+    "netIncome": 44470.37
   },
   {
     "month": "Sep 25",
     "d": {
-      "d1": {
-        "rev": 34725.97,
-        "cogs": 18562.82,
-        "gp": 16163.15,
-        "gpM": 46.54
-      },
-      "d2": {
-        "rev": 10280,
-        "cogs": 8626.91,
-        "gp": 1653.09,
-        "gpM": 16.08
-      },
-      "d3": {
-        "rev": 50876.08,
-        "cogs": 40102.18,
-        "gp": 10773.9,
-        "gpM": 21.18
-      },
-      "d4": {
-        "rev": 4909.65,
-        "cogs": 0,
-        "gp": 4909.65,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 62788.49,
-        "cogs": 53974.22,
-        "gp": 8814.27,
-        "gpM": 14.04
-      },
-      "d6": {
-        "rev": 8262.5,
-        "cogs": 2962.4,
-        "gp": 5300.1,
-        "gpM": 64.15
-      },
-      "d8": {
-        "rev": 98518.81,
-        "cogs": 40068.53,
-        "gp": 58450.28,
-        "gpM": 59.33
-      }
+      "d1": {"rev": 35761.22, "cogs": 18562.82, "gp": 17198.4, "gpM": 48.09},
+      "d2": {"rev": 17723.88, "cogs": 8626.91, "gp": 9096.97, "gpM": 51.33},
+      "d3": {"rev": 49996.08, "cogs": 40102.18, "gp": 9893.9, "gpM": 19.79},
+      "d4": {"rev": 4909.65, "cogs": 0.0, "gp": 4909.65, "gpM": 100.0},
+      "d5": {"rev": 61230.11, "cogs": 52185.37, "gp": 9044.74, "gpM": 14.77},
+      "d6": {"rev": 8262.5, "cogs": 2962.4, "gp": 5300.1, "gpM": 64.15},
+      "d8": {"rev": 98508.81, "cogs": 40068.53, "gp": 58440.28, "gpM": 59.32}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 7881.64,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 7881.64, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 17320.52,
-        "revProject": 45467.97,
-        "revShipping": 0,
-        "cogsNonProject": 14330,
-        "cogsProject": 39644.22,
-        "cogsShipping": 0
+        "revNonProject": 15762.14, "revProject": 45467.97, "revShipping": 0,
+        "cogsNonProject": 12541.15, "cogsProject": 39644.22, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10959.68,
-        "cogsLabor": 29108.85,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10959.68, "cogsLabor": 29108.85, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 11008.97,
-      "rd": 0
-    },
-    "totRev": 270361.5,
-    "totCogs": 175306.03,
-    "gp": 95055.47,
-    "gpM": 35.16,
-    "opex": 35165.76,
+    "unalloc": {"loh": 11008.97, "rd": 0},
+    "totRev": 276392.25,
+    "totCogs": 173517.18,
+    "gp": 102875.07,
+    "gpM": 37.22,
+    "opex": 35670.41,
     "growth": 29215.54,
-    "ebitda": 30674.17,
-    "ebitdaM": 11.35,
-    "netIncome": 30674.17
+    "ebitda": 37989.12,
+    "ebitdaM": 13.74,
+    "netIncome": 38498.85
   },
   {
     "month": "Oct 25",
     "d": {
-      "d1": {
-        "rev": 32094.86,
-        "cogs": 16530.78,
-        "gp": 15564.08,
-        "gpM": 48.49
-      },
-      "d2": {
-        "rev": 13370.17,
-        "cogs": 7947.14,
-        "gp": 5423.03,
-        "gpM": 40.56
-      },
-      "d3": {
-        "rev": 43920.27,
-        "cogs": 36045.19,
-        "gp": 7875.08,
-        "gpM": 17.93
-      },
-      "d4": {
-        "rev": 1501.14,
-        "cogs": 0,
-        "gp": 1501.14,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 13485.78,
-        "cogs": 7739.5,
-        "gp": 5746.28,
-        "gpM": 42.61
-      },
-      "d6": {
-        "rev": 6485,
-        "cogs": 2599.29,
-        "gp": 3885.71,
-        "gpM": 59.92
-      },
-      "d8": {
-        "rev": 96369.63,
-        "cogs": 36703.69,
-        "gp": 59665.94,
-        "gpM": 61.91
-      }
+      "d1": {"rev": 26824.18, "cogs": 16943.28, "gp": 9880.9, "gpM": 36.84},
+      "d2": {"rev": 14252.5, "cogs": 7947.14, "gp": 6305.36, "gpM": 44.24},
+      "d3": {"rev": 43851.03, "cogs": 36045.19, "gp": 7805.84, "gpM": 17.8},
+      "d4": {"rev": 1501.14, "cogs": 0.0, "gp": 1501.14, "gpM": 100.0},
+      "d5": {"rev": 13834.78, "cogs": 13365.05, "gp": 469.73, "gpM": 3.4},
+      "d6": {"rev": 6485.0, "cogs": 2599.29, "gp": 3885.71, "gpM": 59.92},
+      "d8": {"rev": 96368.98, "cogs": 36703.69, "gp": 59665.29, "gpM": 61.91}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 6829.24,
-        "cogsNonAllocatable": 1117.9
-      },
+      "d2": {"cogsAllocatable": 6829.24, "cogsNonAllocatable": 1117.9},
       "d5": {
-        "revNonProject": 9437.5,
-        "revProject": 4048.28,
-        "revShipping": 0,
-        "cogsNonProject": 3920.16,
-        "cogsProject": 3819.34,
-        "cogsShipping": 0
+        "revNonProject": 9786.5, "revProject": 4048.28, "revShipping": 0,
+        "cogsNonProject": 9545.71, "cogsProject": 3819.34, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 10197.2,
-        "cogsLabor": 26506.49,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 10197.2, "cogsLabor": 26506.49, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 16236.51,
-      "rd": 0
-    },
-    "totRev": 207226.85,
-    "totCogs": 123802.1,
-    "gp": 83424.75,
-    "gpM": 40.26,
-    "opex": 28419,
+    "unalloc": {"loh": 16236.51, "rd": 0},
+    "totRev": 203117.61,
+    "totCogs": 129840.15,
+    "gp": 73277.46,
+    "gpM": 36.08,
+    "opex": 28763.0,
     "growth": 32097.87,
-    "ebitda": 22907.88,
-    "ebitdaM": 11.05,
-    "netIncome": 22907.88
+    "ebitda": 12416.59,
+    "ebitdaM": 6.11,
+    "netIncome": 12238.9
   },
   {
     "month": "Nov 25",
     "d": {
-      "d1": {
-        "rev": 31396,
-        "cogs": 10800.79,
-        "gp": 20595.21,
-        "gpM": 65.6
-      },
-      "d2": {
-        "rev": 1053.32,
-        "cogs": 1719.24,
-        "gp": -665.92,
-        "gpM": -63.22
-      },
-      "d3": {
-        "rev": 49826.94,
-        "cogs": 38566.44,
-        "gp": 11260.5,
-        "gpM": 22.6
-      },
-      "d4": {
-        "rev": 2511.95,
-        "cogs": 0,
-        "gp": 2511.95,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 1450,
-        "cogs": 1173.74,
-        "gp": 276.26,
-        "gpM": 19.05
-      },
-      "d6": {
-        "rev": 4780,
-        "cogs": 2286.48,
-        "gp": 2493.52,
-        "gpM": 52.17
-      },
-      "d8": {
-        "rev": 119774.19,
-        "cogs": 41876.54,
-        "gp": 77897.65,
-        "gpM": 65.04
-      }
+      "d1": {"rev": 30294.0, "cogs": 10800.79, "gp": 19493.21, "gpM": 64.35},
+      "d2": {"rev": 1994.12, "cogs": 1719.24, "gp": 274.88, "gpM": 13.78},
+      "d3": {"rev": 49826.94, "cogs": 38566.44, "gp": 11260.5, "gpM": 22.6},
+      "d4": {"rev": 2511.95, "cogs": 0.0, "gp": 2511.95, "gpM": 100.0},
+      "d5": {"rev": 4283.15, "cogs": 3911.74, "gp": 371.41, "gpM": 8.67},
+      "d6": {"rev": 4780.0, "cogs": 2286.48, "gp": 2493.52, "gpM": 52.17},
+      "d8": {"rev": 119774.19, "cogs": 41876.54, "gp": 77897.65, "gpM": 65.04}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 973.97,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 973.97, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 1450,
-        "revProject": 0,
-        "revShipping": 0,
-        "cogsNonProject": 1173.74,
-        "cogsProject": 0,
-        "cogsShipping": 0
+        "revNonProject": 3741.81, "revProject": 541.34, "revShipping": 0,
+        "cogsNonProject": 3311.74, "cogsProject": 600.0, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 11425.16,
-        "cogsLabor": 30451.38,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 11425.16, "cogsLabor": 30451.38, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 17299.39,
-      "rd": 0
-    },
-    "totRev": 210792.4,
-    "totCogs": 113722.62,
-    "gp": 97069.78,
-    "gpM": 46.05,
-    "opex": 35920.84,
+    "unalloc": {"loh": 17299.39, "rd": 0},
+    "totRev": 213464.35,
+    "totCogs": 116460.62,
+    "gp": 97003.73,
+    "gpM": 45.44,
+    "opex": 36264.84,
     "growth": 27920.02,
-    "ebitda": 33228.92,
-    "ebitdaM": 15.76,
-    "netIncome": 33228.92
+    "ebitda": 32818.87,
+    "ebitdaM": 15.37,
+    "netIncome": 32640.23
   },
   {
     "month": "Dec 25",
     "d": {
-      "d1": {
-        "rev": 35122.19,
-        "cogs": 11389.98,
-        "gp": 23732.21,
-        "gpM": 67.57
-      },
-      "d2": {
-        "rev": 1588.87,
-        "cogs": 1964.88,
-        "gp": -376.01,
-        "gpM": -23.67
-      },
-      "d3": {
-        "rev": 45843.86,
-        "cogs": 36348.61,
-        "gp": 9495.25,
-        "gpM": 20.71
-      },
-      "d4": {
-        "rev": 652.53,
-        "cogs": 0,
-        "gp": 652.53,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 65180.48,
-        "cogs": 57030.68,
-        "gp": 8149.8,
-        "gpM": 12.5
-      },
-      "d6": {
-        "rev": 4780,
-        "cogs": 1852.85,
-        "gp": 2927.15,
-        "gpM": 61.24
-      },
-      "d8": {
-        "rev": 125042.65,
-        "cogs": 40771.02,
-        "gp": 84271.63,
-        "gpM": 67.39
-      }
+      "d1": {"rev": 34687.19, "cogs": 12027.1, "gp": 22660.09, "gpM": 65.33},
+      "d2": {"rev": 1979.16, "cogs": 1964.88, "gp": 14.28, "gpM": 0.72},
+      "d3": {"rev": 43670.18, "cogs": 38345.43, "gp": 5324.75, "gpM": 12.19},
+      "d4": {"rev": 652.53, "cogs": 0.0, "gp": 652.53, "gpM": 100.0},
+      "d5": {"rev": 65113.39, "cogs": 57030.68, "gp": 8082.71, "gpM": 12.41},
+      "d6": {"rev": 4780.0, "cogs": 1852.85, "gp": 2927.15, "gpM": 61.24},
+      "d8": {"rev": 125042.65, "cogs": 40771.02, "gp": 84271.63, "gpM": 67.39}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 1219.61,
-        "cogsNonAllocatable": 745.27
-      },
+      "d2": {"cogsAllocatable": 1219.61, "cogsNonAllocatable": 745.27},
       "d5": {
-        "revNonProject": 61360.93,
-        "revProject": 3819.55,
-        "revShipping": 0,
-        "cogsNonProject": 53250.35,
-        "cogsProject": 3780.33,
-        "cogsShipping": 0
+        "revNonProject": 61360.93, "revProject": 3752.46, "revShipping": 0,
+        "cogsNonProject": 53250.35, "cogsProject": 3780.33, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 11118.52,
-        "cogsLabor": 29652.5,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 11118.52, "cogsLabor": 29652.5, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 17243.65,
-      "rd": 0
-    },
-    "totRev": 278210.58,
-    "totCogs": 166601.67,
-    "gp": 111608.91,
-    "gpM": 40.12,
-    "opex": 34750.11,
-    "growth": 30296.72,
-    "ebitda": 46562.08,
-    "ebitdaM": 16.74,
-    "netIncome": 46562.08
+    "unalloc": {"loh": 17243.65, "rd": 0},
+    "totRev": 275925.1,
+    "totCogs": 169235.61,
+    "gp": 106689.49,
+    "gpM": 38.67,
+    "opex": 34875.11,
+    "growth": 32156.72,
+    "ebitda": 39657.66,
+    "ebitdaM": 14.37,
+    "netIncome": 39581.01
   },
   {
     "month": "Jan 26",
     "d": {
-      "d1": {
-        "rev": 35442.5,
-        "cogs": 13255.45,
-        "gp": 22187.05,
-        "gpM": 62.6
-      },
-      "d2": {
-        "rev": 5375.52,
-        "cogs": 4460.62,
-        "gp": 914.9,
-        "gpM": 17.02
-      },
-      "d3": {
-        "rev": 49901.2,
-        "cogs": 39990.55,
-        "gp": 9910.65,
-        "gpM": 19.86
-      },
-      "d4": {
-        "rev": 4065.28,
-        "cogs": 0,
-        "gp": 4065.28,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 31631.82,
-        "cogs": 26858.52,
-        "gp": 4773.3,
-        "gpM": 15.09
-      },
-      "d6": {
-        "rev": 5110,
-        "cogs": 2788.68,
-        "gp": 2321.32,
-        "gpM": 45.43
-      },
-      "d8": {
-        "rev": 124772.53,
-        "cogs": 40103.15,
-        "gp": 84669.38,
-        "gpM": 67.86
-      }
+      "d1": {"rev": 35442.5, "cogs": 12989.7, "gp": 22452.8, "gpM": 63.35},
+      "d2": {"rev": 3200.52, "cogs": 4438.37, "gp": -1237.85, "gpM": -38.68},
+      "d3": {"rev": 49955.2, "cogs": 39990.55, "gp": 9964.65, "gpM": 19.95},
+      "d4": {"rev": 4065.28, "cogs": 0.0, "gp": 4065.28, "gpM": 100.0},
+      "d5": {"rev": 31631.82, "cogs": 26858.52, "gp": 4773.3, "gpM": 15.09},
+      "d6": {"rev": 5110.0, "cogs": 2782.84, "gp": 2327.16, "gpM": 45.54},
+      "d8": {"rev": 124718.53, "cogs": 39548.8, "gp": 85169.73, "gpM": 68.29}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 3642.66,
-        "cogsNonAllocatable": 817.96
-      },
+      "d2": {"cogsAllocatable": 3620.41, "cogsNonAllocatable": 817.96},
       "d5": {
-        "revNonProject": 11125.91,
-        "revProject": 18240.9,
-        "revShipping": 2265.01,
-        "cogsNonProject": 11269.28,
-        "cogsProject": 15052.83,
-        "cogsShipping": 536.41
+        "revNonProject": 13390.92, "revProject": 18240.9, "revShipping": 0,
+        "cogsNonProject": 11805.69, "cogsProject": 15052.83, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 5038.34,
-        "cogsLabor": 27723.06,
-        "cogsResold": 7342.75
-      }
+      "d8": {"cogsCloud": 12381.09, "cogsLabor": 27167.71, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 0,
-      "rd": 25856.46
-    },
-    "totRev": 256298.85,
-    "totCogs": 153313.43,
-    "gp": 102985.42,
-    "gpM": 40.18,
-    "opex": 44279.83,
-    "growth": 39033.75,
-    "ebitda": 19671.84,
-    "ebitdaM": 7.68,
-    "netIncome": 19671.84
+    "unalloc": {"loh": 25017.24, "rd": 0},
+    "totRev": 254123.85,
+    "totCogs": 151626.02,
+    "gp": 102497.83,
+    "gpM": 40.33,
+    "opex": 40389.12,
+    "growth": 40722.16,
+    "ebitda": 21386.55,
+    "ebitdaM": 8.42,
+    "netIncome": 21228.53
   },
   {
     "month": "Feb 26",
     "d": {
-      "d1": {
-        "rev": 30688.39,
-        "cogs": 13342.13,
-        "gp": 17346.26,
-        "gpM": 56.52
-      },
-      "d2": {
-        "rev": 2557.85,
-        "cogs": 7530.68,
-        "gp": -4972.83,
-        "gpM": -194.41
-      },
-      "d3": {
-        "rev": 55803.96,
-        "cogs": 44248.08,
-        "gp": 11555.88,
-        "gpM": 20.71
-      },
-      "d4": {
-        "rev": 4851.31,
-        "cogs": 0,
-        "gp": 4851.31,
-        "gpM": 100
-      },
-      "d5": {
-        "rev": 6532,
-        "cogs": 9564.55,
-        "gp": -3032.55,
-        "gpM": -46.43
-      },
-      "d6": {
-        "rev": 6805,
-        "cogs": 3017.4,
-        "gp": 3787.6,
-        "gpM": 55.66
-      },
-      "d8": {
-        "rev": 123701.74,
-        "cogs": 47918.33,
-        "gp": 75783.41,
-        "gpM": 61.26
-      }
+      "d1": {"rev": 30688.39, "cogs": 13342.13, "gp": 17346.26, "gpM": 56.52},
+      "d2": {"rev": 2557.85, "cogs": 7530.68, "gp": -4972.83, "gpM": -194.41},
+      "d3": {"rev": 55803.96, "cogs": 44248.08, "gp": 11555.88, "gpM": 20.71},
+      "d4": {"rev": 4851.31, "cogs": 0.0, "gp": 4851.31, "gpM": 100.0},
+      "d5": {"rev": 6532.0, "cogs": 9564.55, "gp": -3032.55, "gpM": -46.43},
+      "d6": {"rev": 6805.0, "cogs": 3017.4, "gp": 3787.6, "gpM": 55.66},
+      "d8": {"rev": 123701.74, "cogs": 47918.33, "gp": 75783.41, "gpM": 61.26}
     },
     "detail": {
-      "d2": {
-        "cogsAllocatable": 6728.36,
-        "cogsNonAllocatable": 802.32
-      },
+      "d2": {"cogsAllocatable": 6728.36, "cogsNonAllocatable": 802.32},
       "d5": {
-        "revNonProject": 4136,
-        "revProject": 2396,
-        "revShipping": 0,
-        "cogsNonProject": 6142.35,
-        "cogsProject": 3422.2,
-        "cogsShipping": 0
+        "revNonProject": 4136.0, "revProject": 2396.0, "revShipping": 0,
+        "cogsNonProject": 6142.35, "cogsProject": 3422.2, "cogsShipping": 0
       },
-      "d8": {
-        "cogsCloud": 12525.82,
-        "cogsLabor": 35392.51,
-        "cogsResold": 0
-      }
+      "d8": {"cogsCloud": 12525.82, "cogsLabor": 35392.51, "cogsResold": 0}
     },
-    "unalloc": {
-      "loh": 21213.18,
-      "rd": 0
-    },
+    "unalloc": {"loh": 21213.18, "rd": 0},
     "totRev": 230940.25,
     "totCogs": 146834.35,
     "gp": 84105.9,
