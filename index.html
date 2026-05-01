@@ -2079,14 +2079,18 @@
 
       const dd = months.map(m => dan(m));
       const nc = months.length;
-      const colSpan = nc + 1;
+      const analyticsCols = 7; // MOM Δ, MOM %, 3-MO AVG, VS AVG Δ, VS AVG %, L12M BEST, VS L12M Δ
+      const colSpan = nc + 1 + analyticsCols;
+
+      // Compute all dan-format data for L12M lookback
+      const allDan = DATA.map(m => dan(m));
 
       // Format helpers
       function $(v) {
         if (v == null || isNaN(v)) return '';
         const neg = v < 0;
         const abs = Math.abs(v);
-        const formatted = '$' + abs.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const formatted = '$' + abs.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
         if (neg) return `<span class="pnl-val-neg">(${formatted})</span>`;
         return formatted;
       }
@@ -2095,6 +2099,21 @@
         const neg = v < 0;
         return `<span class="${neg ? 'pnl-val-neg' : ''}">${Math.round(v)}%</span>`;
       }
+      function delta(v) {
+        if (v == null || isNaN(v) || v === 0) return '<span style="color:#94a3b8;">—</span>';
+        const neg = v < 0;
+        const abs = Math.abs(v);
+        const str = '$' + abs.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        if (neg) return `<span class="pnl-val-neg">-${str}</span>`;
+        return `<span class="pnl-val-pos">+${str}</span>`;
+      }
+      function deltaPct(cur, prev) {
+        if (prev == null || prev === 0 || cur == null) return '<span style="color:#94a3b8;">—</span>';
+        const p = Math.round((cur - prev) / Math.abs(prev) * 100);
+        if (p === 0) return '<span style="color:#94a3b8;">0%</span>';
+        if (p > 0) return `<span class="pnl-val-pos">+${p}%</span>`;
+        return `<span class="pnl-val-neg">${p}%</span>`;
+      }
 
       // Build header
       let html = `<thead><tr><th>Line Item</th>`;
@@ -2102,9 +2121,16 @@
         const isCur = (startIdx + i) === ci;
         html += `<th${isCur ? ' class="col-current"' : ''}>${m.month}</th>`;
       });
+      html += `<th style="background:#f0fdf4; border-left:2px solid #d1d5db;">MOM Δ</th>`;
+      html += `<th style="background:#f0fdf4;">MOM %</th>`;
+      html += `<th style="background:#eff6ff; border-left:2px solid #d1d5db;">3-MO AVG</th>`;
+      html += `<th style="background:#eff6ff;">VS AVG Δ</th>`;
+      html += `<th style="background:#eff6ff;">VS AVG %</th>`;
+      html += `<th style="background:#fef2f2; border-left:2px solid #d1d5db;">L12M BEST</th>`;
+      html += `<th style="background:#fef2f2;">VS L12M Δ</th>`;
       html += `</tr></thead><tbody>`;
 
-      // Row builder
+      // Row builder with analytics columns
       function row(label, vals, cls, fmt) {
         let r = `<tr class="${cls || ''}"><td>${label}</td>`;
         vals.forEach((v, i) => {
@@ -2112,108 +2138,205 @@
           const cc = isCur ? ' class="col-current"' : '';
           r += `<td${cc}>${fmt === 'pct' ? pct(v) : $(v)}</td>`;
         });
+
+        // Analytics: current value, previous value, 3-mo avg, L12M best
+        const cur = vals[vals.length - 1];
+        const prev = vals.length >= 2 ? vals[vals.length - 2] : null;
+
+        // 3-month average
+        const avg3Vals = vals.slice(-3);
+        const avg3 = avg3Vals.length > 0 ? avg3Vals.reduce((s,v) => s + (v||0), 0) / avg3Vals.length : null;
+
+        // L12M best (highest for revenue/GP, uses absolute value concept)
+        const l12Start = Math.max(0, ci - 11);
+        let l12Best = null;
+        let l12BestMonth = '';
+        if (fmt !== 'pct') {
+          for (let li = l12Start; li <= ci; li++) {
+            // We need the same metric from allDan — use a getter approach
+            // For now we'll find L12M from the vals if enough months, else from what we have
+          }
+        }
+
+        if (fmt === 'pct') {
+          // For percentage rows, show simpler analytics
+          const momD = (cur != null && prev != null) ? cur - prev : null;
+          const avgVsDelta = (cur != null && avg3 != null) ? cur - avg3 : null;
+          r += `<td style="border-left:2px solid #d1d5db;">${momD != null && momD !== 0 ? (momD > 0 ? `<span class="pnl-val-pos">+${Math.round(momD)}%</span>` : `<span class="pnl-val-neg">${Math.round(momD)}%</span>`) : '<span style="color:#94a3b8;">—</span>'}</td>`;
+          r += `<td></td>`; // MOM % not applicable for % rows
+          r += `<td style="border-left:2px solid #d1d5db;">${avg3 != null ? Math.round(avg3) + '%' : '—'}</td>`;
+          r += `<td>${avgVsDelta != null && avgVsDelta !== 0 ? (avgVsDelta > 0 ? `<span class="pnl-val-pos">+${Math.round(avgVsDelta)}%</span>` : `<span class="pnl-val-neg">${Math.round(avgVsDelta)}%</span>`) : '<span style="color:#94a3b8;">—</span>'}</td>`;
+          r += `<td></td>`; // VS AVG % not applicable
+          r += `<td style="border-left:2px solid #d1d5db;"></td><td></td>`; // L12M not shown for %
+        } else {
+          // MOM Δ
+          const momDelta = (cur != null && prev != null) ? cur - prev : null;
+          r += `<td style="border-left:2px solid #d1d5db;">${delta(momDelta)}</td>`;
+          // MOM %
+          r += `<td>${deltaPct(cur, prev)}</td>`;
+          // 3-MO AVG
+          r += `<td style="border-left:2px solid #d1d5db;">${avg3 != null ? $(avg3) : '—'}</td>`;
+          // VS AVG Δ
+          const vsAvg = (cur != null && avg3 != null) ? cur - avg3 : null;
+          r += `<td>${delta(vsAvg)}</td>`;
+          // VS AVG %
+          r += `<td>${deltaPct(cur, avg3)}</td>`;
+          // L12M BEST — scan all months in range
+          r += `<td style="border-left:2px solid #d1d5db;"></td><td></td>`; // placeholder, filled by rowL12
+        }
         return r + '</tr>';
       }
 
+      // Enhanced row with L12M support: pass an extractor function to pull the metric from allDan
+      function rowX(label, vals, cls, fmt, extractor) {
+        let r = `<tr class="${cls || ''}"><td>${label}</td>`;
+        vals.forEach((v, i) => {
+          const isCur = (startIdx + i) === ci;
+          const cc = isCur ? ' class="col-current"' : '';
+          r += `<td${cc}>${fmt === 'pct' ? pct(v) : $(v)}</td>`;
+        });
+
+        const cur = vals[vals.length - 1];
+        const prev = vals.length >= 2 ? vals[vals.length - 2] : null;
+        const avg3Vals = vals.slice(-3);
+        const avg3 = avg3Vals.length > 0 ? avg3Vals.reduce((s,v) => s + (v||0), 0) / avg3Vals.length : null;
+
+        if (fmt === 'pct') {
+          const momD = (cur != null && prev != null) ? cur - prev : null;
+          const avgVsDelta = (cur != null && avg3 != null) ? cur - avg3 : null;
+          r += `<td style="border-left:2px solid #d1d5db;">${momD != null && momD !== 0 ? (momD > 0 ? `<span class="pnl-val-pos">+${Math.round(momD)}%</span>` : `<span class="pnl-val-neg">${Math.round(momD)}%</span>`) : '<span style="color:#94a3b8;">—</span>'}</td>`;
+          r += `<td></td>`;
+          r += `<td style="border-left:2px solid #d1d5db;">${avg3 != null ? Math.round(avg3) + '%' : '—'}</td>`;
+          r += `<td>${avgVsDelta != null && avgVsDelta !== 0 ? (avgVsDelta > 0 ? `<span class="pnl-val-pos">+${Math.round(avgVsDelta)}%</span>` : `<span class="pnl-val-neg">${Math.round(avgVsDelta)}%</span>`) : '<span style="color:#94a3b8;">—</span>'}</td>`;
+          r += `<td></td><td style="border-left:2px solid #d1d5db;"></td><td></td>`;
+        } else {
+          const momDelta = (cur != null && prev != null) ? cur - prev : null;
+          r += `<td style="border-left:2px solid #d1d5db;">${delta(momDelta)}</td>`;
+          r += `<td>${deltaPct(cur, prev)}</td>`;
+          r += `<td style="border-left:2px solid #d1d5db;">${avg3 != null ? $(avg3) : '—'}</td>`;
+          const vsAvg = (cur != null && avg3 != null) ? cur - avg3 : null;
+          r += `<td>${delta(vsAvg)}</td>`;
+          r += `<td>${deltaPct(cur, avg3)}</td>`;
+          // L12M BEST
+          if (extractor) {
+            const l12Start = Math.max(0, ci - 11);
+            let bestVal = null, bestMonth = '';
+            for (let li = l12Start; li <= ci; li++) {
+              const v = extractor(allDan[li]);
+              if (v != null && (bestVal === null || v > bestVal)) { bestVal = v; bestMonth = DATA[li].month; }
+            }
+            const vsL12 = (cur != null && bestVal != null) ? cur - bestVal : null;
+            r += `<td style="border-left:2px solid #d1d5db;">${bestVal != null ? $(bestVal) + ' <span style="color:#94a3b8;font-size:11px;">(' + bestMonth + ')</span>' : '—'}</td>`;
+            r += `<td>${delta(vsL12)}</td>`;
+          } else {
+            r += `<td style="border-left:2px solid #d1d5db;"></td><td></td>`;
+          }
+        }
+        return r + '</tr>';
+      }
+
+      // Spacer row helper that spans all columns including analytics
+      function spacer() { return `<tr><td>&nbsp;</td>${'<td></td>'.repeat(nc + analyticsCols)}</tr>`; }
+
       // --- Division 1 (IT Support Labor) ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 1 (IT Support Labor)</td></tr>`;
-      html += row('Revenue - Clarity IT & On Demand', dd.map(d => d.d1.rev), 'pnl-indent');
-      html += row('Div 8 Revenue (70% of A+ Animal & Diamond)', dd.map(d => d.d1.d8rev), 'pnl-indent');
-      html += row('<strong>Total Revenue</strong>', dd.map(d => d.d1.totalRev), 'pnl-bold');
-      html += `<tr><td>&nbsp;</td>${'<td></td>'.repeat(nc)}</tr>`;
-      html += row('Div 1 Cost', dd.map(d => d.d1.d1cost), 'pnl-indent');
-      html += row('Div 8 Labor', dd.map(d => d.d1.d8labor), 'pnl-indent');
-      html += row('<strong>Total Cost</strong>', dd.map(d => d.d1.totalCost), 'pnl-bold');
-      html += `<tr><td>&nbsp;</td>${'<td></td>'.repeat(nc)}</tr>`;
-      html += row('<strong>Gross Profit - Div 1</strong>', dd.map(d => d.d1.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d1.gpM), 'pnl-indent', 'pct');
+      html += rowX('Revenue - Clarity IT & On Demand', dd.map(d => d.d1.rev), 'pnl-indent', null, d => d.d1.rev);
+      html += rowX('Div 8 Revenue (70% of A+ Animal & Diamond)', dd.map(d => d.d1.d8rev), 'pnl-indent', null, d => d.d1.d8rev);
+      html += rowX('<strong>Total Revenue</strong>', dd.map(d => d.d1.totalRev), 'pnl-bold', null, d => d.d1.totalRev);
+      html += spacer();
+      html += rowX('Div 1 Cost', dd.map(d => d.d1.d1cost), 'pnl-indent', null, d => d.d1.d1cost);
+      html += rowX('Div 8 Labor', dd.map(d => d.d1.d8labor), 'pnl-indent', null, d => d.d1.d8labor);
+      html += rowX('<strong>Total Cost</strong>', dd.map(d => d.d1.totalCost), 'pnl-bold', null, d => d.d1.totalCost);
+      html += spacer();
+      html += rowX('<strong>Gross Profit - Div 1</strong>', dd.map(d => d.d1.gp), 'pnl-row-hl', null, d => d.d1.gp);
+      html += rowX('GP%', dd.map(d => d.d1.gpM), 'pnl-indent', 'pct');
 
       // --- Division 2 (IT Project Labor) ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 2 (IT Project Labor)</td></tr>`;
-      html += row('Revenue', dd.map(d => d.d2.rev), 'pnl-indent');
-      html += row('Allocatable Labor', dd.map(d => d.d2.alloc), 'pnl-indent');
-      html += row("Non-Allocatable Labour (Dan's Payroll)", dd.map(d => d.d2.nonAlloc), 'pnl-indent');
-      html += row('<strong>Gross Profit - Div 2</strong>', dd.map(d => d.d2.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d2.gpM), 'pnl-indent', 'pct');
+      html += rowX('Revenue', dd.map(d => d.d2.rev), 'pnl-indent', null, d => d.d2.rev);
+      html += rowX('Allocatable Labor', dd.map(d => d.d2.alloc), 'pnl-indent', null, d => d.d2.alloc);
+      html += rowX("Non-Allocatable Labour (Dan's Payroll)", dd.map(d => d.d2.nonAlloc), 'pnl-indent', null, d => d.d2.nonAlloc);
+      html += rowX('<strong>Gross Profit - Div 2</strong>', dd.map(d => d.d2.gp), 'pnl-row-hl', null, d => d.d2.gp);
+      html += rowX('GP%', dd.map(d => d.d2.gpM), 'pnl-indent', 'pct');
 
       // --- Division 3 (Cloud VAR) ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 3 (Cloud VAR)</td></tr>`;
-      html += row('Revenue', dd.map(d => d.d3.rev), 'pnl-indent');
-      html += row('Cost', dd.map(d => d.d3.cost), 'pnl-indent');
-      html += row('<strong>Gross Profit - Div 3</strong>', dd.map(d => d.d3.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d3.gpM), 'pnl-indent', 'pct');
+      html += rowX('Revenue', dd.map(d => d.d3.rev), 'pnl-indent', null, d => d.d3.rev);
+      html += rowX('Cost', dd.map(d => d.d3.cost), 'pnl-indent', null, d => d.d3.cost);
+      html += rowX('<strong>Gross Profit - Div 3</strong>', dd.map(d => d.d3.gp), 'pnl-row-hl', null, d => d.d3.gp);
+      html += rowX('GP%', dd.map(d => d.d3.gpM), 'pnl-indent', 'pct');
 
       // --- Division 4 (Partner Network) ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 4 (Partner Network)</td></tr>`;
-      html += row('Revenue', dd.map(d => d.d4.rev), 'pnl-indent');
-      html += row('Cost', dd.map(d => d.d4.cost), 'pnl-indent');
-      html += row('<strong>Gross Profit - Div 4</strong>', dd.map(d => d.d4.gp), 'pnl-row-hl');
+      html += rowX('Revenue', dd.map(d => d.d4.rev), 'pnl-indent', null, d => d.d4.rev);
+      html += rowX('Cost', dd.map(d => d.d4.cost), 'pnl-indent', null, d => d.d4.cost);
+      html += rowX('<strong>Gross Profit - Div 4</strong>', dd.map(d => d.d4.gp), 'pnl-row-hl', null, d => d.d4.gp);
 
       // --- Division 5A - Non-Project Materials ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 5A - Non-Project Materials</td></tr>`;
-      html += row('Revenue', dd.map(d => d.d5a.rev), 'pnl-indent');
-      html += row('Cost', dd.map(d => d.d5a.cost), 'pnl-indent');
-      html += row('<strong>Gross Profit - Div 5A</strong>', dd.map(d => d.d5a.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d5a.gpM), 'pnl-indent', 'pct');
+      html += rowX('Revenue', dd.map(d => d.d5a.rev), 'pnl-indent', null, d => d.d5a.rev);
+      html += rowX('Cost', dd.map(d => d.d5a.cost), 'pnl-indent', null, d => d.d5a.cost);
+      html += rowX('<strong>Gross Profit - Div 5A</strong>', dd.map(d => d.d5a.gp), 'pnl-row-hl', null, d => d.d5a.gp);
+      html += rowX('GP%', dd.map(d => d.d5a.gpM), 'pnl-indent', 'pct');
 
       // --- Division 5B - Project Materials ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 5B - Project Materials</td></tr>`;
-      html += row('Revenue', dd.map(d => d.d5b.rev), 'pnl-indent');
-      html += row('Cost', dd.map(d => d.d5b.cost), 'pnl-indent');
-      html += row('<strong>Gross Profit - Div 5B</strong>', dd.map(d => d.d5b.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d5b.gpM), 'pnl-indent', 'pct');
+      html += rowX('Revenue', dd.map(d => d.d5b.rev), 'pnl-indent', null, d => d.d5b.rev);
+      html += rowX('Cost', dd.map(d => d.d5b.cost), 'pnl-indent', null, d => d.d5b.cost);
+      html += rowX('<strong>Gross Profit - Div 5B</strong>', dd.map(d => d.d5b.gp), 'pnl-row-hl', null, d => d.d5b.gp);
+      html += rowX('GP%', dd.map(d => d.d5b.gpM), 'pnl-indent', 'pct');
 
       // --- Division 6 - CxO ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 6 - CxO</td></tr>`;
-      html += row('Revenue', dd.map(d => d.d6.rev), 'pnl-indent');
-      html += row('Cost', dd.map(d => d.d6.cost), 'pnl-indent');
-      html += row('<strong>Gross Profit - Div 6</strong>', dd.map(d => d.d6.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d6.gpM), 'pnl-indent', 'pct');
+      html += rowX('Revenue', dd.map(d => d.d6.rev), 'pnl-indent', null, d => d.d6.rev);
+      html += rowX('Cost', dd.map(d => d.d6.cost), 'pnl-indent', null, d => d.d6.cost);
+      html += rowX('<strong>Gross Profit - Div 6</strong>', dd.map(d => d.d6.gp), 'pnl-row-hl', null, d => d.d6.gp);
+      html += rowX('GP%', dd.map(d => d.d6.gpM), 'pnl-indent', 'pct');
 
       // --- Division 8 (A+ Animal & Diamond) ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Division 8 (A+ Animal & Diamond) — DAG Tech Platform</td></tr>`;
-      html += row('Total Revenue (30% of A+ Animal & Diamond)', dd.map(d => d.d8.totalRev), 'pnl-bold');
-      html += `<tr><td>&nbsp;</td>${'<td></td>'.repeat(nc)}</tr>`;
-      html += row('Cloud Costs (VAR)', dd.map(d => d.d8.cloud), 'pnl-indent');
-      html += row('<strong>Total Cost</strong>', dd.map(d => d.d8.totalCost), 'pnl-bold');
-      html += `<tr><td>&nbsp;</td>${'<td></td>'.repeat(nc)}</tr>`;
-      html += row('<strong>Gross Profit - Div 8</strong>', dd.map(d => d.d8.gp), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.d8.gpM), 'pnl-indent', 'pct');
+      html += rowX('Total Revenue (30% of A+ Animal & Diamond)', dd.map(d => d.d8.totalRev), 'pnl-bold', null, d => d.d8.totalRev);
+      html += spacer();
+      html += rowX('Cloud Costs (VAR)', dd.map(d => d.d8.cloud), 'pnl-indent', null, d => d.d8.cloud);
+      html += rowX('<strong>Total Cost</strong>', dd.map(d => d.d8.totalCost), 'pnl-bold', null, d => d.d8.totalCost);
+      html += spacer();
+      html += rowX('<strong>Gross Profit - Div 8</strong>', dd.map(d => d.d8.gp), 'pnl-row-hl', null, d => d.d8.gp);
+      html += rowX('GP%', dd.map(d => d.d8.gpM), 'pnl-indent', 'pct');
 
       // --- Labor Overhead ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Unallocated</td></tr>`;
-      html += row('Labor Overhead Cost (Non Billable Hours)', dd.map(d => d.loh), 'pnl-indent');
+      html += rowX('Labor Overhead Cost (Non Billable Hours)', dd.map(d => d.loh), 'pnl-indent', null, d => d.loh);
 
       // --- Company Totals ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Company Totals</td></tr>`;
-      html += row('<strong>Total Revenue (All Divisions)</strong>', dd.map(d => d.totRev), 'pnl-row-hl');
-      html += row('<strong>Total COGS (All Divisions) + Internal</strong>', dd.map(d => d.totCogs), 'pnl-bold');
-      html += row('<strong>Total Gross Profit</strong>', dd.map(d => d.totGP), 'pnl-row-hl');
-      html += row('GP%', dd.map(d => d.gpM), 'pnl-indent', 'pct');
+      html += rowX('<strong>Total Revenue (All Divisions)</strong>', dd.map(d => d.totRev), 'pnl-row-hl', null, d => d.totRev);
+      html += rowX('<strong>Total COGS (All Divisions) + Internal</strong>', dd.map(d => d.totCogs), 'pnl-bold', null, d => d.totCogs);
+      html += rowX('<strong>Total Gross Profit</strong>', dd.map(d => d.totGP), 'pnl-row-hl', null, d => d.totGP);
+      html += rowX('GP%', dd.map(d => d.gpM), 'pnl-indent', 'pct');
 
       // --- Operating Expenses ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Operating Expenses</td></tr>`;
-      html += row('<strong>Total Operating Expenses</strong>', dd.map(d => d.opex), 'pnl-row-hl');
+      html += rowX('<strong>Total Operating Expenses</strong>', dd.map(d => d.opex), 'pnl-row-hl', null, d => d.opex);
       Object.entries(opxD).forEach(([line, values]) => {
         const vals = months.map((m, i) => values[startIdx + i] != null ? values[startIdx + i] : 0);
-        html += row(line, vals, 'pnl-indent');
+        html += rowX(line, vals, 'pnl-indent');
       });
 
       // --- Growth Expenses ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Growth Expenses</td></tr>`;
-      html += row('<strong>Total Growth Expenses</strong>', dd.map(d => d.growth), 'pnl-row-hl');
+      html += rowX('<strong>Total Growth Expenses</strong>', dd.map(d => d.growth), 'pnl-row-hl', null, d => d.growth);
       Object.entries(grwD).forEach(([line, values]) => {
         const vals = months.map((m, i) => values[startIdx + i] != null ? values[startIdx + i] : 0);
-        html += row(line, vals, 'pnl-indent');
+        html += rowX(line, vals, 'pnl-indent');
       });
 
       // --- Bottom Line ---
       html += `<tr class="pnl-section-header"><td colspan="${colSpan}">Bottom Line</td></tr>`;
-      html += row('<strong>Total Expenses</strong>', dd.map(d => d.opex + d.growth), 'pnl-bold');
-      html += row('<strong>EBITDA</strong>', dd.map(d => d.ebitda), 'pnl-row-hl');
-      html += row('EBITDA Margin %', dd.map(d => d.totRev ? (d.ebitda / d.totRev * 100) : 0), 'pnl-indent', 'pct');
-      html += row('<strong>Net Income</strong>', dd.map(d => d.netIncome), 'pnl-row-hl');
-      html += row('Net Margin %', dd.map(d => d.totRev ? (d.netIncome / d.totRev * 100) : 0), 'pnl-indent', 'pct');
+      html += rowX('<strong>Total Expenses</strong>', dd.map(d => d.opex + d.growth), 'pnl-bold', null, d => d.opex + d.growth);
+      html += rowX('<strong>EBITDA</strong>', dd.map(d => d.ebitda), 'pnl-row-hl', null, d => d.ebitda);
+      html += rowX('EBITDA Margin %', dd.map(d => d.totRev ? (d.ebitda / d.totRev * 100) : 0), 'pnl-indent', 'pct');
+      html += rowX('<strong>Net Income</strong>', dd.map(d => d.netIncome), 'pnl-row-hl', null, d => d.netIncome);
+      html += rowX('Net Margin %', dd.map(d => d.totRev ? (d.netIncome / d.totRev * 100) : 0), 'pnl-indent', 'pct');
 
       html += `</tbody>`;
       table.innerHTML = html;
