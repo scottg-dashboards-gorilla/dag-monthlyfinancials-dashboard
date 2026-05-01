@@ -771,3 +771,84 @@ var SEAT_PRODUCTS = [
   {id: "Diamond Legacy", color: "#f59e0b", desc: "Legacy Diamond platform"},
   {id: "TS4", color: "#8b5cf6", desc: "TS4 security module"}
 ];
+
+// MSP Benchmarking — Industry ranges and DAG config
+// Values are computed dynamically from DATA in renderBenchmarkView()
+// headcount is manual until automated: update when team changes
+var BENCH_CONFIG = {
+  headcount: 16,
+  benchmarks: [
+    {
+      id: "ebitda",
+      title: "Adjusted EBITDA Margin",
+      formula: "(Revenue − COGS − OpEx + owner addbacks) ÷ Revenue",
+      desc: "The single number that drives valuation multiple at exit. Top quartile earns ~2.5x the EBITDA margin of the median. Clearing 20% materially expands the exit multiple.",
+      medianLo: 10.0, medianHi: 14.0,
+      topLo: 20.0, topHi: 25.0,
+      unit: "%",
+      source: "ConnectWise/Service Leadership Q2 & Q4 2024; Aventis Advisors"
+    },
+    {
+      id: "revPerEmp",
+      title: "Service Revenue per Employee",
+      formula: "Annual Service Revenue ÷ Total Headcount",
+      desc: "TruMethods anchor metric. Lead indicator of EBITDA margin. Captures service output produced per person — the compounding lever of standardization and automation.",
+      medianLo: 125, medianHi: 135,
+      topLo: 165, topHi: 185,
+      unit: "$K",
+      source: "TruMethods World Class MSP; Kaptius 2025; Dune Creek Capital"
+    },
+    {
+      id: "recurPct",
+      title: "Recurring Revenue % of Total",
+      formula: "(MS + Security + Cloud MRR) ÷ Total Revenue",
+      desc: "Recurring dollars are valued at ~10x the multiple of one-time/resale dollars. The foundation of MSP valuation premium — buyers pay 8–12x for high-recurring MSPs vs 4–5x for project-heavy shops.",
+      medianLo: 55.0, medianHi: 65.0,
+      topLo: 75.0, topHi: 85.0,
+      unit: "%",
+      source: "ScalePad 2025; Service Leadership Index; Auxo Capital"
+    },
+    {
+      id: "svcMult",
+      title: "Service Multiple of Wages",
+      formula: "Service Revenue ÷ Service-Team Labor (COGS)",
+      desc: "Most directly tied to gross margin. TruMethods target: service wages should be no more than 33% of service revenue (i.e., 3.0x minimum). Every $1 in service wages producing $4.50 vs $2.50 is the difference between top-decile and median margins. Driven by automation, offshoring, and pricing discipline.",
+      medianLo: 2.50, medianHi: 3.50,
+      topLo: 4.00, topHi: 5.00,
+      unit: "x",
+      source: "TruMethods 33% wage rule; Thread 30 MSP KPIs"
+    },
+    {
+      id: "recurGrowth",
+      title: "Recurring Revenue Growth Rate",
+      formula: "Current Recurring Rev ÷ Recurring Rev 12 months prior × 100",
+      desc: "Measures whether recurring revenue is growing or shrinking year-over-year. Above 100% means the book is expanding. PE buyers use this to grade revenue quality — sustained growth above 100% materially expands the exit multiple.",
+      medianLo: 97.0, medianHi: 103.0,
+      topLo: 107.0, topHi: 117.0,
+      unit: "%",
+      note: "Includes both expansion of existing clients and new logo adds — not a pure same-store NRR metric. MSP-specific benchmarks for this metric are limited; ranges derived from IT services M&A advisory data.",
+      source: "Service Leadership Index 2024; Evergreen Services Agreement data; Auxo Capital"
+    },
+    {
+      id: "msMargin",
+      title: "Managed Services Gross Margin",
+      formula: "(Service Rev − Direct Service COGS incl. labor) ÷ Service Revenue",
+      desc: "The headline gross margin buyers want to see, stripped of product-resale drag. Service Leadership 2024 data shows median at 40–42% and top quartile at 46–48%. Only 25% of MSPs exceed 50%. Top performers achieve higher margins through tooling efficiency and tier-1 automation.",
+      medianLo: 40.0, medianHi: 48.0,
+      topLo: 52.0, topHi: 60.0,
+      unit: "%",
+      source: "Service Leadership Index 2024; ScalePad Benchmark 2025; ConnectWise IT Nation"
+    },
+    {
+      id: "clientConc",
+      title: "Client Concentration Risk",
+      formula: "Top Client Revenue ÷ Total Recurring Revenue × 100",
+      desc: "Buyers discount heavily for concentration. A single client over 15% of revenue triggers a risk flag in most LOIs. Target: no single client above 10%, top 5 clients below 30% combined. High concentration = key-man risk + negotiation leverage loss.",
+      medianLo: 10.0, medianHi: 15.0,
+      topLo: 5.0, topHi: 8.0,
+      unit: "%",
+      invert: true,
+      source: "Dune Creek Capital; Evergreen M&A advisory; TruMethods"
+    }
+  ]
+};
