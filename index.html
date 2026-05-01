@@ -972,6 +972,7 @@
       <div class="nav-item" onclick="switchView('grossprofit')">Gross Profit</div>
       <div class="nav-item" onclick="switchView('pnl')">P&L Detail</div>
       <div class="nav-item" onclick="switchView('intelligence')">Intelligence</div>
+      <div class="nav-item" onclick="switchView('seats')">Seat Tracking</div>
       <div class="nav-item" onclick="switchView('import')">Import Data</div>
       <div style="padding: 24px 20px; border-top: 1px solid #374151; margin-top: 24px;">
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -1059,6 +1060,36 @@
         <!-- Intelligence View -->
         <div class="view" id="intelligence">
           <div class="intel-report" id="intelReport"></div>
+        </div>
+
+        <!-- Seat Tracking View -->
+        <div class="view" id="seats">
+          <div class="chart-row">
+            <div class="chart-card">
+              <div class="chart-title">Total Seats — All Products</div>
+              <canvas id="seatTotalChart"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Total MRR — All Products</div>
+              <canvas id="seatMrrChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-card">
+              <div class="chart-title">Seat Count by Product</div>
+              <canvas id="seatByProductChart"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Month-over-Month Seat Change by Product</div>
+              <canvas id="seatDiffChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <div class="chart-title" style="padding: 0 0 16px 0;">Month-over-Month Detail</div>
+            <div class="pnl-wrap">
+              <table class="pnl-table" id="seatTable"></table>
+            </div>
+          </div>
         </div>
 
         <!-- Import Data View -->
@@ -1162,6 +1193,7 @@
         grossprofit: 'Gross Profit Analysis',
         pnl: 'P&L Detail',
         intelligence: 'Intelligence Hub',
+        seats: 'A+ Animal Seat Tracking',
         import: 'Import Data'
       };
       document.getElementById('viewTitle').textContent = titles[viewName];
@@ -1171,6 +1203,7 @@
         grossprofit: '3-month rolling analysis with benchmarks',
         pnl: 'Traditional P&L statement',
         intelligence: 'Anomalies, insights, and advisor chat',
+        seats: 'Month-over-month seat counts and MRR for Div 8 products',
         import: 'Update financial data from external sources'
       }[viewName];
 
@@ -1179,6 +1212,7 @@
       else if (viewName === 'grossprofit') renderGrossProfitView();
       else if (viewName === 'pnl') renderPnLView();
       else if (viewName === 'intelligence') renderIntelligenceView();
+      else if (viewName === 'seats') renderSeatsView();
     }
 
     function getCurrentData() {
@@ -1984,6 +2018,210 @@
       html += row('Net Margin %', dd.map(d => d.totRev ? (d.netIncome / d.totRev * 100) : 0), 'pnl-indent', 'pct');
 
       html += `</tbody>`;
+      table.innerHTML = html;
+    }
+
+    function renderSeatsView() {
+      const labels = SEAT_DATA.map(d => d.month);
+      const allProds = SEAT_PRODUCTS.map(p => p.id);
+
+      // Compute totals per month
+      const totalSeats = SEAT_DATA.map(d => {
+        return allProds.reduce((sum, p) => sum + ((d.products[p] || {}).s || 0), 0);
+      });
+      const totalMrr = SEAT_DATA.map(d => {
+        return allProds.reduce((sum, p) => sum + ((d.products[p] || {}).mrr || 0), 0);
+      });
+      const totalDiff = SEAT_DATA.map(d => {
+        return allProds.reduce((sum, p) => sum + ((d.products[p] || {}).d || 0), 0);
+      });
+
+      // 1. Total Seats chart
+      if (charts.seatTotal) charts.seatTotal.destroy();
+      charts.seatTotal = new Chart(document.getElementById('seatTotalChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Total Seats',
+            data: totalSeats,
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139,92,246,0.10)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3,
+            borderWidth: 2.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' seats' } }
+          },
+          scales: { y: { beginAtZero: false, title: { display: true, text: 'Seats', font: { size: 11 } } } }
+        }
+      });
+
+      // 2. Total MRR chart
+      if (charts.seatMrr) charts.seatMrr.destroy();
+      charts.seatMrr = new Chart(document.getElementById('seatMrrChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Total MRR',
+            data: totalMrr,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16,185,129,0.10)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3,
+            borderWidth: 2.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}) } }
+          },
+          scales: { y: { beginAtZero: false, title: { display: true, text: 'MRR ($)', font: { size: 11 } }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } } }
+        }
+      });
+
+      // 3. Seats by product (stacked area)
+      if (charts.seatByProduct) charts.seatByProduct.destroy();
+      charts.seatByProduct = new Chart(document.getElementById('seatByProductChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: SEAT_PRODUCTS.map(p => ({
+            label: p.id,
+            data: SEAT_DATA.map(d => (d.products[p.id] || {}).s || 0),
+            borderColor: p.color,
+            backgroundColor: p.color + '20',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 2,
+            borderWidth: 2
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } } },
+          scales: {
+            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Seats', font: { size: 11 } } },
+            x: { stacked: true }
+          }
+        }
+      });
+
+      // 4. MoM seat diff by product (bar chart)
+      if (charts.seatDiff) charts.seatDiff.destroy();
+      charts.seatDiff = new Chart(document.getElementById('seatDiffChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: SEAT_PRODUCTS.map(p => ({
+            label: p.id,
+            data: SEAT_DATA.map(d => (d.products[p.id] || {}).d || 0),
+            backgroundColor: p.color + 'cc',
+            borderColor: p.color,
+            borderWidth: 1
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } } },
+          scales: {
+            y: { stacked: true, title: { display: true, text: 'Seat Change', font: { size: 11 } } },
+            x: { stacked: true }
+          }
+        }
+      });
+
+      // 5. Detail table
+      const table = document.getElementById('seatTable');
+      let html = '<thead><tr class="pnl-row-hl"><th class="pnl-label">Product / Metric</th>';
+      SEAT_DATA.forEach((d, i) => {
+        const isCur = (i === SEAT_DATA.length - 1);
+        html += `<th class="pnl-val${isCur ? ' col-current' : ''}">${d.month}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      SEAT_PRODUCTS.forEach(p => {
+        // Section header
+        html += `<tr class="pnl-section-header"><td class="pnl-label" colspan="${SEAT_DATA.length + 1}" style="color:${p.color}; font-weight:600;">${p.id}</td></tr>`;
+        // Seats row
+        html += '<tr><td class="pnl-label" style="padding-left:24px;">Seats</td>';
+        SEAT_DATA.forEach((d, i) => {
+          const v = (d.products[p.id] || {}).s || 0;
+          const isCur = (i === SEAT_DATA.length - 1);
+          html += `<td class="pnl-val${isCur ? ' col-current' : ''}">${v > 0 ? v.toLocaleString() : '—'}</td>`;
+        });
+        html += '</tr>';
+        // Diff row
+        html += '<tr><td class="pnl-label" style="padding-left:24px;">MoM Change</td>';
+        SEAT_DATA.forEach((d, i) => {
+          const v = (d.products[p.id] || {}).d || 0;
+          const isCur = (i === SEAT_DATA.length - 1);
+          const cls = v > 0 ? 'pnl-val-pos' : (v < 0 ? 'pnl-val-neg' : '');
+          const display = v > 0 ? '+' + v : (v < 0 ? v : '—');
+          html += `<td class="pnl-val ${cls}${isCur ? ' col-current' : ''}">${display}</td>`;
+        });
+        html += '</tr>';
+        // Clients row
+        html += '<tr><td class="pnl-label" style="padding-left:24px;">Clients</td>';
+        SEAT_DATA.forEach((d, i) => {
+          const v = (d.products[p.id] || {}).c || 0;
+          const isCur = (i === SEAT_DATA.length - 1);
+          html += `<td class="pnl-val${isCur ? ' col-current' : ''}">${v > 0 ? v : '—'}</td>`;
+        });
+        html += '</tr>';
+        // MRR row
+        html += '<tr><td class="pnl-label" style="padding-left:24px;">MRR</td>';
+        SEAT_DATA.forEach((d, i) => {
+          const v = (d.products[p.id] || {}).mrr || 0;
+          const isCur = (i === SEAT_DATA.length - 1);
+          html += `<td class="pnl-val${isCur ? ' col-current' : ''}">${v > 0 ? '$' + v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}) : '—'}</td>`;
+        });
+        html += '</tr>';
+        // Spacer
+        html += `<tr style="height:6px;"><td colspan="${SEAT_DATA.length + 1}"></td></tr>`;
+      });
+
+      // Totals section
+      html += `<tr class="pnl-section-header"><td class="pnl-label" colspan="${SEAT_DATA.length + 1}" style="font-weight:700;">ALL PRODUCTS — TOTALS</td></tr>`;
+      html += '<tr class="pnl-row-hl"><td class="pnl-label" style="padding-left:24px; font-weight:600;">Total Seats</td>';
+      SEAT_DATA.forEach((d, i) => {
+        const isCur = (i === SEAT_DATA.length - 1);
+        html += `<td class="pnl-val${isCur ? ' col-current' : ''}" style="font-weight:600;">${totalSeats[i].toLocaleString()}</td>`;
+      });
+      html += '</tr>';
+      html += '<tr><td class="pnl-label" style="padding-left:24px; font-weight:600;">Total MoM Change</td>';
+      SEAT_DATA.forEach((d, i) => {
+        const v = totalDiff[i];
+        const isCur = (i === SEAT_DATA.length - 1);
+        const cls = v > 0 ? 'pnl-val-pos' : (v < 0 ? 'pnl-val-neg' : '');
+        const display = v > 0 ? '+' + v : (v < 0 ? v : '—');
+        html += `<td class="pnl-val ${cls}${isCur ? ' col-current' : ''}" style="font-weight:600;">${display}</td>`;
+      });
+      html += '</tr>';
+      html += '<tr class="pnl-row-hl"><td class="pnl-label" style="padding-left:24px; font-weight:600;">Total MRR</td>';
+      SEAT_DATA.forEach((d, i) => {
+        const isCur = (i === SEAT_DATA.length - 1);
+        html += `<td class="pnl-val${isCur ? ' col-current' : ''}" style="font-weight:600;">$${totalMrr[i].toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</td>`;
+      });
+      html += '</tr>';
+
+      html += '</tbody>';
       table.innerHTML = html;
     }
 
