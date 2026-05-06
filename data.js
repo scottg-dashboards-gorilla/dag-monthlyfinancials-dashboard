@@ -591,8 +591,13 @@ var ANOMALIES = {
   ],
   "Jun 25": [
     {"type": "anomaly", "category": "COGS", "description": "SCILUC01 — Adobe yearly subscriptions", "impact": 12478, "dept": "d3", "action": "Annual renewal; one-time spike"},
-    {"type": "anomaly", "category": "Revenue", "description": "WHIDCA01-CxO $2,400 not received — credit card expired, will record in July", "impact": 2400, "dept": "d6", "action": "Payment shifted to July"},
-    {"type": "anomaly", "category": "COGS", "description": "Multiple projects showing negative income — higher labor cost than invoiced", "impact": 0, "dept": "d2", "action": "Review VRLVL01-Dallas, VRLVRY01-Chicago/Boston, NCJWOM01, BHSTRT01, HMCBLD01 projects"}
+    {"type": "anomaly", "category": "Revenue", "description": "WHIDCA01-CxO $2,400 not received — credit card expired. Payment processed in August, June deposit adjusted accordingly", "impact": 2400, "dept": "d6", "action": "Payment shifted to August (not July as initially expected)"},
+    {"type": "anomaly", "category": "COGS", "description": "VRLVL01-Dallas — invoiced 28 hrs ($4,200) but 30.5 hrs of labor cost recorded", "impact": 0, "dept": "d2", "action": "Labor cost exceeds invoiced amount"},
+    {"type": "anomaly", "category": "Revenue", "description": "VRLVRY01-Chicago 100 Oakbrook — client invoice pending", "impact": 0, "dept": "d2", "action": "Invoice to be sent"},
+    {"type": "anomaly", "category": "Revenue", "description": "VRLVRY01-Boston 154 Newbury St — client invoice pending", "impact": 0, "dept": "d2", "action": "Invoice to be sent"},
+    {"type": "anomaly", "category": "Revenue", "description": "NCJWOM01 — new office move invoice pending", "impact": 0, "dept": "d2", "action": "Invoice to be sent"},
+    {"type": "anomaly", "category": "COGS", "description": "BHSTRT01-PA1-S1 (New Office Move) — project completed since 2023, costs still showing", "impact": 0, "dept": "d2", "action": "Legacy entry; clean up project codes"},
+    {"type": "anomaly", "category": "COGS", "description": "HMCBLD01-PA1-S7 (185 Madison Access Control) — invoiced in 2023 but costs lingering", "impact": 0, "dept": "d2", "action": "Legacy entry; clean up project codes"}
   ],
   "Jul 25": [
     {"type": "anomaly", "category": "COGS", "description": "SHALOM01 — client shifted from Timothy to Craig, higher on-demand costs", "impact": 0, "dept": "d1", "action": "New engineer assignment driving cost increase"},
@@ -602,7 +607,7 @@ var ANOMALIES = {
     {"type": "anomaly", "category": "Margin", "description": "Minimal time on WHIDCA-CxO and RDKSTG01-CxO — higher Div 6 profit than usual", "impact": 0, "dept": "d6", "action": "Low activity month; profit % inflated"},
     {"type": "expense", "category": "OpEx", "description": "Traveler insurance $372.60 accrued monthly but no cost recorded in August", "impact": -372.60, "dept": "opex", "action": "Bank timing difference"},
     {"type": "anomaly", "category": "OpEx", "description": "No employee cost overhead recorded in August", "impact": 0, "dept": "opex", "action": "Verify with accounting"},
-    {"type": "anomaly", "category": "Revenue", "description": "KRAOCS01-AUS — flagged for review", "impact": 0, "dept": "d1", "action": "Investigate billing status"}
+    {"type": "anomaly", "category": "Revenue", "description": "KRAOCS01-AUS — billing anomaly flagged for review", "impact": 0, "dept": "d1", "action": "Verify billing status and client engagement"}
   ],
   "Sep 25": [
     {"type": "anomaly", "category": "COGS", "description": "VRLVL01 — Dallas and Chicago project hours exceed estimates (Jun-Aug carryover)", "impact": 0, "dept": "d2", "action": "Review project scope and billing"},
@@ -642,13 +647,16 @@ var ANOMALIES = {
     {"type": "adjustment", "category": "Revenue", "description": "Div 8 Resold services COGS $7,343", "impact": 7342.75, "dept": "d8", "action": "New resold services cost line"}
   ],
   "Feb 26": [
-    {"type": "anomaly", "category": "Margin", "description": "Div 2 Project Labor GP% at -194% — allocatable labor $6,728 exceeds revenue $2,558", "impact": -4972.83, "dept": "d2", "action": "Review project staffing vs billing"},
-    {"type": "anomaly", "category": "Margin", "description": "Div 5 Materials GP% at -46% — costs ($9,565) exceed revenue ($6,532)", "impact": -3032.55, "dept": "d5", "action": "Review material procurement margins"},
-    {"type": "anomaly", "category": "Margin", "description": "Div 3 Cloud VAR GP% at 20.7% — consistently below 25% target", "impact": 0, "dept": "d3", "action": "Ongoing structural margin issue"},
-    {"type": "expense", "category": "OpEx", "description": "Insurance spiked to $2,781 — up from ~$1,157 avg", "impact": 2780.99, "dept": "opex", "action": "Verify if annual renewal or rate increase"},
-    {"type": "expense", "category": "OpEx", "description": "Office admin jumped to $1,736 — up from near-zero recent months", "impact": 1735.97, "dept": "opex", "action": "Identify what drove the increase"},
-    {"type": "expense", "category": "Growth", "description": "Travel & business at $6,251 — 4x January's $1,554", "impact": 6250.95, "dept": "growth", "action": "Review travel expenses"},
-    {"type": "expense", "category": "OpEx", "description": "Ask My Accountant — $4,782 in other expenses", "impact": 4781.65, "dept": "other", "action": "Reclassify to proper expense categories"},
+    {"type": "anomaly", "category": "Revenue", "description": "Some clients reduced On Demand hours — Div 1 revenue decline of ~$4,754", "impact": -4754.11, "dept": "d1", "action": "Monitor client on-demand usage trends"},
+    {"type": "anomaly", "category": "COGS", "description": "VRLVRY01-Boston 154 Newbury — labor costs recorded but revenue already recognized in 2025. Hours overran, cannot alter prior-year revenue (books closed, tax returns filed)", "impact": -2634.75, "dept": "d2", "action": "Loss recognized in D2; prior-year books are closed"},
+    {"type": "anomaly", "category": "COGS", "description": "~$3,000 in labor costs not charged to client — pre-approval project efforts and mislogged employee hours into wrong client codes", "impact": -3000, "dept": "d2", "action": "Review timesheet logging practices; correct mis-allocated hours"},
+    {"type": "anomaly", "category": "Revenue", "description": "HMCBLD01 — increase in cloud services income", "impact": 4660, "dept": "d3", "action": "Client usage increase driving revenue"},
+    {"type": "anomaly", "category": "Revenue", "description": "MLWGRP01 — increase in cloud services income", "impact": 2036.76, "dept": "d3", "action": "Client usage increase driving revenue"},
+    {"type": "anomaly", "category": "Revenue", "description": "WHIDCA01-CxO — excess CxO hours in February increased revenue", "impact": 2025, "dept": "d6", "action": "Higher client engagement this month"},
+    {"type": "expense", "category": "OpEx", "description": "Large reduction in Legal & Professional fees vs January", "impact": 0, "dept": "opex", "action": "January had one-time legal engagements (Niro, Whiteford, CT Corp)"},
+    {"type": "expense", "category": "OpEx", "description": "ELA Ruga (Microsourcing contractor) cost now expensed under Office/General Admin instead of Labor Overhead — going forward this will be the standard", "impact": 1735.97, "dept": "opex", "action": "Reclassification: previously split across clients based on hours"},
+    {"type": "expense", "category": "Growth", "description": "Travel expense in February remains high, similar to January levels (~$5K increase vs Dec 2025)", "impact": 5000, "dept": "growth", "action": "Review if travel is generating corresponding client revenue"},
+    {"type": "expense", "category": "OpEx", "description": "Various non-project material purchases not yet invoiced to clients — Stanley asked to invoice all pending material purchases", "impact": 6134.85, "dept": "other", "action": "Follow up with Stanley on pending invoices"},
     {"type": "adjustment", "category": "COGS", "description": "Labor overhead returned to $21,213 after $0 in January", "impact": 21213.18, "dept": "unalloc", "action": "January had R&D reclassification; February normalized"}
   ]
 };
@@ -656,12 +664,13 @@ var ANOMALIES = {
 // Flagged Items — color-coded action/monitor cards per month
 var FLAGS = {
   "Feb 26": [
-    {"status":"action","title":"Div 2 Project Labor GP% at -194%","desc":"Revenue only $2,558 but allocatable labor at $6,728. Worst Div 2 margin ever recorded.","next":"Review why labor is being allocated to low/no-revenue projects","dept":"Margin / D2"},
-    {"status":"action","title":"Div 5 Materials GP% at -46%","desc":"Both non-project and project materials running negative. Combined loss of $3,033.","next":"Review material procurement pricing and client pass-through","dept":"Margin / D5"},
-    {"status":"action","title":"Ask My Accountant — $4,782","desc":"Large amount sitting in unclassified 'Ask My Accountant' category.","next":"Work with Bharat to reclassify to proper expense categories","dept":"Other Expenses"},
-    {"status":"monitor","title":"Insurance at $2,781 (+140% vs avg)","desc":"Jumped from ~$1,157 average. Could be annual renewal or rate increase.","next":"Verify with accounting","dept":"OPEX"},
-    {"status":"monitor","title":"Travel & business at $6,251 (+302% MoM)","desc":"4x increase from January's $1,554. Second highest travel month.","next":"Review if tied to client activity","dept":"Growth / OPEX"},
-    {"status":"monitor","title":"Revenue down to $231K (-10% MoM)","desc":"Dropped from $256K in January. Div 1 down $5K, Div 2 down $3K.","next":"Monitor for trend vs seasonal dip","dept":"Revenue"}
+    {"status":"action","title":"VRLVRY01-Boston labor overrun — no revenue recognition possible","desc":"Labor costs recorded but revenue was already recognized in 2025. Books are closed and tax returns filed — cannot alter prior-year revenue. $2,635 loss in D2.","next":"Accept as sunk cost; tighten project hour estimates going forward","dept":"COGS / D2"},
+    {"status":"action","title":"$3K unbilled labor — mislogged hours & pre-approval work","desc":"Employee/contractor hours logged to project codes during pre-approval phase or to wrong client codes. Not billable.","next":"Implement timesheet review process; correct future logging","dept":"COGS / D2"},
+    {"status":"action","title":"Non-project material purchases not invoiced — $6,135","desc":"Various material purchases made but not yet billed to clients. Stanley has been asked to invoice all pending.","next":"Follow up with Stanley on invoicing status","dept":"Revenue / D5"},
+    {"status":"monitor","title":"Client On Demand hours reduced — Div 1 revenue down $4,754","desc":"Multiple clients reduced on-demand hours, driving Div 1 revenue decline.","next":"Monitor if trend continues; review client engagement","dept":"Revenue / D1"},
+    {"status":"monitor","title":"ELA Ruga cost reclassified to Office/General Admin","desc":"Microsourcing contractor cost ($1,736) now under Office/General Admin instead of Labor Overhead. New permanent categorization going forward.","next":"No action — accounting reclassification","dept":"OPEX"},
+    {"status":"monitor","title":"Travel expense remains elevated (~$5K above Dec baseline)","desc":"Travel spending in February similar to January levels. Approximately $5K increase compared to December 2025.","next":"Review if travel is tied to client acquisition/retention","dept":"Growth / OPEX"},
+    {"status":"monitor","title":"HMCBLD01 & MLWGRP01 cloud revenue increase","desc":"Combined $6,697 revenue increase in cloud services from these two clients.","next":"Positive trend — monitor for sustainability","dept":"Revenue / D3"}
   ],
   "Jan 26": [
     {"status":"resolved","title":"R&D in COGS — $25,856","desc":"Normal tech overhead is ~$17K/mo. January was $25,856 — the increase of ~$8.9K is the delta above normal. Was previously booked under Growth Expenses at ~$868/mo in 2025.","next":"Resolved — delta is $8.9K above $17K baseline","dept":"COGS / UNALLOC"},
@@ -721,7 +730,7 @@ var FLAGS = {
 };
 
 var FLAG_SUMMARY = {
-  "Feb 26": "Revenue at $231K, down 10% from Jan. GP margin at 36.4%. EBITDA margin improved to 9.4%. Net margin at 7.4%. Div 2 and Div 5 both running negative margins. Div 8 Security Platform at $124K remains 54% of total revenue. $4,782 in unclassified 'Ask My Accountant' needs reclassification. Travel & business spiked 4x from January.",
+  "Feb 26": "Revenue at $231K, down 10% from Jan. Client on-demand reductions drove Div 1 down ~$4.8K. Div 2 losses from VRLVRY01-Boston labor overrun ($2.6K — prior-year books closed) and $3K in mislogged/pre-approval hours. Cloud revenue up via HMCBLD01 (+$4.7K) and MLWGRP01 (+$2K). WHIDCA01-CxO excess hours added $2K. ELA Ruga contractor permanently reclassified from Labor Overhead to Office/General Admin. $6.1K in material purchases pending invoicing (Stanley following up). Travel remains elevated similar to January.",
   "Jan 26": "Revenue at $256K grew 24% YoY. GP margin at 40.2%. Net margin at 7.7% compressed by expense anomalies. A+ Animal/Diamond at $125K represents 49% of revenue. Normalize for the R&D COGS reclassification and GP would be 50.3%.",
   "Dec 25": "Revenue at $278K — record month. GP margin 40.1%. D8 Security Platform at $125K is 45% of revenue. D5 Materials had massive $65K spike. D2 continued negative margins.",
   "Nov 25": "Revenue at $211K. GP margin improved to 46.1% (best of 2025). D2 Project Labor posted worst-ever -63.2% margin. D5 Materials nearly zeroed out at $1.5K.",
