@@ -3016,6 +3016,7 @@
                 <div class="intel-card-badge ${a.type}">${a.type}</div>
                 <div class="intel-card-title">${titleText}</div>
                 <div class="intel-card-desc">${a.description}</div>
+                ${a.action ? '<div style="font-size:12px;color:#475569;margin-top:4px;">➡️ '+a.action+'</div>' : ''}
                 <div class="intel-card-dept">${a.category} / ${a.dept.toUpperCase()}</div>
               </div>
               <div class="intel-card-impact ${impClass}">${impText}</div>
@@ -3039,10 +3040,70 @@
           </div>`;
       });
 
+      // --- Build Flagged Items timeline ---
+      const flagMonths = Object.keys(FLAGS).sort((a, b) => {
+        const ia = monthOrder.indexOf(a), ib = monthOrder.indexOf(b);
+        return (ib >= 0 ? ib : -1) - (ia >= 0 ? ia : -1);
+      });
+      let totalAction = 0, totalMonitor = 0, totalResolved = 0;
+      flagMonths.forEach(m => {
+        (FLAGS[m] || []).forEach(f => {
+          if (f.status === 'action') totalAction++;
+          else if (f.status === 'monitor') totalMonitor++;
+          else if (f.status === 'resolved') totalResolved++;
+        });
+      });
+
+      let flagsHtml = '';
+      flagMonths.forEach(m => {
+        const flags = FLAGS[m] || [];
+        if (!flags.length) return;
+        const summary = FLAG_SUMMARY[m] || '';
+        const ac = flags.filter(f => f.status === 'action').length;
+        const mc = flags.filter(f => f.status === 'monitor').length;
+        const rc = flags.filter(f => f.status === 'resolved').length;
+
+        let flagCards = '';
+        const order = {action:0, monitor:1, resolved:2};
+        flags.slice().sort((a,b) => (order[a.status]||9) - (order[b.status]||9)).forEach(flag => {
+          const badgeLabel = flag.status === 'action' ? 'Action Required' : flag.status === 'monitor' ? 'Monitor' : 'Resolved';
+          const dotColor = flag.status === 'action' ? '#ef4444' : flag.status === 'monitor' ? '#eab308' : '#16a34a';
+          flagCards += `
+            <div style="background:white;border-radius:8px;padding:12px 16px;border-left:4px solid ${dotColor};margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <strong style="font-size:13px;">${flag.title}</strong>
+                <span style="font-size:11px;padding:2px 8px;border-radius:12px;background:${flag.status==='action'?'#fef2f2':flag.status==='monitor'?'#fefce8':'#f0fdf4'};color:${dotColor};font-weight:600;">${badgeLabel}</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px;">${flag.desc}</div>
+              <div style="font-size:12px;color:#475569;">\u27A1\uFE0F ${flag.status === 'resolved' ? '' : 'Next: '}${flag.next}</div>
+              ${flag.dept ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">'+flag.dept+'</div>' : ''}
+            </div>`;
+        });
+
+        let countBadges = '';
+        if (ac > 0) countBadges += '<span style="color:#ef4444;font-size:12px;font-weight:600;margin-right:8px;">\uD83D\uDD34 '+ac+' Action</span>';
+        if (mc > 0) countBadges += '<span style="color:#eab308;font-size:12px;font-weight:600;margin-right:8px;">\uD83D\uDFE1 '+mc+' Monitor</span>';
+        if (rc > 0) countBadges += '<span style="color:#16a34a;font-size:12px;font-weight:600;">\u2705 '+rc+' Resolved</span>';
+
+        flagsHtml += `
+          <div class="intel-month-group">
+            <div class="intel-month-header">
+              <div>
+                <span class="intel-month-dot"></span>
+                <span class="intel-month-name">${m}</span>
+                <span class="intel-month-age">(${daysAgo(m)})</span>
+              </div>
+              <div>${countBadges}</div>
+            </div>
+            ${summary ? '<div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;color:#475569;line-height:1.5;"><strong>Summary:</strong> '+summary+'</div>' : ''}
+            ${flagCards}
+          </div>`;
+      });
+
       document.getElementById('intelReport').innerHTML = `
         <div class="intel-header">
           <h2>Intelligence Report</h2>
-          <p>AI-powered MSP strategy analysis alongside anomalies & one-time items</p>
+          <p>Remarks, anomalies, and flagged items from P&L review \u2014 all months</p>
         </div>
         <div class="intel-section">
           <div class="intel-section-header">
@@ -3061,21 +3122,50 @@
         </div>
         <div class="intel-section" style="margin-top:24px;">
           <div class="intel-section-header">
-            <div class="intel-section-title">\u26A1 Anomalies & One-Time Items</div>
-            <div class="intel-section-subtitle">Non-recurring items by month</div>
+            <div class="intel-section-title">\u26A0\uFE0F Flagged Items Tracker</div>
+            <div class="intel-section-subtitle">Action items, monitors, and resolved flags \u2014 all months</div>
           </div>
           <div class="intel-stats">
             <div class="intel-stat">
-              <div class="intel-stat-label">Items</div>
+              <div class="intel-stat-label">Action Required</div>
+              <div class="intel-stat-value" style="color:#ef4444;">${totalAction}</div>
+            </div>
+            <div class="intel-stat">
+              <div class="intel-stat-label">Monitor</div>
+              <div class="intel-stat-value" style="color:#eab308;">${totalMonitor}</div>
+            </div>
+            <div class="intel-stat">
+              <div class="intel-stat-label">Resolved</div>
+              <div class="intel-stat-value" style="color:#16a34a;">${totalResolved}</div>
+            </div>
+            <div class="intel-stat">
+              <div class="intel-stat-label">Total Flags</div>
+              <div class="intel-stat-value">${totalAction + totalMonitor + totalResolved}</div>
+            </div>
+          </div>
+          ${flagsHtml}
+        </div>
+        <div class="intel-section" style="margin-top:24px;">
+          <div class="intel-section-header">
+            <div class="intel-section-title">\u26A1 Remarks & Anomalies</div>
+            <div class="intel-section-subtitle">Accountant remarks and one-time items by month</div>
+          </div>
+          <div class="intel-stats">
+            <div class="intel-stat">
+              <div class="intel-stat-label">Total Remarks</div>
               <div class="intel-stat-value">${totalItems}</div>
             </div>
             <div class="intel-stat">
-              <div class="intel-stat-label">Favorable</div>
+              <div class="intel-stat-label">Favorable Impact</div>
               <div class="intel-stat-value favorable">+${fmt(totalFavorable)}</div>
             </div>
             <div class="intel-stat">
-              <div class="intel-stat-label">Unfavorable</div>
+              <div class="intel-stat-label">Unfavorable Impact</div>
               <div class="intel-stat-value unfavorable">-${fmt(Math.abs(totalUnfavorable))}</div>
+            </div>
+            <div class="intel-stat">
+              <div class="intel-stat-label">Net Impact</div>
+              <div class="intel-stat-value ${totalFavorable + totalUnfavorable >= 0 ? 'favorable' : 'unfavorable'}">${totalFavorable + totalUnfavorable >= 0 ? '+' : '-'}${fmt(Math.abs(totalFavorable + totalUnfavorable))}</div>
             </div>
           </div>
           ${monthsHtml}
