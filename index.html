@@ -3798,177 +3798,146 @@
       const fmt = v => '$' + Math.round(Math.abs(v)).toLocaleString();
       const fmtS = v => v > 0 ? '+$' + Math.round(v).toLocaleString() : '-$' + Math.round(Math.abs(v)).toLocaleString();
 
-      let html = '';
+      const d8ProductColors = { 'D8-A+': '#f59e0b', 'D8-Ess': '#10b981', 'D8-Pro': '#3b82f6', 'D8-Leg': '#ef4444' };
+      const d8ProductLabels = { 'D8-A+': 'A+ Animal', 'D8-Ess': 'Essentials', 'D8-Pro': 'IT Pro', 'D8-Leg': 'Legacy' };
 
-      // --- Net change summary for this transition ---
+      // Helper to render up/down table
+      const renderUpDown = (items, color, label) => {
+        if (!items.length) return '';
+        let h = `<div style="font-size:11px;color:${color};font-weight:600;margin-bottom:3px;">${label}</div>`;
+        h += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
+        items.forEach(c => {
+          const sign = c.delta > 0 ? '+' : '-';
+          h += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:${color};font-weight:500;">${sign}${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`;
+        });
+        h += '</tbody></table>';
+        return h;
+      };
+      const renderNewLost = (items, color, label, showGroup) => {
+        let h = `<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:${color};">${label}</div>`;
+        if (!items.length) return h + '<div style="font-size:11px;color:var(--dim);">None</div>';
+        h += '<table style="width:100%;font-size:11px;"><tbody>';
+        items.forEach(c => {
+          const groupLabel = showGroup ? (d8ProductLabels[c.group] || c.group) : c.group;
+          h += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:${color};">${fmt(c.rev || 0)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${groupLabel}</td></tr>`;
+        });
+        h += '</tbody></table>';
+        return h;
+      };
+
+      // D1 filters
+      const d1SlaUp = d1.up.filter(c => c.group === 'SLA');
+      const d1SlaDown = d1.down.filter(c => c.group === 'SLA');
+      const d1TmUp = d1.up.filter(c => c.group === 'T&M');
+      const d1TmDown = d1.down.filter(c => c.group === 'T&M');
+      const d1AllNew = [...d1.new.filter(c => c.group === 'SLA'), ...d1.new.filter(c => c.group === 'T&M')];
+      const d1AllLost = [...d1.lost.filter(c => c.group === 'SLA'), ...d1.lost.filter(c => c.group === 'T&M')];
+
+      // D8 group by product
+      const d8UpByProd = {};
+      const d8DownByProd = {};
+      d8.up.forEach(c => { if (!d8UpByProd[c.group]) d8UpByProd[c.group] = []; d8UpByProd[c.group].push(c); });
+      d8.down.forEach(c => { if (!d8DownByProd[c.group]) d8DownByProd[c.group] = []; d8DownByProd[c.group].push(c); });
+      const d8Products = ['D8-A+', 'D8-Ess', 'D8-Pro', 'D8-Leg'];
+
       const d1Net = d1.upTotal - Math.abs(d1.downTotal) + d1.newTotal - d1.lostTotal;
       const d8Net = d8.upTotal - Math.abs(d8.downTotal) + d8.newTotal - d8.lostTotal;
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">';
-      html += `<div class="chart-card" style="padding:14px;"><div style="font-weight:600;margin-bottom:8px;">Division 1 Net Change</div>`;
-      html += `<div style="font-size:20px;font-weight:700;color:${d1Net>=0?'#16a34a':'#dc2626'};">${fmtS(d1Net)}</div>`;
-      html += `<div style="display:flex;gap:12px;margin-top:6px;font-size:12px;">`;
+
+      // === TWO-COLUMN LAYOUT: D1 left, D8 right ===
+      let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">';
+
+      // ---- LEFT COLUMN: Division 1 ----
+      html += '<div>';
+
+      // D1 Net Change card
+      html += `<div class="chart-card" style="padding:14px;margin-bottom:12px;border-left:4px solid #6366f1;">`;
+      html += `<div style="font-weight:600;margin-bottom:6px;color:#6366f1;">Division 1 Net Change</div>`;
+      html += `<div style="font-size:22px;font-weight:700;color:${d1Net>=0?'#16a34a':'#dc2626'};">${fmtS(d1Net)}</div>`;
+      html += `<div style="display:flex;gap:10px;margin-top:6px;font-size:12px;flex-wrap:wrap;">`;
       html += `<span style="color:#16a34a;">↑ ${fmt(d1.upTotal)}</span>`;
       html += `<span style="color:#dc2626;">↓ ${fmt(Math.abs(d1.downTotal))}</span>`;
       html += `<span style="color:#16a34a;">+New ${fmt(d1.newTotal)}</span>`;
       html += `<span style="color:#dc2626;">-Lost ${fmt(d1.lostTotal)}</span>`;
       html += `</div></div>`;
 
-      html += `<div class="chart-card" style="padding:14px;"><div style="font-weight:600;margin-bottom:8px;">Division 8 Net Change</div>`;
-      html += `<div style="font-size:20px;font-weight:700;color:${d8Net>=0?'#16a34a':'#dc2626'};">${fmtS(d8Net)}</div>`;
-      html += `<div style="display:flex;gap:12px;margin-top:6px;font-size:12px;">`;
+      // D1 SLA changes
+      html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;">';
+      html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;">SLA / Clarity</div>';
+      html += renderUpDown(d1SlaUp, '#16a34a', '▲ Increased');
+      html += renderUpDown(d1SlaDown, '#dc2626', '▼ Decreased');
+      if (!d1SlaUp.length && !d1SlaDown.length) html += '<div style="font-size:11px;color:var(--dim);">No changes</div>';
+      html += '</div>';
+
+      // D1 T&M changes
+      html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;">';
+      html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;">T&M (On Demand)</div>';
+      html += renderUpDown(d1TmUp, '#16a34a', '▲ Increased');
+      html += renderUpDown(d1TmDown, '#dc2626', '▼ Decreased');
+      if (!d1TmUp.length && !d1TmDown.length) html += '<div style="font-size:11px;color:var(--dim);">No changes</div>';
+      html += '</div>';
+
+      // D1 New clients
+      if (d1AllNew.length) {
+        html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;border-left:3px solid #16a34a;">';
+        html += renderNewLost(d1AllNew, '#16a34a', '+ New Clients', false);
+        html += '</div>';
+      }
+
+      // D1 Lost clients
+      if (d1AllLost.length) {
+        html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;border-left:3px solid #dc2626;">';
+        html += renderNewLost(d1AllLost, '#dc2626', '− Lost / Cancelled', false);
+        html += '</div>';
+      }
+
+      html += '</div>'; // end D1 column
+
+      // ---- RIGHT COLUMN: Division 8 ----
+      html += '<div>';
+
+      // D8 Net Change card
+      html += `<div class="chart-card" style="padding:14px;margin-bottom:12px;border-left:4px solid #f59e0b;">`;
+      html += `<div style="font-weight:600;margin-bottom:6px;color:#f59e0b;">Division 8 Net Change</div>`;
+      html += `<div style="font-size:22px;font-weight:700;color:${d8Net>=0?'#16a34a':'#dc2626'};">${fmtS(d8Net)}</div>`;
+      html += `<div style="display:flex;gap:10px;margin-top:6px;font-size:12px;flex-wrap:wrap;">`;
       html += `<span style="color:#16a34a;">↑ ${fmt(d8.upTotal)}</span>`;
       html += `<span style="color:#dc2626;">↓ ${fmt(Math.abs(d8.downTotal))}</span>`;
       html += `<span style="color:#16a34a;">+New ${fmt(d8.newTotal)}</span>`;
       html += `<span style="color:#dc2626;">-Lost ${fmt(d8.lostTotal)}</span>`;
       html += `</div></div>`;
-      html += '</div>';
 
-      // --- Division 1 Details ---
-      html += '<div style="margin-bottom:20px;">';
-      html += '<div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#6366f1;">Division 1 — Changes</div>';
-
-      // D1 SLA changes
-      const d1SlaUp = d1.up.filter(c => c.group === 'SLA');
-      const d1SlaDown = d1.down.filter(c => c.group === 'SLA');
-      const d1TmUp = d1.up.filter(c => c.group === 'T&M');
-      const d1TmDown = d1.down.filter(c => c.group === 'T&M');
-      const d1SlaNew = d1.new.filter(c => c.group === 'SLA');
-      const d1SlaLost = d1.lost.filter(c => c.group === 'SLA');
-      const d1TmNew = d1.new.filter(c => c.group === 'T&M');
-      const d1TmLost = d1.lost.filter(c => c.group === 'T&M');
-
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
-
-      // SLA Up/Down
-      html += '<div class="chart-card" style="padding:12px;">';
-      html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;">SLA / Clarity — Existing Changes</div>';
-      if (d1SlaUp.length) {
-        html += '<div style="font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px;">▲ Increased</div>';
-        html += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
-        d1SlaUp.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#16a34a;font-weight:500;">+${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
-        html += '</tbody></table>';
-      }
-      if (d1SlaDown.length) {
-        html += '<div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:3px;">▼ Decreased</div>';
-        html += '<table style="width:100%;font-size:11px;"><tbody>';
-        d1SlaDown.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#dc2626;font-weight:500;">-${fmt(Math.abs(c.delta))}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
-        html += '</tbody></table>';
-      }
-      if (!d1SlaUp.length && !d1SlaDown.length) html += '<div style="font-size:11px;color:var(--dim);">No changes</div>';
-      html += '</div>';
-
-      // T&M Up/Down
-      html += '<div class="chart-card" style="padding:12px;">';
-      html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;">T&M (On Demand) — Existing Changes</div>';
-      if (d1TmUp.length) {
-        html += '<div style="font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px;">▲ Increased</div>';
-        html += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
-        d1TmUp.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#16a34a;font-weight:500;">+${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
-        html += '</tbody></table>';
-      }
-      if (d1TmDown.length) {
-        html += '<div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:3px;">▼ Decreased</div>';
-        html += '<table style="width:100%;font-size:11px;"><tbody>';
-        d1TmDown.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#dc2626;font-weight:500;">-${fmt(Math.abs(c.delta))}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
-        html += '</tbody></table>';
-      }
-      if (!d1TmUp.length && !d1TmDown.length) html += '<div style="font-size:11px;color:var(--dim);">No changes</div>';
-      html += '</div>';
-      html += '</div>';
-
-      // D1 New & Lost
-      if (d1SlaNew.length || d1TmNew.length || d1SlaLost.length || d1TmLost.length) {
-        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
-        // New clients
-        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #16a34a;">';
-        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#16a34a;">+ New Clients</div>';
-        const allNew = [...d1SlaNew, ...d1TmNew];
-        if (allNew.length) {
-          html += '<table style="width:100%;font-size:11px;"><tbody>';
-          allNew.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#16a34a;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${c.group}</td></tr>`);
-          html += '</tbody></table>';
-        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
+      // D8 product cards
+      d8Products.forEach(prod => {
+        const ups = d8UpByProd[prod] || [];
+        const downs = d8DownByProd[prod] || [];
+        if (!ups.length && !downs.length) return;
+        html += `<div class="chart-card" style="padding:12px;margin-bottom:10px;border-left:3px solid ${d8ProductColors[prod]};">`;
+        html += `<div style="font-weight:600;font-size:12px;margin-bottom:6px;">${d8ProductLabels[prod]}</div>`;
+        html += renderUpDown(ups, '#16a34a', '▲ Increased');
+        html += renderUpDown(downs, '#dc2626', '▼ Decreased');
         html += '</div>';
-        // Lost clients
-        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #dc2626;">';
-        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#dc2626;">− Lost / Cancelled</div>';
-        const allLost = [...d1SlaLost, ...d1TmLost];
-        if (allLost.length) {
-          html += '<table style="width:100%;font-size:11px;"><tbody>';
-          allLost.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#dc2626;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${c.group}</td></tr>`);
-          html += '</tbody></table>';
-        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
-        html += '</div>';
+      });
+
+      if (!d8.up.length && !d8.down.length) {
+        html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;"><div style="font-size:12px;color:var(--dim);">No existing client changes this period.</div></div>';
+      }
+
+      // D8 New clients
+      if (d8.new.length) {
+        html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;border-left:3px solid #16a34a;">';
+        html += renderNewLost(d8.new, '#16a34a', '+ New Clients', true);
         html += '</div>';
       }
 
-      html += '</div>';
-
-      // --- Division 8 Details ---
-      html += '<div style="margin-bottom:20px;">';
-      html += '<div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#f59e0b;">Division 8 — Changes</div>';
-
-      const d8ProductColors = { 'D8-A+': '#f59e0b', 'D8-Ess': '#10b981', 'D8-Pro': '#3b82f6', 'D8-Leg': '#ef4444' };
-      const d8ProductLabels = { 'D8-A+': 'A+ Animal', 'D8-Ess': 'Essentials', 'D8-Pro': 'IT Pro', 'D8-Leg': 'Legacy' };
-
-      // Group D8 changes by product
-      const d8UpByProd = {};
-      const d8DownByProd = {};
-      d8.up.forEach(c => { if (!d8UpByProd[c.group]) d8UpByProd[c.group] = []; d8UpByProd[c.group].push(c); });
-      d8.down.forEach(c => { if (!d8DownByProd[c.group]) d8DownByProd[c.group] = []; d8DownByProd[c.group].push(c); });
-
-      const d8Products = ['D8-A+', 'D8-Ess', 'D8-Pro', 'D8-Leg'];
-      const hasD8Changes = d8.up.length || d8.down.length;
-      if (hasD8Changes) {
-        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
-        d8Products.forEach(prod => {
-          const ups = d8UpByProd[prod] || [];
-          const downs = d8DownByProd[prod] || [];
-          if (!ups.length && !downs.length) return;
-          html += `<div class="chart-card" style="padding:12px;border-left:3px solid ${d8ProductColors[prod]};">`;
-          html += `<div style="font-weight:600;font-size:12px;margin-bottom:6px;">${d8ProductLabels[prod]}</div>`;
-          if (ups.length) {
-            html += '<div style="font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px;">▲ Increased</div>';
-            html += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
-            ups.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#16a34a;font-weight:500;">+${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
-            html += '</tbody></table>';
-          }
-          if (downs.length) {
-            html += '<div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:3px;">▼ Decreased</div>';
-            html += '<table style="width:100%;font-size:11px;"><tbody>';
-            downs.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#dc2626;font-weight:500;">-${fmt(Math.abs(c.delta))}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
-            html += '</tbody></table>';
-          }
-          html += '</div>';
-        });
-        html += '</div>';
-      } else {
-        html += '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">No existing client changes this period.</div>';
-      }
-
-      // D8 New & Lost
-      if (d8.new.length || d8.lost.length) {
-        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
-        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #16a34a;">';
-        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#16a34a;">+ New Clients</div>';
-        if (d8.new.length) {
-          html += '<table style="width:100%;font-size:11px;"><tbody>';
-          d8.new.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#16a34a;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${d8ProductLabels[c.group] || c.group}</td></tr>`);
-          html += '</tbody></table>';
-        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
-        html += '</div>';
-        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #dc2626;">';
-        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#dc2626;">− Lost / Cancelled</div>';
-        if (d8.lost.length) {
-          html += '<table style="width:100%;font-size:11px;"><tbody>';
-          d8.lost.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#dc2626;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${d8ProductLabels[c.group] || c.group}</td></tr>`);
-          html += '</tbody></table>';
-        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
-        html += '</div>';
+      // D8 Lost clients
+      if (d8.lost.length) {
+        html += '<div class="chart-card" style="padding:12px;margin-bottom:10px;border-left:3px solid #dc2626;">';
+        html += renderNewLost(d8.lost, '#dc2626', '− Lost / Cancelled', true);
         html += '</div>';
       }
 
-      html += '</div>';
+      html += '</div>'; // end D8 column
+      html += '</div>'; // end grid
 
       document.getElementById('mrrMovementContent').innerHTML = html;
     }
