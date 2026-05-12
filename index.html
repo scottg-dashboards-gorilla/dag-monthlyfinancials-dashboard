@@ -3643,191 +3643,323 @@
     // ── Client Revenue Movement View ──
     function renderClientRevView() {
       const el = document.getElementById('clientRevContent');
-      const M = CLIENT_REV_MONTHS;
-      const gt = CLIENT_REV_GRAND_TOTALS;
-      const fmt = v => v ? '$' + Math.round(v).toLocaleString() : '$0';
-      const fmtD = v => v ? '$' + Math.round(v).toLocaleString() : '—';
+      const M = MRR_MONTHS;
+      const fmt = v => v != null ? '$' + Math.round(v).toLocaleString() : '$0';
+      const fmtD = v => v ? (v > 0 ? '+$' : '-$') + Math.abs(Math.round(v)).toLocaleString() : '—';
       const pct = (a,b) => b ? ((a/b)*100).toFixed(1)+'%' : '—';
 
-      // MOM changes
-      let momChanges = [];
-      for (let i = 1; i < M.length; i++) {
-        momChanges.push({ month: M[i], cur: gt[i], prev: gt[i-1], delta: gt[i]-gt[i-1], pct: ((gt[i]-gt[i-1])/gt[i-1]*100) });
-      }
-
-      // New clients by month
-      let newByMonth = {};
-      CLIENT_REV_NEW.forEach(c => { if(!newByMonth[c.month]) newByMonth[c.month]={count:0,rev:0,clients:[]}; newByMonth[c.month].count++; newByMonth[c.month].rev+=c.firstRev; newByMonth[c.month].clients.push(c); });
-
-      // Lost clients by month
-      let lostByMonth = {};
-      CLIENT_REV_LOST.forEach(c => { if(!lostByMonth[c.month]) lostByMonth[c.month]={count:0,rev:0,clients:[]}; lostByMonth[c.month].count++; lostByMonth[c.month].rev+=c.lastRev; lostByMonth[c.month].clients.push(c); });
-
-      let html = '';
-
-      // ── KPI cards ──
-      const totalRev = gt.reduce((a,b)=>a+b,0);
-      const avgMonth = totalRev / M.length;
-      const latestRev = gt[gt.length-1];
-      const peakRev = Math.max(...gt);
-      const peakMonth = M[gt.indexOf(peakRev)];
-      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;">';
-      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Total Revenue (9 mo)</div><div style="font-size:22px;font-weight:700;color:var(--accent);">${fmt(totalRev)}</div></div>`;
-      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Monthly Average</div><div style="font-size:22px;font-weight:700;">${fmt(avgMonth)}</div></div>`;
-      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">New Clients Added</div><div style="font-size:22px;font-weight:700;color:#16a34a;">${CLIENT_REV_STATS.totalNew}</div></div>`;
-      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Clients Lost</div><div style="font-size:22px;font-weight:700;color:#dc2626;">${CLIENT_REV_STATS.totalLost}</div></div>`;
-      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Unique Clients</div><div style="font-size:22px;font-weight:700;">${CLIENT_REV_AGG.length}</div></div>`;
-      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Peak Month</div><div style="font-size:22px;font-weight:700;">${peakMonth}</div><div style="font-size:12px;color:var(--dim);">${fmt(peakRev)}</div></div>`;
+      // --- Summary cards ---
+      let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">';
+      html += `<div class="chart-card" style="padding:14px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Combined MRR (Latest)</div><div style="font-size:20px;font-weight:700;">${fmt(MRR_COMBINED[M.length-1])}</div></div>`;
+      html += `<div class="chart-card" style="padding:14px;text-align:center;"><div style="font-size:11px;color:var(--dim);">D1 SLA (Recurring)</div><div style="font-size:20px;font-weight:700;color:#6366f1;">${fmt(MRR_D1_SLA_TOTALS[M.length-1])}</div></div>`;
+      html += `<div class="chart-card" style="padding:14px;text-align:center;"><div style="font-size:11px;color:var(--dim);">D1 T&M</div><div style="font-size:20px;font-weight:700;color:#8b5cf6;">${fmt(MRR_D1_TM_TOTALS[M.length-1])}</div></div>`;
+      html += `<div class="chart-card" style="padding:14px;text-align:center;"><div style="font-size:11px;color:var(--dim);">D8 Total</div><div style="font-size:20px;font-weight:700;color:#f59e0b;">${fmt(MRR_D8_TOTALS[M.length-1])}</div></div>`;
+      html += `<div class="chart-card" style="padding:14px;text-align:center;"><div style="font-size:11px;color:var(--dim);">D1 Clients</div><div style="font-size:20px;font-weight:700;">${MRR_STATS.d1Clients}</div></div>`;
+      html += `<div class="chart-card" style="padding:14px;text-align:center;"><div style="font-size:11px;color:var(--dim);">D8 Clients</div><div style="font-size:20px;font-weight:700;">${MRR_STATS.d8Clients}</div></div>`;
       html += '</div>';
 
-      // ── Revenue Trend Chart ──
-      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Monthly Revenue Trend</div><canvas id="crTrendChart" height="80"></canvas></div>';
-
-      // ── MOM Change Table ──
-      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Month-over-Month Revenue Change</div>';
-      html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px;">';
-      html += '<tr style="border-bottom:2px solid var(--border);"><th style="text-align:left;padding:8px;">Month</th><th style="text-align:right;padding:8px;">Revenue</th><th style="text-align:right;padding:8px;">Change</th><th style="text-align:right;padding:8px;">%</th><th style="text-align:center;padding:8px;">New Clients</th><th style="text-align:center;padding:8px;">Lost Clients</th></tr>';
-      // First month (no change)
-      html += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;font-weight:600;">${M[0]}</td><td style="text-align:right;padding:8px;">${fmt(gt[0])}</td><td style="text-align:right;padding:8px;color:var(--dim);">—</td><td style="text-align:right;padding:8px;">—</td><td style="text-align:center;padding:8px;">—</td><td style="text-align:center;padding:8px;">${lostByMonth[0]?lostByMonth[0].count:'—'}</td></tr>`;
-      momChanges.forEach(m => {
-        const mi = M.indexOf(m.month);
-        const color = m.delta >= 0 ? '#16a34a' : '#dc2626';
-        const arrow = m.delta >= 0 ? '▲' : '▼';
-        const nb = newByMonth[mi] || {count:0};
-        const lb = lostByMonth[mi] || {count:0};
-        html += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;font-weight:600;">${m.month}</td><td style="text-align:right;padding:8px;">${fmt(m.cur)}</td><td style="text-align:right;padding:8px;color:${color};font-weight:600;">${arrow} ${fmt(Math.abs(m.delta))}</td><td style="text-align:right;padding:8px;color:${color};">${m.pct.toFixed(1)}%</td><td style="text-align:center;padding:8px;"><span style="color:#16a34a;font-weight:600;">${nb.count||'—'}</span></td><td style="text-align:center;padding:8px;"><span style="color:#dc2626;font-weight:600;">${lb.count||'—'}</span></td></tr>`;
-      });
-      html += '</table></div>';
-
-      // ── New Clients Waterfall ──
+      // --- Trend charts ---
       html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">';
-
-      // New clients
-      html += '<div class="chart-card" style="padding:20px;"><div class="chart-title" style="color:#16a34a;">▲ New Client Acquisitions</div>';
-      html += '<div style="max-height:500px;overflow-y:auto;margin-top:12px;">';
-      for (let mi = 1; mi < M.length; mi++) {
-        const nb = newByMonth[mi];
-        if (!nb) continue;
-        const sorted = nb.clients.sort((a,b) => b.firstRev - a.firstRev);
-        html += `<div style="margin-bottom:16px;"><div style="font-weight:600;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">${M[mi]} <span style="color:#16a34a;font-size:12px;">+${nb.count} clients, ${fmt(nb.rev)} initial revenue</span></div>`;
-        sorted.forEach(c => {
-          const stillActive = c.latestRev > 0;
-          const badge = stillActive ? '<span style="background:#dcfce7;color:#16a34a;font-size:10px;padding:1px 6px;border-radius:8px;margin-left:6px;">Active</span>' : '<span style="background:#fee2e2;color:#dc2626;font-size:10px;padding:1px 6px;border-radius:8px;margin-left:6px;">Churned</span>';
-          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;font-size:12px;"><span>${c.name}${badge}<span style="color:var(--dim);font-size:10px;margin-left:6px;">${c.divs.join(', ')}</span></span><span style="font-weight:600;">${fmt(c.firstRev)}</span></div>`;
-        });
-        html += '</div>';
-      }
-      html += '</div></div>';
-
-      // Lost clients
-      html += '<div class="chart-card" style="padding:20px;"><div class="chart-title" style="color:#dc2626;">▼ Lost / Cancelled Clients</div>';
-      html += '<div style="max-height:500px;overflow-y:auto;margin-top:12px;">';
-      for (let mi = 0; mi < M.length - 1; mi++) {
-        const lb = lostByMonth[mi];
-        if (!lb) continue;
-        const sorted = lb.clients.sort((a,b) => b.peakRev - a.peakRev);
-        html += `<div style="margin-bottom:16px;"><div style="font-weight:600;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">Last active: ${M[mi]} <span style="color:#dc2626;font-size:12px;">−${lb.count} clients, ${fmt(lb.rev)} last month rev</span></div>`;
-        sorted.forEach(c => {
-          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;font-size:12px;"><span>${c.name}<span style="color:var(--dim);font-size:10px;margin-left:6px;">${c.divs.join(', ')}</span></span><span style="font-weight:600;">peak ${fmt(c.peakRev)}</span></div>`;
-        });
-        html += '</div>';
-      }
-      html += '</div></div>';
+      html += '<div class="chart-card" style="padding:16px;"><div style="font-weight:600;margin-bottom:8px;">Combined MRR Trend</div><canvas id="mrrCombinedChart" height="180"></canvas></div>';
+      html += '<div class="chart-card" style="padding:16px;"><div style="font-weight:600;margin-bottom:8px;">D1: SLA vs T&M</div><canvas id="mrrD1SplitChart" height="180"></canvas></div>';
+      html += '<div class="chart-card" style="padding:16px;"><div style="font-weight:600;margin-bottom:8px;">D8 by Product Line</div><canvas id="mrrD8ProductChart" height="180"></canvas></div>';
+      html += '<div class="chart-card" style="padding:16px;"><div style="font-weight:600;margin-bottom:8px;">New vs Lost Clients</div><canvas id="mrrNewLostChart" height="180"></canvas></div>';
       html += '</div>';
 
-      // ── Top 40 Clients Table ──
-      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Top 40 Clients by Total Revenue</div>';
-      html += '<div style="overflow-x:auto;margin-top:12px;">';
-      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-      html += '<tr style="border-bottom:2px solid var(--border);background:var(--bg);"><th style="text-align:left;padding:6px;position:sticky;left:0;background:var(--bg);">#</th><th style="text-align:left;padding:6px;position:sticky;left:24px;background:var(--bg);">Client</th>';
-      M.forEach(m => html += `<th style="text-align:right;padding:6px;min-width:75px;">${m}</th>`);
-      html += '<th style="text-align:right;padding:6px;font-weight:700;">Total</th><th style="text-align:center;padding:6px;">Trend</th></tr>';
-      CLIENT_REV_TOP40.forEach((c, idx) => {
-        const vals = c.v;
-        const maxV = Math.max(...vals);
-        html += `<tr style="border-bottom:1px solid var(--border);${idx < 10 ? 'background:rgba(59,130,246,0.03);':''}"><td style="padding:6px;color:var(--dim);">${idx+1}</td><td style="padding:6px;font-weight:500;white-space:nowrap;">${c.name}<div style="font-size:10px;color:var(--dim);">${c.divs.join(', ')}</div></td>`;
-        vals.forEach(v => {
-          const bg = v === 0 ? 'background:rgba(220,38,38,0.05);' : (v === maxV ? 'background:rgba(22,163,74,0.08);' : '');
-          html += `<td style="text-align:right;padding:6px;${bg}">${v > 0 ? fmt(v) : '<span style="color:#ccc;">—</span>'}</td>`;
-        });
-        html += `<td style="text-align:right;padding:6px;font-weight:700;">${fmt(c.total)}</td>`;
-        // Sparkline trend indicator
-        const first = vals.find(v => v > 0) || 0;
-        const last = vals[vals.length-1];
-        const trend = last > first ? '📈' : last < first ? '📉' : '➡️';
-        html += `<td style="text-align:center;padding:6px;">${trend}</td></tr>`;
+      // --- Month-by-month movement selector ---
+      html += '<div style="margin-bottom:16px;">';
+      html += '<div style="font-weight:600;font-size:15px;margin-bottom:10px;">Monthly Revenue Movement</div>';
+      html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="mrrMonthBtns">';
+      MRR_D1_MOVEMENTS.forEach((mv, i) => {
+        html += `<button onclick="showMrrMovement(${i})" class="mrr-month-btn" id="mrrBtn${i}" style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:${i===MRR_D1_MOVEMENTS.length-1?'var(--accent)':'var(--card)'};color:${i===MRR_D1_MOVEMENTS.length-1?'#fff':'inherit'};cursor:pointer;font-size:12px;font-weight:500;">${mv.from} → ${mv.to}</button>`;
       });
-      html += '</table></div></div>';
-
-      // ── Division Breakdown ──
-      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Revenue by Division</div>';
-      html += '<div style="overflow-x:auto;margin-top:12px;">';
-      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-      html += '<tr style="border-bottom:2px solid var(--border);"><th style="text-align:left;padding:6px;">Division</th>';
-      M.forEach(m => html += `<th style="text-align:right;padding:6px;">${m}</th>`);
-      html += '<th style="text-align:right;padding:6px;font-weight:700;">Total</th></tr>';
-      const divNames = {'D1':'IT Support (On Demand)','D2':'IT Project Labor','D3':'Managed & Cloud','D3-TS3':'TS3 Income','D5-Mat':'Materials','D5-Mkp':'Markup','D5-NP':'Non-Project Materials','D5-Ship':'Shipping','D6':'CxO Consulting','D8-A+':'A+ Animal','D8-Ess':'Diamond Essentials','D8-Pro':'Diamond Pro','D8-Leg':'Diamond Legacy'};
-      Object.entries(CLIENT_REV_DIV_TOTALS).forEach(([key, vals]) => {
-        const total = vals.reduce((a,b)=>a+b,0);
-        html += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:6px;font-weight:500;">${divNames[key]||key}</td>`;
-        vals.forEach(v => html += `<td style="text-align:right;padding:6px;">${fmt(v)}</td>`);
-        html += `<td style="text-align:right;padding:6px;font-weight:700;">${fmt(total)}</td></tr>`;
-      });
-      // Grand total row
-      html += `<tr style="border-top:2px solid var(--border);font-weight:700;"><td style="padding:6px;">Grand Total</td>`;
-      gt.forEach(v => html += `<td style="text-align:right;padding:6px;">${fmt(v)}</td>`);
-      html += `<td style="text-align:right;padding:6px;">${fmt(totalRev)}</td></tr>`;
-      html += '</table></div></div>';
-
-      // ── New vs Lost Chart ──
-      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Client Additions vs. Losses by Month</div><canvas id="crNewLostChart" height="80"></canvas></div>';
+      html += '</div>';
+      html += '<div id="mrrMovementContent"></div>';
+      html += '</div>';
 
       el.innerHTML = html;
 
-      // ── Charts ──
-      // Revenue Trend
-      new Chart(document.getElementById('crTrendChart'), {
-        type: 'bar',
+      // --- Draw charts ---
+      const tickFmt = v => '$' + (v/1000).toFixed(0) + 'K';
+      const gridStyle = { color: 'rgba(0,0,0,0.05)' };
+
+      // Combined MRR trend
+      new Chart(document.getElementById('mrrCombinedChart'), {
+        type: 'line',
         data: {
           labels: M,
           datasets: [{
-            label: 'Revenue',
-            data: gt,
-            backgroundColor: gt.map((v,i) => i > 0 && v < gt[i-1] ? 'rgba(220,38,38,0.6)' : 'rgba(59,130,246,0.6)'),
-            borderRadius: 4
+            label: 'Combined MRR',
+            data: MRR_COMBINED,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            borderWidth: 2
           }]
         },
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
-          scales: {
-            y: { ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { grid: { display: false } }
-          }
+          scales: { y: { ticks: { callback: tickFmt }, grid: gridStyle }, x: { grid: { display: false } } }
         }
       });
 
-      // New vs Lost
-      const newCounts = M.map((m,i) => newByMonth[i] ? newByMonth[i].count : 0);
-      const lostCounts = M.map((m,i) => lostByMonth[i] ? -lostByMonth[i].count : 0);
-      new Chart(document.getElementById('crNewLostChart'), {
-        type: 'bar',
+      // D1 SLA vs T&M
+      new Chart(document.getElementById('mrrD1SplitChart'), {
+        type: 'line',
         data: {
           labels: M,
           datasets: [
-            { label: 'New Clients', data: newCounts, backgroundColor: 'rgba(22,163,74,0.6)', borderRadius: 4 },
-            { label: 'Lost Clients', data: lostCounts, backgroundColor: 'rgba(220,38,38,0.6)', borderRadius: 4 }
+            { label: 'SLA/Clarity (Recurring)', data: MRR_D1_SLA_TOTALS, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2 },
+            { label: 'T&M (On Demand)', data: MRR_D1_TM_TOTALS, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2 }
           ]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'top' } },
-          scales: {
-            y: { grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { grid: { display: false } }
-          }
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+          scales: { y: { ticks: { callback: tickFmt }, grid: gridStyle }, x: { grid: { display: false } } }
         }
       });
+
+      // D8 by product
+      const d8Colors = { 'D8-A+': '#f59e0b', 'D8-Ess': '#10b981', 'D8-Pro': '#3b82f6', 'D8-Leg': '#ef4444' };
+      const d8Labels = { 'D8-A+': 'A+ Animal', 'D8-Ess': 'Essentials', 'D8-Pro': 'IT Pro', 'D8-Leg': 'Legacy' };
+      new Chart(document.getElementById('mrrD8ProductChart'), {
+        type: 'line',
+        data: {
+          labels: M,
+          datasets: Object.entries(MRR_D8_PRODUCT_TOTALS).map(([key, vals]) => ({
+            label: d8Labels[key] || key,
+            data: vals,
+            borderColor: d8Colors[key] || '#666',
+            tension: 0.3,
+            pointRadius: 3,
+            borderWidth: 2,
+            fill: false
+          }))
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+          scales: { y: { ticks: { callback: tickFmt }, grid: gridStyle }, x: { grid: { display: false } } }
+        }
+      });
+
+      // New vs Lost
+      const d1NewCounts = MRR_D1_MOVEMENTS.map(mv => mv.new.length);
+      const d1LostCounts = MRR_D1_MOVEMENTS.map(mv => -mv.lost.length);
+      const d8NewCounts = MRR_D8_MOVEMENTS.map(mv => mv.new.length);
+      const d8LostCounts = MRR_D8_MOVEMENTS.map(mv => -mv.lost.length);
+      const transLabels = MRR_D1_MOVEMENTS.map(mv => mv.to);
+      new Chart(document.getElementById('mrrNewLostChart'), {
+        type: 'bar',
+        data: {
+          labels: transLabels,
+          datasets: [
+            { label: 'D1 New', data: d1NewCounts, backgroundColor: 'rgba(22,163,74,0.6)', borderRadius: 3 },
+            { label: 'D8 New', data: d8NewCounts, backgroundColor: 'rgba(22,163,74,0.3)', borderRadius: 3 },
+            { label: 'D1 Lost', data: d1LostCounts, backgroundColor: 'rgba(220,38,38,0.6)', borderRadius: 3 },
+            { label: 'D8 Lost', data: d8LostCounts, backgroundColor: 'rgba(220,38,38,0.3)', borderRadius: 3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+          scales: { y: { grid: gridStyle }, x: { grid: { display: false } } }
+        }
+      });
+
+      // Show latest movement by default
+      showMrrMovement(MRR_D1_MOVEMENTS.length - 1);
+    }
+
+    function showMrrMovement(idx) {
+      // Update button styling
+      document.querySelectorAll('.mrr-month-btn').forEach((btn, i) => {
+        btn.style.background = i === idx ? 'var(--accent)' : 'var(--card)';
+        btn.style.color = i === idx ? '#fff' : 'inherit';
+      });
+
+      const d1 = MRR_D1_MOVEMENTS[idx];
+      const d8 = MRR_D8_MOVEMENTS[idx];
+      const fmt = v => '$' + Math.round(Math.abs(v)).toLocaleString();
+      const fmtS = v => v > 0 ? '+$' + Math.round(v).toLocaleString() : '-$' + Math.round(Math.abs(v)).toLocaleString();
+
+      let html = '';
+
+      // --- Net change summary for this transition ---
+      const d1Net = d1.upTotal - Math.abs(d1.downTotal) + d1.newTotal - d1.lostTotal;
+      const d8Net = d8.upTotal - Math.abs(d8.downTotal) + d8.newTotal - d8.lostTotal;
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">';
+      html += `<div class="chart-card" style="padding:14px;"><div style="font-weight:600;margin-bottom:8px;">Division 1 Net Change</div>`;
+      html += `<div style="font-size:20px;font-weight:700;color:${d1Net>=0?'#16a34a':'#dc2626'};">${fmtS(d1Net)}</div>`;
+      html += `<div style="display:flex;gap:12px;margin-top:6px;font-size:12px;">`;
+      html += `<span style="color:#16a34a;">↑ ${fmt(d1.upTotal)}</span>`;
+      html += `<span style="color:#dc2626;">↓ ${fmt(Math.abs(d1.downTotal))}</span>`;
+      html += `<span style="color:#16a34a;">+New ${fmt(d1.newTotal)}</span>`;
+      html += `<span style="color:#dc2626;">-Lost ${fmt(d1.lostTotal)}</span>`;
+      html += `</div></div>`;
+
+      html += `<div class="chart-card" style="padding:14px;"><div style="font-weight:600;margin-bottom:8px;">Division 8 Net Change</div>`;
+      html += `<div style="font-size:20px;font-weight:700;color:${d8Net>=0?'#16a34a':'#dc2626'};">${fmtS(d8Net)}</div>`;
+      html += `<div style="display:flex;gap:12px;margin-top:6px;font-size:12px;">`;
+      html += `<span style="color:#16a34a;">↑ ${fmt(d8.upTotal)}</span>`;
+      html += `<span style="color:#dc2626;">↓ ${fmt(Math.abs(d8.downTotal))}</span>`;
+      html += `<span style="color:#16a34a;">+New ${fmt(d8.newTotal)}</span>`;
+      html += `<span style="color:#dc2626;">-Lost ${fmt(d8.lostTotal)}</span>`;
+      html += `</div></div>`;
+      html += '</div>';
+
+      // --- Division 1 Details ---
+      html += '<div style="margin-bottom:20px;">';
+      html += '<div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#6366f1;">Division 1 — Changes</div>';
+
+      // D1 SLA changes
+      const d1SlaUp = d1.up.filter(c => c.group === 'SLA');
+      const d1SlaDown = d1.down.filter(c => c.group === 'SLA');
+      const d1TmUp = d1.up.filter(c => c.group === 'T&M');
+      const d1TmDown = d1.down.filter(c => c.group === 'T&M');
+      const d1SlaNew = d1.new.filter(c => c.group === 'SLA');
+      const d1SlaLost = d1.lost.filter(c => c.group === 'SLA');
+      const d1TmNew = d1.new.filter(c => c.group === 'T&M');
+      const d1TmLost = d1.lost.filter(c => c.group === 'T&M');
+
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
+
+      // SLA Up/Down
+      html += '<div class="chart-card" style="padding:12px;">';
+      html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;">SLA / Clarity — Existing Changes</div>';
+      if (d1SlaUp.length) {
+        html += '<div style="font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px;">▲ Increased</div>';
+        html += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
+        d1SlaUp.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#16a34a;font-weight:500;">+${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
+        html += '</tbody></table>';
+      }
+      if (d1SlaDown.length) {
+        html += '<div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:3px;">▼ Decreased</div>';
+        html += '<table style="width:100%;font-size:11px;"><tbody>';
+        d1SlaDown.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#dc2626;font-weight:500;">-${fmt(Math.abs(c.delta))}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
+        html += '</tbody></table>';
+      }
+      if (!d1SlaUp.length && !d1SlaDown.length) html += '<div style="font-size:11px;color:var(--dim);">No changes</div>';
+      html += '</div>';
+
+      // T&M Up/Down
+      html += '<div class="chart-card" style="padding:12px;">';
+      html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;">T&M (On Demand) — Existing Changes</div>';
+      if (d1TmUp.length) {
+        html += '<div style="font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px;">▲ Increased</div>';
+        html += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
+        d1TmUp.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#16a34a;font-weight:500;">+${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
+        html += '</tbody></table>';
+      }
+      if (d1TmDown.length) {
+        html += '<div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:3px;">▼ Decreased</div>';
+        html += '<table style="width:100%;font-size:11px;"><tbody>';
+        d1TmDown.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#dc2626;font-weight:500;">-${fmt(Math.abs(c.delta))}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
+        html += '</tbody></table>';
+      }
+      if (!d1TmUp.length && !d1TmDown.length) html += '<div style="font-size:11px;color:var(--dim);">No changes</div>';
+      html += '</div>';
+      html += '</div>';
+
+      // D1 New & Lost
+      if (d1SlaNew.length || d1TmNew.length || d1SlaLost.length || d1TmLost.length) {
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
+        // New clients
+        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #16a34a;">';
+        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#16a34a;">+ New Clients</div>';
+        const allNew = [...d1SlaNew, ...d1TmNew];
+        if (allNew.length) {
+          html += '<table style="width:100%;font-size:11px;"><tbody>';
+          allNew.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#16a34a;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${c.group}</td></tr>`);
+          html += '</tbody></table>';
+        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
+        html += '</div>';
+        // Lost clients
+        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #dc2626;">';
+        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#dc2626;">− Lost / Cancelled</div>';
+        const allLost = [...d1SlaLost, ...d1TmLost];
+        if (allLost.length) {
+          html += '<table style="width:100%;font-size:11px;"><tbody>';
+          allLost.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#dc2626;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${c.group}</td></tr>`);
+          html += '</tbody></table>';
+        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
+        html += '</div>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+
+      // --- Division 8 Details ---
+      html += '<div style="margin-bottom:20px;">';
+      html += '<div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#f59e0b;">Division 8 — Changes</div>';
+
+      const d8ProductColors = { 'D8-A+': '#f59e0b', 'D8-Ess': '#10b981', 'D8-Pro': '#3b82f6', 'D8-Leg': '#ef4444' };
+      const d8ProductLabels = { 'D8-A+': 'A+ Animal', 'D8-Ess': 'Essentials', 'D8-Pro': 'IT Pro', 'D8-Leg': 'Legacy' };
+
+      // Group D8 changes by product
+      const d8UpByProd = {};
+      const d8DownByProd = {};
+      d8.up.forEach(c => { if (!d8UpByProd[c.group]) d8UpByProd[c.group] = []; d8UpByProd[c.group].push(c); });
+      d8.down.forEach(c => { if (!d8DownByProd[c.group]) d8DownByProd[c.group] = []; d8DownByProd[c.group].push(c); });
+
+      const d8Products = ['D8-A+', 'D8-Ess', 'D8-Pro', 'D8-Leg'];
+      const hasD8Changes = d8.up.length || d8.down.length;
+      if (hasD8Changes) {
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
+        d8Products.forEach(prod => {
+          const ups = d8UpByProd[prod] || [];
+          const downs = d8DownByProd[prod] || [];
+          if (!ups.length && !downs.length) return;
+          html += `<div class="chart-card" style="padding:12px;border-left:3px solid ${d8ProductColors[prod]};">`;
+          html += `<div style="font-weight:600;font-size:12px;margin-bottom:6px;">${d8ProductLabels[prod]}</div>`;
+          if (ups.length) {
+            html += '<div style="font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px;">▲ Increased</div>';
+            html += '<table style="width:100%;font-size:11px;margin-bottom:6px;"><tbody>';
+            ups.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#16a34a;font-weight:500;">+${fmt(c.delta)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
+            html += '</tbody></table>';
+          }
+          if (downs.length) {
+            html += '<div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:3px;">▼ Decreased</div>';
+            html += '<table style="width:100%;font-size:11px;"><tbody>';
+            downs.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;color:#dc2626;font-weight:500;">-${fmt(Math.abs(c.delta))}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${fmt(c.prev)} → ${fmt(c.cur)}</td></tr>`);
+            html += '</tbody></table>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">No existing client changes this period.</div>';
+      }
+
+      // D8 New & Lost
+      if (d8.new.length || d8.lost.length) {
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
+        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #16a34a;">';
+        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#16a34a;">+ New Clients</div>';
+        if (d8.new.length) {
+          html += '<table style="width:100%;font-size:11px;"><tbody>';
+          d8.new.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#16a34a;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${d8ProductLabels[c.group] || c.group}</td></tr>`);
+          html += '</tbody></table>';
+        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
+        html += '</div>';
+        html += '<div class="chart-card" style="padding:12px;border-left:3px solid #dc2626;">';
+        html += '<div style="font-weight:600;font-size:12px;margin-bottom:6px;color:#dc2626;">− Lost / Cancelled</div>';
+        if (d8.lost.length) {
+          html += '<table style="width:100%;font-size:11px;"><tbody>';
+          d8.lost.forEach(c => html += `<tr><td style="padding:2px 0;">${c.name}</td><td style="text-align:right;font-weight:500;color:#dc2626;">${fmt(c.rev)}</td><td style="text-align:right;color:var(--dim);font-size:10px;">${d8ProductLabels[c.group] || c.group}</td></tr>`);
+          html += '</tbody></table>';
+        } else { html += '<div style="font-size:11px;color:var(--dim);">None</div>'; }
+        html += '</div>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+
+      document.getElementById('mrrMovementContent').innerHTML = html;
     }
 
     document.addEventListener('keypress', function(e) {
