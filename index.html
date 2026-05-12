@@ -1240,6 +1240,7 @@
       <div class="nav-item" onclick="switchView('benchmarks')">Benchmarking</div>
       <div class="nav-item" onclick="switchView('seats')">Seat Tracking</div>
       <div class="nav-item" onclick="switchView('useraudit')">User Count Audit</div>
+      <div class="nav-item" onclick="switchView('clientrev')">Client Revenue</div>
       <div class="nav-item" onclick="switchView('import')">Import Data</div>
       <div style="padding: 24px 20px; border-top: 1px solid #374151; margin-top: 24px;">
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -1447,6 +1448,10 @@
         </div>
 
         <!-- Import Data View -->
+        <div class="view" id="clientrev">
+          <div id="clientRevContent"></div>
+        </div>
+
         <div class="view" id="import">
           <div class="chart-card">
             <div class="chart-title">Import Financial Data</div>
@@ -1543,7 +1548,7 @@
       const prev = viewHistory[viewHistory.length - 1];
       // Find and click the right nav item
       const navItems = document.querySelectorAll('.nav-item');
-      const viewOrder = ['dashboard','departments','grossprofit','pnl','intelligence','benchmarks','seats','useraudit','import'];
+      const viewOrder = ['dashboard','departments','grossprofit','pnl','intelligence','benchmarks','seats','useraudit','clientrev','import'];
       const idx = viewOrder.indexOf(prev);
       if (idx >= 0 && navItems[idx]) {
         navItems[idx].click();
@@ -1572,6 +1577,7 @@
         benchmarks: 'MSP Benchmarking — Top 7 Metrics',
         seats: 'A+ Animal Seat Tracking',
         useraudit: 'User Count Audit',
+        clientrev: 'Client Revenue Movement',
         import: 'Import Data'
       };
       document.getElementById('viewTitle').textContent = titles[viewName];
@@ -1584,6 +1590,7 @@
         benchmarks: 'Sub-$50M MSP benchmarks from Service Leadership Index, TruMethods, ScalePad 2025, and MSP M&A advisors',
         seats: 'Month-over-month seat counts and MRR for Div 8 products',
         useraudit: 'Autotask onboarding/offboarding tickets — reconcile against Setsail before billing',
+        clientrev: 'New clients, lost clients, and revenue changes — Jun 2025 to Feb 2026',
         import: 'Update financial data from external sources'
       }[viewName];
 
@@ -1595,6 +1602,7 @@
       else if (viewName === 'benchmarks') renderBenchmarkView();
       else if (viewName === 'seats') renderSeatsView();
       else if (viewName === 'useraudit') initUserAuditView();
+      else if (viewName === 'clientrev') renderClientRevView();
     }
 
     function getCurrentData() {
@@ -3630,6 +3638,196 @@
       a.href = url; a.download = 'user-count-audit.csv';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    // ── Client Revenue Movement View ──
+    function renderClientRevView() {
+      const el = document.getElementById('clientRevContent');
+      const M = CLIENT_REV_MONTHS;
+      const gt = CLIENT_REV_GRAND_TOTALS;
+      const fmt = v => v ? '$' + Math.round(v).toLocaleString() : '$0';
+      const fmtD = v => v ? '$' + Math.round(v).toLocaleString() : '—';
+      const pct = (a,b) => b ? ((a/b)*100).toFixed(1)+'%' : '—';
+
+      // MOM changes
+      let momChanges = [];
+      for (let i = 1; i < M.length; i++) {
+        momChanges.push({ month: M[i], cur: gt[i], prev: gt[i-1], delta: gt[i]-gt[i-1], pct: ((gt[i]-gt[i-1])/gt[i-1]*100) });
+      }
+
+      // New clients by month
+      let newByMonth = {};
+      CLIENT_REV_NEW.forEach(c => { if(!newByMonth[c.month]) newByMonth[c.month]={count:0,rev:0,clients:[]}; newByMonth[c.month].count++; newByMonth[c.month].rev+=c.firstRev; newByMonth[c.month].clients.push(c); });
+
+      // Lost clients by month
+      let lostByMonth = {};
+      CLIENT_REV_LOST.forEach(c => { if(!lostByMonth[c.month]) lostByMonth[c.month]={count:0,rev:0,clients:[]}; lostByMonth[c.month].count++; lostByMonth[c.month].rev+=c.lastRev; lostByMonth[c.month].clients.push(c); });
+
+      let html = '';
+
+      // ── KPI cards ──
+      const totalRev = gt.reduce((a,b)=>a+b,0);
+      const avgMonth = totalRev / M.length;
+      const latestRev = gt[gt.length-1];
+      const peakRev = Math.max(...gt);
+      const peakMonth = M[gt.indexOf(peakRev)];
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;">';
+      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Total Revenue (9 mo)</div><div style="font-size:22px;font-weight:700;color:var(--accent);">${fmt(totalRev)}</div></div>`;
+      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Monthly Average</div><div style="font-size:22px;font-weight:700;">${fmt(avgMonth)}</div></div>`;
+      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">New Clients Added</div><div style="font-size:22px;font-weight:700;color:#16a34a;">${CLIENT_REV_STATS.totalNew}</div></div>`;
+      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Clients Lost</div><div style="font-size:22px;font-weight:700;color:#dc2626;">${CLIENT_REV_STATS.totalLost}</div></div>`;
+      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Unique Clients</div><div style="font-size:22px;font-weight:700;">${CLIENT_REV_AGG.length}</div></div>`;
+      html += `<div class="chart-card" style="padding:16px;text-align:center;"><div style="font-size:11px;color:var(--dim);">Peak Month</div><div style="font-size:22px;font-weight:700;">${peakMonth}</div><div style="font-size:12px;color:var(--dim);">${fmt(peakRev)}</div></div>`;
+      html += '</div>';
+
+      // ── Revenue Trend Chart ──
+      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Monthly Revenue Trend</div><canvas id="crTrendChart" height="80"></canvas></div>';
+
+      // ── MOM Change Table ──
+      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Month-over-Month Revenue Change</div>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px;">';
+      html += '<tr style="border-bottom:2px solid var(--border);"><th style="text-align:left;padding:8px;">Month</th><th style="text-align:right;padding:8px;">Revenue</th><th style="text-align:right;padding:8px;">Change</th><th style="text-align:right;padding:8px;">%</th><th style="text-align:center;padding:8px;">New Clients</th><th style="text-align:center;padding:8px;">Lost Clients</th></tr>';
+      // First month (no change)
+      html += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;font-weight:600;">${M[0]}</td><td style="text-align:right;padding:8px;">${fmt(gt[0])}</td><td style="text-align:right;padding:8px;color:var(--dim);">—</td><td style="text-align:right;padding:8px;">—</td><td style="text-align:center;padding:8px;">—</td><td style="text-align:center;padding:8px;">${lostByMonth[0]?lostByMonth[0].count:'—'}</td></tr>`;
+      momChanges.forEach(m => {
+        const mi = M.indexOf(m.month);
+        const color = m.delta >= 0 ? '#16a34a' : '#dc2626';
+        const arrow = m.delta >= 0 ? '▲' : '▼';
+        const nb = newByMonth[mi] || {count:0};
+        const lb = lostByMonth[mi] || {count:0};
+        html += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;font-weight:600;">${m.month}</td><td style="text-align:right;padding:8px;">${fmt(m.cur)}</td><td style="text-align:right;padding:8px;color:${color};font-weight:600;">${arrow} ${fmt(Math.abs(m.delta))}</td><td style="text-align:right;padding:8px;color:${color};">${m.pct.toFixed(1)}%</td><td style="text-align:center;padding:8px;"><span style="color:#16a34a;font-weight:600;">${nb.count||'—'}</span></td><td style="text-align:center;padding:8px;"><span style="color:#dc2626;font-weight:600;">${lb.count||'—'}</span></td></tr>`;
+      });
+      html += '</table></div>';
+
+      // ── New Clients Waterfall ──
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">';
+
+      // New clients
+      html += '<div class="chart-card" style="padding:20px;"><div class="chart-title" style="color:#16a34a;">▲ New Client Acquisitions</div>';
+      html += '<div style="max-height:500px;overflow-y:auto;margin-top:12px;">';
+      for (let mi = 1; mi < M.length; mi++) {
+        const nb = newByMonth[mi];
+        if (!nb) continue;
+        const sorted = nb.clients.sort((a,b) => b.firstRev - a.firstRev);
+        html += `<div style="margin-bottom:16px;"><div style="font-weight:600;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">${M[mi]} <span style="color:#16a34a;font-size:12px;">+${nb.count} clients, ${fmt(nb.rev)} initial revenue</span></div>`;
+        sorted.forEach(c => {
+          const stillActive = c.latestRev > 0;
+          const badge = stillActive ? '<span style="background:#dcfce7;color:#16a34a;font-size:10px;padding:1px 6px;border-radius:8px;margin-left:6px;">Active</span>' : '<span style="background:#fee2e2;color:#dc2626;font-size:10px;padding:1px 6px;border-radius:8px;margin-left:6px;">Churned</span>';
+          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;font-size:12px;"><span>${c.name}${badge}<span style="color:var(--dim);font-size:10px;margin-left:6px;">${c.divs.join(', ')}</span></span><span style="font-weight:600;">${fmt(c.firstRev)}</span></div>`;
+        });
+        html += '</div>';
+      }
+      html += '</div></div>';
+
+      // Lost clients
+      html += '<div class="chart-card" style="padding:20px;"><div class="chart-title" style="color:#dc2626;">▼ Lost / Cancelled Clients</div>';
+      html += '<div style="max-height:500px;overflow-y:auto;margin-top:12px;">';
+      for (let mi = 0; mi < M.length - 1; mi++) {
+        const lb = lostByMonth[mi];
+        if (!lb) continue;
+        const sorted = lb.clients.sort((a,b) => b.peakRev - a.peakRev);
+        html += `<div style="margin-bottom:16px;"><div style="font-weight:600;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">Last active: ${M[mi]} <span style="color:#dc2626;font-size:12px;">−${lb.count} clients, ${fmt(lb.rev)} last month rev</span></div>`;
+        sorted.forEach(c => {
+          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;font-size:12px;"><span>${c.name}<span style="color:var(--dim);font-size:10px;margin-left:6px;">${c.divs.join(', ')}</span></span><span style="font-weight:600;">peak ${fmt(c.peakRev)}</span></div>`;
+        });
+        html += '</div>';
+      }
+      html += '</div></div>';
+      html += '</div>';
+
+      // ── Top 40 Clients Table ──
+      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Top 40 Clients by Total Revenue</div>';
+      html += '<div style="overflow-x:auto;margin-top:12px;">';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<tr style="border-bottom:2px solid var(--border);background:var(--bg);"><th style="text-align:left;padding:6px;position:sticky;left:0;background:var(--bg);">#</th><th style="text-align:left;padding:6px;position:sticky;left:24px;background:var(--bg);">Client</th>';
+      M.forEach(m => html += `<th style="text-align:right;padding:6px;min-width:75px;">${m}</th>`);
+      html += '<th style="text-align:right;padding:6px;font-weight:700;">Total</th><th style="text-align:center;padding:6px;">Trend</th></tr>';
+      CLIENT_REV_TOP40.forEach((c, idx) => {
+        const vals = c.v;
+        const maxV = Math.max(...vals);
+        html += `<tr style="border-bottom:1px solid var(--border);${idx < 10 ? 'background:rgba(59,130,246,0.03);':''}"><td style="padding:6px;color:var(--dim);">${idx+1}</td><td style="padding:6px;font-weight:500;white-space:nowrap;">${c.name}<div style="font-size:10px;color:var(--dim);">${c.divs.join(', ')}</div></td>`;
+        vals.forEach(v => {
+          const bg = v === 0 ? 'background:rgba(220,38,38,0.05);' : (v === maxV ? 'background:rgba(22,163,74,0.08);' : '');
+          html += `<td style="text-align:right;padding:6px;${bg}">${v > 0 ? fmt(v) : '<span style="color:#ccc;">—</span>'}</td>`;
+        });
+        html += `<td style="text-align:right;padding:6px;font-weight:700;">${fmt(c.total)}</td>`;
+        // Sparkline trend indicator
+        const first = vals.find(v => v > 0) || 0;
+        const last = vals[vals.length-1];
+        const trend = last > first ? '📈' : last < first ? '📉' : '➡️';
+        html += `<td style="text-align:center;padding:6px;">${trend}</td></tr>`;
+      });
+      html += '</table></div></div>';
+
+      // ── Division Breakdown ──
+      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Revenue by Division</div>';
+      html += '<div style="overflow-x:auto;margin-top:12px;">';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<tr style="border-bottom:2px solid var(--border);"><th style="text-align:left;padding:6px;">Division</th>';
+      M.forEach(m => html += `<th style="text-align:right;padding:6px;">${m}</th>`);
+      html += '<th style="text-align:right;padding:6px;font-weight:700;">Total</th></tr>';
+      const divNames = {'D1':'IT Support (On Demand)','D2':'IT Project Labor','D3':'Managed & Cloud','D3-TS3':'TS3 Income','D5-Mat':'Materials','D5-Mkp':'Markup','D5-NP':'Non-Project Materials','D5-Ship':'Shipping','D6':'CxO Consulting','D8-A+':'A+ Animal','D8-Ess':'Diamond Essentials','D8-Pro':'Diamond Pro','D8-Leg':'Diamond Legacy'};
+      Object.entries(CLIENT_REV_DIV_TOTALS).forEach(([key, vals]) => {
+        const total = vals.reduce((a,b)=>a+b,0);
+        html += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:6px;font-weight:500;">${divNames[key]||key}</td>`;
+        vals.forEach(v => html += `<td style="text-align:right;padding:6px;">${fmt(v)}</td>`);
+        html += `<td style="text-align:right;padding:6px;font-weight:700;">${fmt(total)}</td></tr>`;
+      });
+      // Grand total row
+      html += `<tr style="border-top:2px solid var(--border);font-weight:700;"><td style="padding:6px;">Grand Total</td>`;
+      gt.forEach(v => html += `<td style="text-align:right;padding:6px;">${fmt(v)}</td>`);
+      html += `<td style="text-align:right;padding:6px;">${fmt(totalRev)}</td></tr>`;
+      html += '</table></div></div>';
+
+      // ── New vs Lost Chart ──
+      html += '<div class="chart-card" style="padding:20px;margin-bottom:20px;"><div class="chart-title">Client Additions vs. Losses by Month</div><canvas id="crNewLostChart" height="80"></canvas></div>';
+
+      el.innerHTML = html;
+
+      // ── Charts ──
+      // Revenue Trend
+      new Chart(document.getElementById('crTrendChart'), {
+        type: 'bar',
+        data: {
+          labels: M,
+          datasets: [{
+            label: 'Revenue',
+            data: gt,
+            backgroundColor: gt.map((v,i) => i > 0 && v < gt[i-1] ? 'rgba(220,38,38,0.6)' : 'rgba(59,130,246,0.6)'),
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // New vs Lost
+      const newCounts = M.map((m,i) => newByMonth[i] ? newByMonth[i].count : 0);
+      const lostCounts = M.map((m,i) => lostByMonth[i] ? -lostByMonth[i].count : 0);
+      new Chart(document.getElementById('crNewLostChart'), {
+        type: 'bar',
+        data: {
+          labels: M,
+          datasets: [
+            { label: 'New Clients', data: newCounts, backgroundColor: 'rgba(22,163,74,0.6)', borderRadius: 4 },
+            { label: 'Lost Clients', data: lostCounts, backgroundColor: 'rgba(220,38,38,0.6)', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: {
+            y: { grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
     }
 
     document.addEventListener('keypress', function(e) {
