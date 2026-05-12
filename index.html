@@ -1538,6 +1538,17 @@
       else if (view === 'grossprofit') renderGrossProfitView();
       else if (view === 'pnl') renderPnLView();
       else if (view === 'intelligence') renderIntelligenceView();
+      else if (view === 'clientrev') {
+        // Map global month to nearest MRR movement transition
+        const selMonth = DATA[idx].month;
+        const mrrIdx = MRR_D1_MOVEMENTS.findIndex(mv => mv.to === selMonth);
+        if (mrrIdx >= 0) showMrrMovement(mrrIdx);
+        else {
+          // Try matching the 'from' of first movement or fall back to last
+          const fromIdx = MRR_D1_MOVEMENTS.findIndex(mv => mv.from === selMonth);
+          if (fromIdx >= 0) showMrrMovement(fromIdx);
+        }
+      }
     }
 
     var viewHistory = ['dashboard'];
