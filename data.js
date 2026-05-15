@@ -500,7 +500,7 @@ var DATA = [
       "d2": {"rev": 2557.85, "cogs": 7530.68, "gp": -4972.83, "gpM": -194.41},
       "d3": {"rev": 55803.96, "cogs": 44248.08, "gp": 11555.88, "gpM": 20.71},
       "d4": {"rev": 4851.31, "cogs": 0.0, "gp": 4851.31, "gpM": 100.0},
-      "d5": {"rev": 6532.0, "cogs": 9564.55, "gp": -3032.55, "gpM": -46.43},
+      "d5": {"rev": 6532.0, "cogs": 5334.4, "gp": 1197.6, "gpM": 18.33},
       "d6": {"rev": 6805.0, "cogs": 3017.4, "gp": 3787.6, "gpM": 55.66},
       "d8": {"rev": 123701.74, "cogs": 47918.33, "gp": 75783.41, "gpM": 61.26}
     },
@@ -508,20 +508,20 @@ var DATA = [
       "d2": {"cogsAllocatable": 6728.36, "cogsNonAllocatable": 802.32},
       "d5": {
         "revNonProject": 4136.0, "revProject": 2396.0, "revShipping": 0,
-        "cogsNonProject": 6142.35, "cogsProject": 3422.2, "cogsShipping": 0
+        "cogsNonProject": 3265.4, "cogsProject": 2069.0, "cogsShipping": 0
       },
       "d8": {"cogsCloud": 12525.82, "cogsLabor": 35392.51, "cogsResold": 0}
     },
     "unalloc": {"loh": 21213.18, "rd": 0},
     "totRev": 230940.25,
-    "totCogs": 146834.35,
-    "gp": 84105.9,
-    "gpM": 36.42,
+    "totCogs": 142604.2,
+    "gp": 88336.05,
+    "gpM": 38.25,
     "opex": 28456.91,
     "growth": 34050.14,
-    "ebitda": 21598.85,
-    "ebitdaM": 9.35,
-    "netIncome": 17048.99
+    "ebitda": 25829.0,
+    "ebitdaM": 11.18,
+    "netIncome": 19972.08
   }
 ];
 
