@@ -1,4 +1,4 @@
-// DAG Tech P&L Data — Last updated: February 2026
+// DAG Tech P&L Data — Last updated: March 2026
 // Cowork: When adding a new month, append a new month object to DATA and update related fields.
 // Do NOT modify the dashboard code (index.html). Only update this file.
 
@@ -522,37 +522,68 @@ var DATA = [
     "ebitda": 25829.0,
     "ebitdaM": 11.18,
     "netIncome": 19972.08
+  },
+  {
+    "month": "Mar 26",
+    "d": {
+      "d1": {"rev": 34972.78, "cogs": 13583.25, "gp": 21389.53, "gpM": 61.16},
+      "d2": {"rev": 4101.91, "cogs": 3584.70, "gp": 517.21, "gpM": 12.61},
+      "d3": {"rev": 48847.38, "cogs": 41186.35, "gp": 7661.03, "gpM": 15.68},
+      "d4": {"rev": 6437.79, "cogs": 0.0, "gp": 6437.79, "gpM": 100.0},
+      "d5": {"rev": 6238.87, "cogs": 5600.95, "gp": 637.92, "gpM": 10.22},
+      "d6": {"rev": 6830.0, "cogs": 2718.74, "gp": 4111.26, "gpM": 60.19},
+      "d8": {"rev": 122742.38, "cogs": 43647.31, "gp": 79095.07, "gpM": 64.44}
+    },
+    "detail": {
+      "d2": {"cogsAllocatable": 2802.27, "cogsNonAllocatable": 782.43},
+      "d5": {
+        "revNonProject": 4958.81, "revProject": 1144.06, "revShipping": 136.0,
+        "cogsNonProject": 5237.55, "cogsProject": 363.40, "cogsShipping": 0
+      },
+      "d8": {"cogsCloud": 12343.13, "cogsLabor": 31304.18, "cogsResold": 0}
+    },
+    "unalloc": {"loh": 28826.99, "rd": 0},
+    "totRev": 230171.11,
+    "totCogs": 139148.29,
+    "gp": 91022.82,
+    "gpM": 39.55,
+    "opex": 42314.51,
+    "growth": 31172.97,
+    "ebitda": 17535.34,
+    "ebitdaM": 7.62,
+    "netIncome": 16625.64
   }
 ];
 
-// Operating expense detail (last 4 months: Nov 25, Dec 25, Jan 26, Feb 26)
+// Operating expense detail (15 months: Jan 25 - Mar 26)
 var opxD = {
-  "Bank charges": [5470.68, 4432.79, 4912.70, 4890.52, 5145.89, 5186.21, 5354.33, 4446.31, 6740.63, 5151.06, 4876.79, 6830.99, 6501.52, 5456.56],
-  "Bonus": [0, 0, 0, 0, 0, 1500, 0, 0, 0, 0, 0, 0, 3000, 0],
-  "Commissions": [1019.70, 1019.70, 1019.70, 1019.70, 1019.70, 1019.70, 1340.10, 1340.10, 1340.10, 1340.10, 2683.18, 2683.18, 1663.48, 1663.48],
-  "Employee benefits": [26.50, 1206.89, 360.83, 26.50, 26.50, 550.75, 739.81, 26.50, 773.36, 546.24, 450.75, 751.98, 26.50, 628.70],
-  "Financial admin": [5648.19, 5767.25, 5714.91, 6964.37, 6056.43, 6824.27, 5623.06, 5769.86, 7187.42, 5380.60, 5512.10, 7293.31, 5900.36, 4957.88],
-  "HR": [1000, 1000, 1000, 1000, 1000, 1000, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400],
-  "Insurance": [990.80, 2321.32, 1065.75, 1234.22, 1234.23, 1234.24, 1833.01, 861.64, 861.61, 1743.16, 1156.64, 1156.64, 1156.64, 2780.99],
-  "Interest": [2769.32, 483.88, 483.88, 355.27, 322.07, 355.27, 342.65, 341.48, 351.66, 344, 344, 344, 0, 0],
-  "Legal & professional": [1828.21, 2630.88, 6588.45, 7284.52, 2128.78, 5005.41, 4368.51, 4164.71, 3644.68, 1117.90, 4419.27, 745.27, 5432.92, 802.32],
-  "Office space": [1514.58, 1382.58, 1382.58, 1382.58, 1382.58, 1382.58, 2104.87, 1382.58, 1382.58, 1419.36, 1419.36, 1419.36, 1419.36, 1419.36],
-  "Office admin": [1280, 0, 67.91, 0, 969.83, 126.92, 22.78, 0, 0, 249.28, 78.66, 0, 68.74, 1735.97],
-  "Operational services": [14591.31, 8897.64, 13091.83, 7053.71, 6453.25, 6949.92, 7719.20, 7253.46, 9175.66, 9646.48, 12487.45, 8549.35, 11542.41, 6811.23],
-  "QB payments": [814.47, 778.62, 1208.04, 538.59, 1142.58, 1970.04, 1373.40, 958.64, 2341.71, 424.82, 1436.64, 3701.03, 2134.80, 800.42],
-  "Taxes & licenses": [0, 0, 150, 0, 0, 0, 0, 0, 471, 0, 0, 0, 107.09, 0],
-  "Utilities": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35.30, 0]
+  "Bank charges": [5470.68, 4432.79, 4912.70, 4890.52, 5145.89, 5186.21, 5354.33, 4446.31, 6740.63, 5151.06, 4876.79, 6830.99, 6501.52, 5456.56, 5296.13],
+  "Bonus": [0, 0, 0, 0, 0, 1500, 0, 0, 0, 0, 0, 0, 3000, 0, 0],
+  "Commissions": [1019.70, 1019.70, 1019.70, 1019.70, 1019.70, 1019.70, 1340.10, 1340.10, 1340.10, 1340.10, 2683.18, 2683.18, 1663.48, 1663.48, 1663.48],
+  "Employee benefits": [26.50, 1206.89, 360.83, 26.50, 26.50, 550.75, 739.81, 26.50, 773.36, 546.24, 450.75, 751.98, 26.50, 628.70, 2037.47],
+  "Financial admin": [5648.19, 5767.25, 5714.91, 6964.37, 6056.43, 6824.27, 5623.06, 5769.86, 7187.42, 5380.60, 5512.10, 7293.31, 5900.36, 4957.88, 6839.95],
+  "Franchise fees": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 853.00],
+  "HR": [1000, 1000, 1000, 1000, 1000, 1000, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400],
+  "Insurance": [990.80, 2321.32, 1065.75, 1234.22, 1234.23, 1234.24, 1833.01, 861.64, 861.61, 1743.16, 1156.64, 1156.64, 1156.64, 2780.99, 1254.03],
+  "Interest": [2769.32, 483.88, 483.88, 355.27, 322.07, 355.27, 342.65, 341.48, 351.66, 344, 344, 344, 0, 0, 0],
+  "Legal & professional": [1828.21, 2630.88, 6588.45, 7284.52, 2128.78, 5005.41, 4368.51, 4164.71, 3644.68, 1117.90, 4419.27, 745.27, 5432.92, 802.32, 7333.43],
+  "Office space": [1514.58, 1382.58, 1382.58, 1382.58, 1382.58, 1382.58, 2104.87, 1382.58, 1382.58, 1419.36, 1419.36, 1419.36, 1419.36, 1419.36, 1676.05],
+  "Office admin": [1280, 0, 67.91, 0, 969.83, 126.92, 22.78, 0, 0, 249.28, 78.66, 0, 68.74, 1735.97, 1500.00],
+  "Operational services": [14591.31, 8897.64, 13091.83, 7053.71, 6453.25, 6949.92, 7719.20, 7253.46, 9175.66, 9646.48, 12487.45, 8549.35, 11542.41, 6811.23, 10807.61],
+  "QB payments": [814.47, 778.62, 1208.04, 538.59, 1142.58, 1970.04, 1373.40, 958.64, 2341.71, 424.82, 1436.64, 3701.03, 2134.80, 800.42, 1653.36],
+  "Taxes & licenses": [0, 0, 150, 0, 0, 0, 0, 0, 471, 0, 0, 0, 107.09, 0, 0],
+  "Utilities": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35.30, 0, 0]
 };
 
-// Growth expense detail (last 4 months)
+// Growth expense detail (15 months: Jan 25 - Mar 26)
 var grwD = {
-  "Advertising": [9493.20, 9535.45, 7377.62, 8003.66, 9308.34, 9132.08, 8598.63, 7866.67, 8504.89, 8691.72, 8525.22, 8376.05, 8979.83, 6730.53],
-  "Business advisory (COO)": [5554.50, 5644.13, 6020.20, 5696.38, 5565, 6011.20, 5802.13, 5802.88, 5741.03, 5399, 5452.69, 10621.85, 10483, 10403.10],
-  "Business development": [5133.16, 5104.64, 4995.66, 4990.54, 5735.80, 4990.54, 6390.54, 6390.54, 6390.54, 7135.82, 6390.54, 6390.54, 8224.33, 6587.98],
-  "Consulting": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  "Marketing": [2992.62, 4400.80, 2923.09, 2710.14, 6192.10, 4885.86, 5082.62, 2319.26, 5997.70, 5146.24, 4689.48, 4469.48, 4469.35, 3275.26],
-  "R&D": [-5033.43, 802.33, 781.03, 1065.27, 1117.91, 985.67, 745.27, 745.27, 745.27, 1117.90, 745.27, 745.27, 817.96, 802.32],
-  "Travel & business": [4486.29, 3405.37, 2022.98, 5711.24, 3980.01, 2066.46, 2774.48, 3577.08, 1836.11, 4607.19, 2116.82, 1553.53, 7747.69, 6250.95]
+  "Advertising": [9493.20, 9535.45, 7377.62, 8003.66, 9308.34, 9132.08, 8598.63, 7866.67, 8504.89, 8691.72, 8525.22, 8376.05, 8979.83, 6730.53, 3620.17],
+  "Business advisory (COO)": [5554.50, 5644.13, 6020.20, 5696.38, 5565, 6011.20, 5802.13, 5802.88, 5741.03, 5399, 5452.69, 10621.85, 10483, 10403.10, 10575.75],
+  "Business development": [5133.16, 5104.64, 4995.66, 4990.54, 5735.80, 4990.54, 6390.54, 6390.54, 6390.54, 7135.82, 6390.54, 6390.54, 8224.33, 6587.98, 8243.72],
+  "Consulting": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2468.47, 0, 3314.83],
+  "Marketing": [2992.62, 4400.80, 2923.09, 2710.14, 6192.10, 4885.86, 5082.62, 2319.26, 5997.70, 5146.24, 4689.48, 4469.48, 4469.35, 3275.26, 3513.37],
+  "R&D": [-5033.43, 802.33, 781.03, 1065.27, 1117.91, 985.67, 745.27, 745.27, 745.27, 1117.90, 745.27, 745.27, 817.96, 802.32, 782.43],
+  "Travel & business": [4486.29, 3405.37, 2022.98, 5711.24, 3980.01, 2066.46, 2774.48, 3577.08, 1836.11, 4607.19, 2116.82, 1553.53, 7747.69, 6250.95, 1122.70]
 };
 
 // Anomalies and flags
@@ -646,6 +677,23 @@ var ANOMALIES = {
     {"type": "adjustment", "category": "Margin", "description": "Div 3 Cloud GP% — 19.9% (target 60%)", "impact": 0, "dept": "d3", "action": "Evaluate bundling into platform pricing"},
     {"type": "adjustment", "category": "Revenue", "description": "Div 8 Resold services COGS $7,343", "impact": 7342.75, "dept": "d8", "action": "New resold services cost line"}
   ],
+  "Mar 26": [
+    {"type": "anomaly", "category": "Margin", "description": "Google Workspace cost increased due to Google price hike — DAG not notified in time, did not raise client pricing. Cost exceeded charge for 4 clients, creating loss on those accounts", "impact": -620, "dept": "d3", "action": "Adjust client pricing immediately to recover; build alerting for vendor price changes"},
+    {"type": "expense", "category": "OpEx", "description": "Advance Global charge in March (Operational Expense) — categorized under Operational Services", "impact": 2000, "dept": "opex", "action": "Confirm whether this is recurring or one-time"},
+    {"type": "expense", "category": "OpEx", "description": "Franchise fees paid in March 2026 — first occurrence in 15-month series", "impact": 853, "dept": "opex", "action": "Verify cadence (annual vs quarterly) for forecasting"},
+    {"type": "expense", "category": "OpEx", "description": "Anupama tax-prep fees paid in March 2026 for tax year 2025 — drove Legal & Professional Fees to $7,333 (vs $802 in Feb)", "impact": 5300, "dept": "opex", "action": "Annual tax prep — non-recurring"},
+    {"type": "anomaly", "category": "COGS", "description": "FLWSTF01 — employee/contractor logged time against client project, but project was never invoiced and was ultimately scrapped. ~$350 loss in Div 2", "impact": -350, "dept": "d2", "action": "Review timesheet approval process; tighten project intake gating"},
+    {"type": "adjustment", "category": "OpEx", "description": "P&L Total Expenses line ($73,487.48) does not reconcile to sum of expense line items ($71,332.48) — $2,155 gap absorbed into Operational Services to balance to stated total (likely includes Advance Global $2,000 + adjustments)", "impact": 2155, "dept": "opex", "action": "Ask accounting to reconcile expense line items to total; verify what makes up the $2,155 delta"},
+    {"type": "anomaly", "category": "Revenue", "description": "Div 1 IT Support revenue recovered to $34,973 (+$4,284 vs Feb) — partial reversal of February on-demand decline", "impact": 4284.39, "dept": "d1", "action": "Monitor on-demand stability"},
+    {"type": "anomaly", "category": "Revenue", "description": "Div 5 Materials revenue collapsed to $6,239 (-$293 vs Feb, -$25K vs Jan) — lowest in 12 months. Project Materials at only $386", "impact": -25393, "dept": "d5", "action": "Investigate whether project pipeline has stalled or simply timing"},
+    {"type": "anomaly", "category": "COGS", "description": "Div 1 Labor Cost recorded as negative $3,915 (reimbursement/credit) — Div 1 GP% jumped to 61.2% (vs 56.5% Feb)", "impact": -3915.38, "dept": "d1", "action": "Verify the credit entry; ensure it isn't an accounting error masking actual labor"},
+    {"type": "anomaly", "category": "Margin", "description": "Div 3 Cloud GP% at 15.7% — lowest of any month in 15-month series (target 25%, top quartile 35%)", "impact": 0, "dept": "d3", "action": "Adobe/Google/Microsoft renewal cost growth eroding pass-through margin; revisit cloud pricing strategy"},
+    {"type": "anomaly", "category": "OpEx", "description": "Travel & Business Meetings collapsed to $1,123 (from $6,251 in Feb and $7,748 in Jan) — return to normalized baseline", "impact": -5128.25, "dept": "growth", "action": "Confirm LACC launch travel is fully expensed"},
+    {"type": "anomaly", "category": "OpEx", "description": "Advertising dropped 46% to $3,620 (from $6,731 in Feb)", "impact": -3110.36, "dept": "growth", "action": "Confirm intentional reduction vs timing"},
+    {"type": "expense", "category": "OpEx", "description": "Office/General Admin at $1,500 (Feb was $1,736) — ELA Ruga Microsourcing contractor cost now permanent category", "impact": 1500, "dept": "opex", "action": "Ongoing — confirmed as standard category going forward"},
+    {"type": "anomaly", "category": "Revenue", "description": "A+ Animal seats dropped to 699 (-21 from Feb), MRR $103,543 — Div 8 revenue fell $959 to $122,742", "impact": -3280.20, "dept": "d8", "action": "Monitor A+ Animal seat erosion — 3rd consecutive monthly decline (724→716→699)"},
+    {"type": "anomaly", "category": "COGS", "description": "Labor overhead (R&D COGS) rose to $28,827 (from $21,213 Feb, $25,017 Jan) — highest in 15-month series. Microsourcing/internal time logging elevated", "impact": 7613.81, "dept": "unalloc", "action": "Review what drove the increase; recurring tech overhead has been ~$17K-$25K range"}
+  ],
   "Feb 26": [
     {"type": "anomaly", "category": "Revenue", "description": "Some clients reduced On Demand hours — Div 1 revenue decline of ~$4,754", "impact": -4754.11, "dept": "d1", "action": "Monitor client on-demand usage trends"},
     {"type": "anomaly", "category": "COGS", "description": "VRLVRY01-Boston 154 Newbury — labor costs recorded but revenue already recognized in 2025. Hours overran, cannot alter prior-year revenue (books closed, tax returns filed)", "impact": -2634.75, "dept": "d2", "action": "Loss recognized in D2; prior-year books are closed"},
@@ -663,6 +711,19 @@ var ANOMALIES = {
 
 // Flagged Items — color-coded action/monitor cards per month
 var FLAGS = {
+  "Mar 26": [
+    {"status":"action","title":"Google Workspace margin loss — 4 clients underwater","desc":"Google raised prices but DAG was not notified in time. Did not pass through to clients. Cost exceeded charge on 4 accounts (~$620 negative margin). Cloud GP% fell to 15.7% — lowest of 15-month series.","next":"Raise client pricing immediately; build vendor price-change alerting; review all Google Workspace accounts","dept":"Margin / D3"},
+    {"status":"action","title":"P&L total does not reconcile to line items — $2,155 gap","desc":"P&L Total for Expenses line shows $73,487.48 but sum of individual line items is $71,332.48. Gap absorbed into Operational Services to keep totals balanced. Likely includes the $2,000 Advance Global charge mentioned in remarks.","next":"Ask accounting to identify what makes up the $2,155 delta and re-issue the P&L with reconciling figures","dept":"OPEX / Reconciliation"},
+    {"status":"action","title":"Div 1 Labor Cost recorded as -$3,915 — verify credit","desc":"Division 1 Labor Cost shows as a negative $3,915 (reimbursement/credit). This pushed Div 1 GP% up to 61.2% (vs 56.5% in Feb). Without the credit, D1 margin would be materially lower.","next":"Confirm what the credit represents (timesheet correction? Reimbursement? Misallocation?) and ensure it isn't masking actual labor","dept":"COGS / D1"},
+    {"status":"monitor","title":"A+ Animal seat erosion — 3rd consecutive monthly decline","desc":"724 (Jan) → 716 (Feb) → 699 (Mar). $4,291 of MRR lost over 60 days. Div 8 revenue down $959 MoM to $122,742.","next":"Identify which clients downsized; check if pattern continues into April","dept":"Revenue / D8"},
+    {"status":"monitor","title":"Div 5 Materials at $6,239 — near 12-month low","desc":"Project Materials revenue only $386. Down from $9,443 in Feb and $31,632 in Jan. Suggests project pipeline stalled or pure timing.","next":"Check open project quotes and Q2 pipeline","dept":"Revenue / D5"},
+    {"status":"monitor","title":"Labor overhead spiked to $28,827 — highest of 15 months","desc":"Up from $21,213 in Feb and $25,017 in Jan. Tech overhead has historically been in the $17K-$25K range. Microsourcing internal time logging elevated.","next":"Review Microsourcing time allocations; identify if any can be billed to clients","dept":"COGS / UNALLOC"},
+    {"status":"resolved","title":"Anupama tax-prep fees — annual one-time $5,300","desc":"Legal & Professional Fees jumped to $7,333 (vs $802 in Feb) because Anupama tax-return prep fee for 2025 hit in March. Confirmed as annual one-time.","next":"Resolved — annual recurring (expect again around same time in 2027)","dept":"OPEX / Legal"},
+    {"status":"resolved","title":"Travel returned to baseline — $1,123 vs $7,748 Jan","desc":"Confirms January travel spike was tied to Dan/Kristin LA Country Club launch trip. February remained elevated at $6,251 then normalized in March.","next":"Resolved — baseline behavior restored","dept":"Growth / OPEX"},
+    {"status":"resolved","title":"FLWSTF01 scrapped project — $350 loss accepted","desc":"Employee/contractor logged time against FLWSTF01 project. Project was never invoiced and was ultimately scrapped, creating ~$350 loss in Div 2.","next":"Resolved — sunk cost. Reinforce project intake gating with team","dept":"COGS / D2"},
+    {"status":"monitor","title":"Franchise fees ($853) — first occurrence in 15 months","desc":"New line item on the P&L. Need to determine if this is annual or quarterly for forecasting.","next":"Confirm cadence with accounting","dept":"OPEX"},
+    {"status":"monitor","title":"EBITDA margin compressed to 7.6%","desc":"Below 8% for the first time since May 2025. Driven by D3 cloud margin compression + elevated labor overhead + one-time tax-prep. Normalized for tax-prep ($5,300) and gap reconciliation ($2,155), EBITDA would be ~10.9%.","next":"Track for two more months before declaring a trend","dept":"EBITDA"}
+  ],
   "Feb 26": [
     {"status":"action","title":"VRLVRY01-Boston labor overrun — no revenue recognition possible","desc":"Labor costs recorded but revenue was already recognized in 2025. Books are closed and tax returns filed — cannot alter prior-year revenue. $2,635 loss in D2.","next":"Accept as sunk cost; tighten project hour estimates going forward","dept":"COGS / D2"},
     {"status":"resolved","title":"$3K unbilled labor — pre-project hours & minor misallocations","desc":"Most hours were pre-approval project acquisition work (not billable if project not secured). Minor misallocations by Virgilio Tamayo, Gil (Paul) Abrenica, and Avinash Kumar — minimal impact. Hours reviewed by Gregory.","next":"Resolved — Scott will also review TSheets for April and provide feedback to Gregory going forward","dept":"COGS / D2"},
@@ -732,6 +793,7 @@ var FLAGS = {
 };
 
 var FLAG_SUMMARY = {
+  "Mar 26": "Revenue at $230K, essentially flat vs Feb (-0.3%). GP margin 39.5%. EBITDA compressed to 7.6% — below 8% for first time since May 2025. Three structural pressures: (1) Google Workspace cost increase on 4 clients not passed through — Div 3 Cloud GP% fell to 15.7%, lowest of 15-month series; (2) Labor overhead spiked to $28,827 — highest of 15-month series; (3) Anupama tax-prep ($5,300) plus a $2,155 unreconciled gap inflated OpEx. Normalized for tax-prep and the gap, EBITDA would be ~10.9%. A+ Animal seats declined for 3rd straight month (724→716→699). Travel returned to baseline confirming Jan LACC trip was the spike. Div 1 Labor Cost recorded as -$3,915 (a credit) — needs verification. New: Franchise fees line item ($853) appeared for first time. FLWSTF01 scrapped project — $350 sunk cost.",
   "Feb 26": "Revenue at $231K, down 10% from Jan. Client on-demand reductions drove Div 1 down ~$4.8K. Div 2: VRLVRY01-Boston labor overrun ($2.6K sunk — prior-year books closed); $3K unbilled labor resolved (mostly pre-project acquisition hours, minor misallocations by 3 employees — minimal impact). Cloud: HMCBLD01 was one-time income, MLWGRP01 was Adobe annual renewal — neither recurring. WHIDCA01-CxO overage confirmed one-time. $6.1K material purchases being invoiced by Stanley (in progress). New action: build MoM project P&L report to track actual vs allocated hours across all projects. ELA Ruga permanently reclassified to Office/General Admin. Travel remains elevated.",
   "Jan 26": "Revenue at $256K grew 24% YoY. GP margin at 40.2%. Net margin at 7.7% compressed by expense anomalies. A+ Animal/Diamond at $125K represents 49% of revenue. Normalize for the R&D COGS reclassification and GP would be 50.3%.",
   "Dec 25": "Revenue at $278K — record month. GP margin 40.1%. D8 Security Platform at $125K is 45% of revenue. D5 Materials had massive $65K spike. D2 continued negative margins.",
@@ -891,6 +953,8 @@ var CLIENT_DATA = [
 ];
 
 // === MRR CLIENT MOVEMENT DATA (D1 + D8, Jun 25 - Feb 26) ===
+// NOTE: Mar 26 P&L was loaded but client-level Mar 26 MRR movement data was not provided with this upload.
+// MRR Client Movement view continues to show through Feb 26 until the next client-level export is supplied.
 const MRR_MONTHS = ["Jun 25", "Jul 25", "Aug 25", "Sep 25", "Oct 25", "Nov 25", "Dec 25", "Jan 26", "Feb 26"];
 const MRR_D1_SLA_TOTALS = [30491.5, 32959, 28931.98, 27234, 19733.5, 18191, 17249, 17252.5, 15565];
 const MRR_D1_TM_TOTALS = [11005.0, 8259.08, 11034.77, 9670.97, 11353.18, 13045.0, 19847.19, 16222.5, 15123.39];
