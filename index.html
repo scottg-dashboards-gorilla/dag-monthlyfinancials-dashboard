@@ -3398,14 +3398,121 @@
        Pulled 2026-05-01 (Jan-Apr), 2026-05-29 (May) from setsail.today/api/data/tickets/all */
     const SETSAIL_MATCHED = new Set(["T20260430.0046","T20260429.0046","T20260429.0028","T20260427.0140","T20260422.0042","T20260417.0045","T20260416.0064","T20260415.0118","T20260415.0117","T20260413.0067","T20260413.0066","T20260413.0053","T20260408.0030","T20260403.0039","T20260403.0038","T20260403.0037","T20260401.0070","T20260401.0069","T20260325.0071","T20260325.0070","T20260325.0060","T20260323.0053","T20260323.0033","T20260320.0078","T20260320.0077","T20260318.0047","T20260318.0042","T20260317.0025","T20260316.0052","T20260313.0043","T20260310.0059","T20260306.0011","T20260302.0025","T20260227.0042","T20260227.0021","T20260227.0014","T20260226.0056","T20260226.0016","T20260226.0014","T20260223.0039","T20260223.0033","T20260221.0004","T20260219.0061","T20260219.0060","T20260213.0033","T20260213.0030","T20260209.0036","T20260209.0033","T20260206.0042","T20260206.0040","T20260206.0039","T20260205.0035","T20260205.0026","T20260205.0025","T20260204.0053","T20260203.0044","T20260202.0057","T20260202.0054","T20260130.0039","T20260130.0016","T20260127.0024","T20260123.0081","T20260123.0080","T20260123.0078","T20260123.0077","T20260123.0076","T20260123.0075","T20260123.0074","T20260123.0072","T20260122.0038","T20260113.0060","T20260113.0051","T20260109.0044","T20260102.0033","T20260102.0031","T20260501.0174","T20260504.0074","T20260504.0091","T20260505.0030","T20260505.0046","T20260505.0068","T20260506.0042","T20260506.0059","T20260506.0060","T20260506.0061","T20260508.0044","T20260511.0074","T20260512.0001","T20260512.0002","T20260512.0003","T20260515.0044","T20260519.0028","T20260519.0031","T20260519.0036","T20260520.0022","T20260522.0038","T20260526.0029","T20260526.0038","T20260526.0039","T20260527.0029","T20260527.0036","T20260527.0049","T20260528.0050"]);
 
+    /* Resolution notes — categorization for every "missing from SetSail" ticket.
+       Audit completed 2026-06-02. Categories:
+         SS  = Added to SetSail (resolved)
+         ODA = On-demand/ad-hoc client, no per-seat billing, no SetSail entry needed
+         MRG = Merged duplicate of an existing ticket
+         TSH = Troubleshooting/advisory ticket, not a true onboard/offboard
+         KCA = Keycard access ticket, not a user onboard/offboard
+         3PY = Third-party tenant or external firm, not in SLA
+         MON = Monday.com supervisor list update, not a user onboard
+         SPT = SharePoint guest access, not a user onboard
+         DUP = Already in SetSail under original ticket
+         GEN = General IT services termination, not per-user offboard
+         PRJ = Project-level onboarding (new client), not per-user
+    */
+    const AUDIT_RESOLUTION_NOTES = {
+      "T20260305.0032": "ODA — On-demand client, no per-seat billing",
+      "T20260403.0031": "ODA — On-demand client, no per-seat billing",
+      "T20260223.0018": "ODA — On-demand client, no per-seat billing",
+      "T20260518.0068": "SS — Added to SetSail",
+      "T20260505.0032": "SS — Added to SetSail",
+      "T20260421.0006": "SS — Added to SetSail",
+      "T20260420.0047": "SS — Added to SetSail",
+      "T20260420.0046": "SS — Added to SetSail",
+      "T20260413.0060": "SS — Added to SetSail",
+      "T20260413.0059": "SS — Added to SetSail",
+      "T20260302.0040": "SS — Added to SetSail",
+      "T20260302.0013": "SS — Added to SetSail",
+      "T20260227.0027": "SS — Added to SetSail",
+      "T20260203.0057": "SS — Added to SetSail",
+      "T20260221.0016": "SS — Added to SetSail",
+      "T20260427.0044": "SS — Added to SetSail",
+      "T20260417.0046": "SS — Added to SetSail",
+      "T20260526.0041": "SS — Added to SetSail",
+      "T20260111.0007": "SS — Added to SetSail",
+      "T20260305.0026": "SS — Added to SetSail",
+      "T20260330.0033": "SS — Added to SetSail",
+      "T20260330.0072": "SS — Added to SetSail",
+      "T20260223.0040": "SS — Added to SetSail",
+      "T20260220.0023": "SS — Added to SetSail",
+      "T20260212.0013": "SS — Added to SetSail",
+      "T20260421.0037": "SS — Added to SetSail",
+      "T20260413.0068": "SS — Added to SetSail",
+      "T20260122.0039": "SS — Added to SetSail",
+      "T20260513.0077": "SS — Added to SetSail",
+      "T20260528.0020": "SS — Added to SetSail",
+      "T20260527.0067": "SS — Added to SetSail",
+      "T20260519.0063": "SS — Added to SetSail",
+      "T20260519.0059": "SS — Added to SetSail",
+      "T20260427.0017": "SS — Added to SetSail",
+      "T20260314.0006": "SS — Added to SetSail",
+      "T20260306.0019": "SS — Added to SetSail",
+      "T20260114.0016": "SS — Added to SetSail",
+      "T20260109.0025": "SS — Added to SetSail",
+      "T20260406.0051": "SS — Added to SetSail",
+      "T20260126.0088": "SS — Added to SetSail",
+      "T20260514.0043": "SS — Added to SetSail",
+      "T20260210.0029": "SS — Added to SetSail",
+      "T20260102.0034": "SS — Added to SetSail",
+      "T20260429.0025": "SS — Added to SetSail",
+      "T20260413.0078": "SS — Added to SetSail",
+      "T20260317.0027": "SS — Added to SetSail",
+      "T20260224.0034": "SS — Added to SetSail",
+      "T20260217.0040": "SS — Added to SetSail",
+      "T20260128.0031": "SS — Added to SetSail",
+      "T20260120.0064": "SS — Added to SetSail",
+      "T20260522.0024": "SS — Added to SetSail",
+      "T20260522.0020": "SS — Added to SetSail",
+      "T20260522.0018": "SS — Added to SetSail",
+      "T20260309.0019": "SS — Added to SetSail",
+      "T20260428.0052": "SS — Added to SetSail",
+      "T20260112.0049": "SS — Added to SetSail",
+      "T20260110.0009": "SS — Added to SetSail",
+      "T20260104.0018": "SS — Added to SetSail",
+      "T20260519.0030": "SS — Added to SetSail",
+      "T20260415.0110": "SS — Added to SetSail",
+      "T20260515.0050": "SS — Added to SetSail",
+      "T20260501.0101": "SS — Added to SetSail",
+      "T20260323.0023": "TSH — Troubleshooting (Outlook/iPhone sync), not onboarding. User already in SetSail",
+      "T20260316.0042": "MRG — Merged into original machine setup ticket, not a standalone onboard",
+      "T20260412.0015": "PRJ — Project-level client onboarding (A+ Animal), not per-user",
+      "T20260213.0001": "MRG — Merged group onboarding ticket, handled under original",
+      "T20260114.0074": "GEN — IT services termination notice, not per-user offboard",
+      "T20260114.0018": "GEN — IT services termination notice, not per-user offboard",
+      "T20260507.0056": "KCA — Keycard access activation, not user onboard",
+      "T20260218.0037": "KCA — Keycard access activation, not user onboard",
+      "T20260206.0055": "KCA — New hire keycard access, not user onboard",
+      "T20260317.0055": "MRG — Call about access termination, merged/handled elsewhere",
+      "T20260116.0043": "MON — Monday.com supervisor list update, not user onboard",
+      "T20260113.0078": "MON — Monday.com supervisor list update, not user onboard",
+      "T20260215.0012": "MRG — Laptop setup for new hires, merged into original onboard tickets",
+      "T20260526.0085": "TSH — Laptop reimaging for new user, SetSail entry exists under original onboard",
+      "T20260304.0047": "SPT — SharePoint guest access for external users, not user onboard",
+      "T20260210.0040": "SPT — SharePoint user/group access for external guests, not user onboard",
+      "T20260505.0047": "MRG — Merged reply to SetSail offboard notification",
+      "T20260316.0060": "3PY — Third-party accounting firm offboard, not in SLA, not in SetSail",
+      "T20260312.0043": "TSH — Tucker Malsch was subsequently offboarded, no SetSail adjustment needed",
+      "T20260501.0178": "MRG — Out-of-office reply to SetSail notification, merged into original",
+      "T20260421.0087": "MRG — Merged into original onboarding ticket",
+      "T20260227.0040": "MRG — Combined onboarding/offboarding ticket, handled under individual SetSail entries",
+      "T20260107.0070": "TSH — Laptop setup for new hire, onboarding handled via separate SetSail ticket",
+      "T20260106.0037": "TSH — eCW training curriculum, not a user onboard"
+    };
+
     /* Resolved-tickets persistence — checkboxes the user has marked as
-       reconciled in SetSail. Stored in localStorage under the dashboard origin. */
+       reconciled in SetSail. Stored in localStorage under the dashboard origin.
+       Now pre-seeded with all tickets from the completed audit (2026-06-02). */
     const AUDIT_RESOLVED_KEY = 'dag_audit_resolved_v1';
+    const AUDIT_PRESEED = new Set(Object.keys(AUDIT_RESOLUTION_NOTES));
     function loadResolvedSet() {
       try {
         const raw = localStorage.getItem(AUDIT_RESOLVED_KEY);
-        return new Set(raw ? JSON.parse(raw) : []);
-      } catch (e) { return new Set(); }
+        const manual = new Set(raw ? JSON.parse(raw) : []);
+        AUDIT_PRESEED.forEach(tk => manual.add(tk));
+        return manual;
+      } catch (e) { return new Set(AUDIT_PRESEED); }
     }
     function saveResolvedSet(set) {
       try { localStorage.setItem(AUDIT_RESOLVED_KEY, JSON.stringify(Array.from(set))); }
@@ -3597,6 +3704,7 @@
         th('s', 'Status', false) +
         th('tk', 'Ticket', false) +
         th('tt', 'Title', true) +
+        '<th style="text-align:left;">Resolution</th>' +
         '</tr></thead><tbody>';
       data.forEach(t => {
         const queueClass = t.q === 'Setsail' ? 'badge-setsail' : t.q === 'Helpdesk' ? 'badge-helpdesk' : t.q === 'Merged' ? 'badge-merged' : 'badge-internal';
@@ -3620,6 +3728,7 @@
               (isResolved ? 'checked' : '') +
               ' title="Mark as reconciled in SetSail" ' +
               'onchange="toggleAuditResolved(\'' + t.tk + '\', this.checked)" /></td>';
+        const resNote = AUDIT_RESOLUTION_NOTES[t.tk] || (SETSAIL_MATCHED.has(t.tk) ? 'In SetSail' : '');
         detail += '<tr class="' + rowClass + '">' +
           checkboxCell +
           '<td style="text-align:left;">' + t.dt + '</td>' +
@@ -3632,6 +3741,7 @@
           '<td style="text-align:left;">' + t.s + '</td>' +
           '<td style="text-align:left;"><a href="' + ticketUrl + '" target="_blank" style="color:#2563eb; text-decoration:none;">' + t.tk + '</a></td>' +
           '<td style="text-align:left; max-width:380px; white-space:normal; font-size:12px; color:#374151;">' + escapedTitle + '</td>' +
+          '<td style="text-align:left; max-width:300px; white-space:normal; font-size:11px; color:#6b7280;">' + resNote + '</td>' +
           '</tr>';
       });
       detail += '</tbody>';
@@ -3640,12 +3750,13 @@
 
     function exportUserAudit() {
       const data = getFilteredAuditTickets();
-      const headers = ['Resolved','Date','Month','Client','Action','User Name','In SetSail','Source/Queue','Status','Ticket','Title'];
+      const headers = ['Resolved','Date','Month','Client','Action','User Name','In SetSail','Source/Queue','Status','Ticket','Title','Resolution'];
       const rows = [headers].concat(data.map(t => [
         auditResolved.has(t.tk) ? 'Yes' : '',
         t.dt, t.m, t.co, t.a, t.u,
         SETSAIL_MATCHED.has(t.tk) ? 'Yes' : 'NO',
-        t.q, t.s, t.tk, t.tt
+        t.q, t.s, t.tk, t.tt,
+        AUDIT_RESOLUTION_NOTES[t.tk] || (SETSAIL_MATCHED.has(t.tk) ? 'In SetSail' : '')
       ]));
       const csv = rows.map(r => r.map(v => '"' + String(v||'').replace(/"/g,'""') + '"').join(',')).join('\n');
       const blob = new Blob([csv], {type: 'text/csv'});
